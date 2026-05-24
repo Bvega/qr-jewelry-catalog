@@ -313,6 +313,61 @@ footer {
 }
 
 
+/* --- QR Code Section --------------------------------------- */
+
+.qr-section {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e8e2da;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.qr-label {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9e9488;
+}
+
+/* Wrapper keeps the QR canvas from stretching full width */
+.qr-canvas-wrapper {
+  line-height: 0;
+  border: 1px solid #e8e2da;
+  border-radius: 4px;
+  padding: 8px;
+  background-color: #ffffff;
+  display: inline-block;
+}
+
+.qr-fallback {
+  font-size: 0.8rem;
+  color: #9e9488;
+  font-style: italic;
+}
+
+.qr-download-btn {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: #2c2c2c;
+  background-color: #ffffff;
+  border: 1px solid #c8c0b8;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.qr-download-btn:hover {
+  background-color: #f0ece5;
+}
+
+
 /* --- Related Items ----------------------------------------- */
 
 .related-section {

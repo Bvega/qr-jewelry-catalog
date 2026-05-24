@@ -132,6 +132,19 @@ else {
         '<span class="copy-confirm" id="copyConfirm">Link copied</span>' +
       '</div>';
 
+    // --- QR code section ---
+    // The empty div #qrCodeCanvas is where the QR image will be drawn.
+    // QR generation happens after innerHTML is set (the div must exist first).
+    var qrSectionHTML =
+      '<div class="qr-section">' +
+        '<p class="qr-label">Scan QR code</p>' +
+        '<div id="qrCodeCanvas" class="qr-canvas-wrapper"></div>' +
+        '<p class="qr-fallback" id="qrFallback" style="display:none;">' +
+          'QR code could not be generated.' +
+        '</p>' +
+        '<button class="qr-download-btn" id="qrDownloadBtn">Download QR code</button>' +
+      '</div>';
+
     // --- Assemble the full detail view ---
     detail.innerHTML =
       '<article class="detail-card">' +
@@ -143,6 +156,7 @@ else {
           '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
           '<p class="detail-description">' + item.description + '</p>' +
           shareLinkHTML +
+          qrSectionHTML +
         '</div>' +
       '</article>' +
       relatedHTML;
@@ -161,6 +175,63 @@ else {
           }, 2000);
         });
       });
+    }
+
+    // --- Step 7: Generate the QR code ---
+    // QRCode is a global provided by the qrcodejs CDN script in item.html.
+    // It draws a canvas (or img in older browsers) inside the target element.
+
+    var qrContainer = document.getElementById("qrCodeCanvas");
+    var qrFallback  = document.getElementById("qrFallback");
+    var qrDownloadBtn = document.getElementById("qrDownloadBtn");
+
+    if (qrContainer && typeof QRCode !== "undefined") {
+      try {
+        new QRCode(qrContainer, {
+          text:       shareURL,
+          width:      160,
+          height:     160,
+          colorDark:  "#2c2c2c",
+          colorLight: "#ffffff"
+        });
+
+        // --- Wire up the download button ---
+        // qrcodejs renders a <canvas> in modern browsers.
+        // Convert it to a PNG data URL and trigger a file download.
+        if (qrDownloadBtn) {
+          qrDownloadBtn.addEventListener("click", function () {
+            var canvas = qrContainer.querySelector("canvas");
+            var img    = qrContainer.querySelector("img");
+            var link   = document.createElement("a");
+
+            link.download = "jewelry-item-" + item.id + "-qr.png";
+
+            if (canvas) {
+              link.href = canvas.toDataURL("image/png");
+            } else if (img) {
+              // Older browser fallback: qrcodejs used an <img> tag
+              link.href = img.src;
+            } else {
+              return;
+            }
+
+            // Append, click, and remove — ensures download works across browsers
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          });
+        }
+
+      } catch (err) {
+        // QR generation threw an error — show the fallback message
+        if (qrFallback)    qrFallback.style.display    = "block";
+        if (qrDownloadBtn) qrDownloadBtn.style.display = "none";
+      }
+
+    } else {
+      // QRCode library did not load — show the fallback message
+      if (qrFallback)    qrFallback.style.display    = "block";
+      if (qrDownloadBtn) qrDownloadBtn.style.display = "none";
     }
   }
 }
