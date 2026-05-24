@@ -264,6 +264,55 @@ footer {
   margin-top: 4px;
 }
 
+/* --- Share Link Box ---------------------------------------- */
+
+.share-link-box {
+  margin-top: 8px;
+  padding: 12px 14px;
+  background-color: #f7f5f2;
+  border: 1px solid #e8e2da;
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.share-url {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.75rem;
+  color: #7a7068;
+  word-break: break-all;
+  flex: 1;
+  min-width: 0;
+}
+
+.copy-btn {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: #2c2c2c;
+  background-color: #ffffff;
+  border: 1px solid #c8c0b8;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.copy-btn:hover {
+  background-color: #f0ece5;
+}
+
+.copy-confirm {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 0.75rem;
+  color: #2e7d32;
+  display: none;
+}
+
+
 /* --- Related Items ----------------------------------------- */
 
 .related-section {

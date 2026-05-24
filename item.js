@@ -120,6 +120,18 @@ else {
         '</section>';
     }
 
+    // --- Share link box ---
+    // Shows the current page URL so the seller can copy and share it.
+    // The copy button is wired up after innerHTML is set below.
+    var shareURL = window.location.href;
+
+    var shareLinkHTML =
+      '<div class="share-link-box">' +
+        '<span class="share-url">' + shareURL + '</span>' +
+        '<button class="copy-btn" id="copyLinkBtn">Copy item link</button>' +
+        '<span class="copy-confirm" id="copyConfirm">Link copied</span>' +
+      '</div>';
+
     // --- Assemble the full detail view ---
     detail.innerHTML =
       '<article class="detail-card">' +
@@ -130,8 +142,25 @@ else {
           '<p class="detail-price">$' + item.price + '</p>' +
           '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
           '<p class="detail-description">' + item.description + '</p>' +
+          shareLinkHTML +
         '</div>' +
       '</article>' +
       relatedHTML;
+
+    // --- Wire up the copy button ---
+    // Must run after innerHTML is set so the button exists in the DOM.
+    var copyBtn = document.getElementById("copyLinkBtn");
+    var copyConfirm = document.getElementById("copyConfirm");
+
+    if (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        navigator.clipboard.writeText(shareURL).then(function () {
+          copyConfirm.style.display = "inline";
+          setTimeout(function () {
+            copyConfirm.style.display = "none";
+          }, 2000);
+        });
+      });
+    }
   }
 }
