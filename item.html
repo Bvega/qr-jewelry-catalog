@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Ensures proper scaling on mobile screens -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Item Detail — Jewelry Catalog</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header>
+    <h1>Jewelry Catalog</h1>
+    <!-- Back link lets buyers return to the full catalog -->
+    <p><a href="index.html">&larr; Back to catalog</a></p>
+  </header>
+
+  <main>
+    <!-- Product detail will be rendered into this container by item.js -->
+    <section id="itemDetail" aria-label="Product detail">
+      <p class="catalog-placeholder">Loading product details&hellip;</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Message to ask about availability or request a photo.</p>
+  </footer>
+
+  <!-- Load item data first so item.js can read window.JEWELRY_ITEMS -->
+  <script src="data/items.js"></script>
+  <script src="item.js"></script>
+
+</body>
+</html>

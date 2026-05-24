@@ -1,10 +1,10 @@
 QR JEWELRY CATALOG — chatGPT_Todo.txt
 
 Current Phase:
-PHASE 0 — Project Initialization
+PHASE 1B — Real Photos and GitHub Pages Publishing
 
 Current Top Task:
-Validate initial documentation scaffold and prepare first commit.
+Replace placeholder images with real jewelry photos, then publish to GitHub Pages.
 
 Completed:
 1. Created local project folder:
@@ -12,7 +12,7 @@ Completed:
 2. Opened project in VS Code.
 3. Initialized Git repository.
 4. Renamed branch to main.
-5. Created initial scaffold files:
+5. Created documentation scaffold:
    - README.md
    - docs/PROJECT_STATE.md
    - docs/SESSION_HANDOFF.md
@@ -21,12 +21,23 @@ Completed:
    - chatGPT_Todo.txt
    - .gitignore
 6. Created Claude implementation rules file.
+7. Built Phase 1 static MVP:
+   - data/items.js (5 sample jewelry items)
+   - index.html (catalog homepage)
+   - item.html (product detail page shell)
+   - styles.css (mobile-first, two-column desktop detail layout)
+   - app.js (renders product cards on homepage)
+   - item.js (renders product detail and related items)
+8. Tested layout locally with python3 -m http.server 5500.
 
 Next Actions:
-1. Validate file contents.
-2. Stage files.
-3. Create first commit.
-4. Create GitHub repo.
-5. Connect local repo to GitHub.
-6. Push initial commit.
-7. Start PHASE 1 — MVP Structure Planning.
+1. Add real jewelry photos to assets/images/.
+2. Update image paths in data/items.js.
+3. Stage all project files.
+4. Create first Git commit.
+5. Create GitHub repository.
+6. Connect local repo to GitHub remote.
+7. Push initial commit.
+8. Enable GitHub Pages.
+9. Validate live item.html?id= links.
+10. Start PHASE 2 planning.

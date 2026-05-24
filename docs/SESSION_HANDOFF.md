@@ -10,16 +10,26 @@ Build a lean mobile-first QR jewelry catalog MVP for Facebook Marketplace jewelr
 
 ## Current Phase
 
-PHASE 0 — Project Initialization
+PHASE 1 — Static MVP Complete
 
 ## Completed
 
 - Local project folder created.
 - VS Code workspace opened.
-- Git initialized.
-- Branch renamed to main.
-- Initial scaffold files created.
+- Git initialized on branch main.
+- Documentation scaffold created.
 - Claude implementation rules file created.
+- Static frontend built:
+  - index.html
+  - item.html
+  - styles.css
+  - app.js
+  - item.js
+  - data/items.js
+- Homepage renders product cards.
+- Detail pages render at item.html?id=ITEM_ID.
+- Related items render on detail pages.
+- Layout tested locally with python3 -m http.server 5500.
 
 ## Working Model
 
@@ -31,8 +41,8 @@ PHASE 0 — Project Initialization
 
 ## Current Task
 
-Validate scaffold content, then create the first Git commit.
+Prepare first commit and move into PHASE 1B.
 
 ## Next Step
 
-Stage all current project files and create the first commit.
+Replace placeholder images with real jewelry photos, then create the GitHub repo and push the initial commit.
