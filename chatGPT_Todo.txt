@@ -1,10 +1,10 @@
 QR JEWELRY CATALOG — chatGPT_Todo.txt
 
 Current Phase:
-PHASE 1B — Real Photos and GitHub Pages Publishing
+PHASE 1D — Real Product Photos and Seller Catalog Polish
 
 Current Top Task:
-Replace placeholder images with real jewelry photos, then publish to GitHub Pages.
+Add real jewelry photos and polish the catalog for actual seller use.
 
 Completed:
 1. Created local project folder:
@@ -29,15 +29,16 @@ Completed:
    - app.js (renders product cards on homepage)
    - item.js (renders product detail and related items)
 8. Tested layout locally with python3 -m http.server 5500.
+9. Added share link box with copy button to detail pages.
+10. Added QR code generator using qrcodejs CDN.
+11. Added Download QR code button (saves PNG).
+12. Published to GitHub Pages.
+13. Confirmed phone QR scan opens correct item page.
 
 Next Actions:
 1. Add real jewelry photos to assets/images/.
 2. Update image paths in data/items.js.
-3. Stage all project files.
-4. Create first Git commit.
-5. Create GitHub repository.
-6. Connect local repo to GitHub remote.
-7. Push initial commit.
-8. Enable GitHub Pages.
-9. Validate live item.html?id= links.
-10. Start PHASE 2 planning.
+3. Review catalog layout with real photos.
+4. Polish detail page presentation as needed.
+5. Commit and push PHASE 1D updates.
+6. Start PHASE 2 planning.

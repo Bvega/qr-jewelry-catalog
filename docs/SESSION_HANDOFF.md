@@ -10,7 +10,7 @@ Build a lean mobile-first QR jewelry catalog MVP for Facebook Marketplace jewelr
 
 ## Current Phase
 
-PHASE 1 — Static MVP Complete
+PHASE 1C — QR Code Generator Working
 
 ## Completed
 
@@ -19,7 +19,7 @@ PHASE 1 — Static MVP Complete
 - Git initialized on branch main.
 - Documentation scaffold created.
 - Claude implementation rules file created.
-- Static frontend built:
+- Static frontend built and published:
   - index.html
   - item.html
   - styles.css
@@ -29,7 +29,12 @@ PHASE 1 — Static MVP Complete
 - Homepage renders product cards.
 - Detail pages render at item.html?id=ITEM_ID.
 - Related items render on detail pages.
-- Layout tested locally with python3 -m http.server 5500.
+- Share link box shows current item URL.
+- Copy link button works.
+- QR code generates from live GitHub Pages URL.
+- Download QR code button saves PNG.
+- Phone QR scan test confirmed working.
+- GitHub Pages published and live.
 
 ## Working Model
 
@@ -41,8 +46,8 @@ PHASE 1 — Static MVP Complete
 
 ## Current Task
 
-Prepare first commit and move into PHASE 1B.
+PHASE 1C is complete. Begin PHASE 1D.
 
 ## Next Step
 
-Replace placeholder images with real jewelry photos, then create the GitHub repo and push the initial commit.
+Add real jewelry photos to assets/images/, update image paths in data/items.js, and polish the catalog for real seller use.

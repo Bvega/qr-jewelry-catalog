@@ -2,41 +2,43 @@
 
 ## Current Phase
 
-PHASE 1 — Static MVP Complete
+PHASE 1C — QR Code Generator Working
 
 ## Current Status
 
-Phase 0 documentation scaffold is complete.
+Static MVP is complete and published on GitHub Pages.
 
-Phase 1 static frontend is built and tested locally.
+QR code generator is live on all product detail pages.
 
-All core MVP files are in place.
+Phone QR scan test confirmed working.
 
-## Files Created
+## Files in Place
 
 - index.html — catalog homepage, renders product cards
-- item.html — product detail page shell
+- item.html — product detail page, loads qrcodejs CDN
 - styles.css — mobile-first styles, two-column detail layout on desktop
 - app.js — renders product grid from window.JEWELRY_ITEMS
-- item.js — renders product detail and related items from URL param ?id=
+- item.js — renders detail, related items, share link, QR code
 - data/items.js — 5 sample jewelry items
 
 ## What Works
 
-- Homepage renders all 5 product cards with name, price, description, and availability badge.
-- Each card links to item.html?id=ITEM_ID.
-- Detail pages render full product info: image area, name, price, description, category, badge.
-- Related items appear below the detail card and link to each other.
-- Layout tested locally with python3 -m http.server 5500.
+- Homepage renders all 5 product cards.
+- Detail pages render at item.html?id=ITEM_ID.
+- Related items appear on detail pages.
+- Share link box shows the current item URL.
+- Copy item link button works.
+- QR code generates from the live GitHub Pages URL.
+- Download QR code button saves a PNG file.
+- Phone camera scan of QR code opens the correct item page.
 - Mobile and desktop layouts both work.
 
 ## Next Planned Work
 
-PHASE 1B — Real photos and GitHub Pages publishing.
+PHASE 1D — Real Product Photos and Seller Catalog Polish.
 
-1. Replace placeholder images with real jewelry photos.
-2. Create GitHub repository.
-3. Connect local repo to GitHub.
-4. Push initial commit.
-5. Publish to GitHub Pages.
-6. Validate live URLs work for item.html?id= links.
+1. Add real jewelry photos to assets/images/.
+2. Update image paths in data/items.js.
+3. Review catalog layout with real photos.
+4. Polish detail page presentation.
+5. Commit and push updates.
