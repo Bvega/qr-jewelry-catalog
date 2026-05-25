@@ -42,7 +42,7 @@ var jewelryItems = [
     description: "Two-layer gold-tone chain necklace. 16 and 18 inch layers. Lobster clasp. Great for everyday wear.",
     status: "available",
     category: "necklace",
-    image: "assets/images/placeholder-necklace-gold.jpg",
+    image: "assets/images/gold-necklace-01.jpeg",
     relatedIds: [1, 3]
   },
   {
@@ -52,7 +52,7 @@ var jewelryItems = [
     description: "Small clear crystal stud earrings. Gold-tone setting. Hypoallergenic posts. Subtle sparkle.",
     status: "sold",
     category: "earrings",
-    image: "assets/images/placeholder-earrings-crystal.jpg",
+    image: "assets/images/crystal-stud-earrings-01.jpeg",
     relatedIds: [2, 3]
   }
 ];
