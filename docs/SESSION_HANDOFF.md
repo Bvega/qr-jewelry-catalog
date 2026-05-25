@@ -10,7 +10,7 @@ Build a lean mobile-first QR jewelry catalog MVP for Facebook Marketplace jewelr
 
 ## Current Phase
 
-PHASE 1C — QR Code Generator Working
+PHASE 1D — Partial Real Photos Stable
 
 ## Completed
 
@@ -35,6 +35,14 @@ PHASE 1C — QR Code Generator Working
 - Download QR code button saves PNG.
 - Phone QR scan test confirmed working.
 - GitHub Pages published and live.
+- 3 real product photos added and live:
+  - Gold Twisted Rope Bracelet
+  - Layered Gold Chain Necklace
+  - Crystal Stud Earrings
+- 2 products intentionally show "No photo yet":
+  - Silver Stackable Ring Set
+  - Pearl Drop Earrings
+- GitHub Pages confirmed working after cache refresh.
 
 ## Working Model
 
@@ -46,8 +54,8 @@ PHASE 1C — QR Code Generator Working
 
 ## Current Task
 
-PHASE 1C is complete. Begin PHASE 1D.
+PHASE 1D is complete. Begin PHASE 1E.
 
 ## Next Step
 
-Add real jewelry photos to assets/images/, update image paths in data/items.js, and polish the catalog for real seller use.
+Review the full catalog as a seller would experience it and polish the layout, copy, and detail page presentation.

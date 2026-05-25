@@ -1,10 +1,10 @@
 QR JEWELRY CATALOG — chatGPT_Todo.txt
 
 Current Phase:
-PHASE 1D — Real Product Photos and Seller Catalog Polish
+PHASE 1E — Seller Workflow Polish
 
 Current Top Task:
-Add real jewelry photos and polish the catalog for actual seller use.
+Review the catalog as a seller would use it and polish the layout and experience.
 
 Completed:
 1. Created local project folder:
@@ -34,11 +34,20 @@ Completed:
 11. Added Download QR code button (saves PNG).
 12. Published to GitHub Pages.
 13. Confirmed phone QR scan opens correct item page.
+14. Added 3 real product photos:
+    - gold-twisted-rope-bracelet-01.jpeg
+    - layered-gold-chain-necklace-01.jpeg
+    - crystal-stud-earrings-01.jpeg
+15. Updated image paths in data/items.js.
+16. Confirmed GitHub Pages live after cache refresh.
+17. 2 products remain on placeholder (no real photo yet):
+    - Silver Stackable Ring Set
+    - Pearl Drop Earrings
 
 Next Actions:
-1. Add real jewelry photos to assets/images/.
-2. Update image paths in data/items.js.
-3. Review catalog layout with real photos.
-4. Polish detail page presentation as needed.
-5. Commit and push PHASE 1D updates.
+1. Review full catalog as seller.
+2. Identify layout or copy improvements.
+3. Polish detail page and card presentation.
+4. Add remaining real photos when available.
+5. Commit and push PHASE 1E updates.
 6. Start PHASE 2 planning.
