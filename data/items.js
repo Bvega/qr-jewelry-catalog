@@ -12,7 +12,7 @@ var jewelryItems = [
     description: "Delicate 18k gold-tone twisted rope bracelet. Lightweight and elegant. Fits most wrist sizes. Lobster clasp closure.",
     status: "available",
     category: "bracelet",
-    image: "assets/images/placeholder-bracelet-gold.jpg",
+    image: "assets/images/gold-twisted-rope-bracelet-01.jpeg",
     relatedIds: [2, 4]
   },
   {
@@ -42,7 +42,7 @@ var jewelryItems = [
     description: "Two-layer gold-tone chain necklace. 16 and 18 inch layers. Lobster clasp. Great for everyday wear.",
     status: "available",
     category: "necklace",
-    image: "assets/images/gold-necklace-01.jpeg",
+    image: "assets/images/layered-gold-chain-necklace-01.jpeg",
     relatedIds: [1, 3]
   },
   {
