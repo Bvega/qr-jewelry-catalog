@@ -1,37 +1,38 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Thursday, July 16, 2026
+Updated: Thursday, July 16, 2026 — 3:51 PM ET
 Project: Between Us Platform
 
 CURRENT STATUS
-- Repository restored successfully.
-- Current branch: main.
-- main is synchronized with origin/main.
-- Working tree is clean.
-- Incorrect branch migration/m02-domain-compatibilityclear was deleted.
-- Accidental files were removed.
-- M00 and M01 are complete and accepted.
-- M02 has been prepared but is not yet stored in the repository.
-- M02 implementation has not started.
+- M00 is accepted.
+- Master Specification v1.0 is approved and synchronized with GitHub.
+- M01 is accepted, merged, and pushed.
+- M02 is accepted, merged, validated, and pushed.
+- M03 — Between Us Brand and Public Shell has been prepared.
+- M03 implementation has not started.
+- M03 will be a visual implementation candidate requiring owner visual acceptance before merge.
 
 TOP TASK
-Install the M02 planning package safely on main.
+Install and commit the M03 implementation package on main, then execute it in a new ChatGPT Work task.
 
 NEXT ACTIONS
-1. Download BETWEEN_US_M02_SETUP.zip.
-2. Extract it directly into:
-   /Users/miniboli/DEV/qr-jewelry-catalog
-3. Confirm these files exist:
+1. Install:
+   docs/MILESTONES/M03.md
    chatGPT_Todo.txt
-   docs/MILESTONES/M02.md
-4. Commit and push the planning package to main.
-5. Open a new ChatGPT Work task.
-6. Execute docs/MILESTONES/M02.md exactly as written.
-7. Return the complete M02 report to between-us-master.
-8. Do not begin M03 until MASTER accepts M02.
+2. Commit and push the M03 planning package to main.
+3. Confirm main is synchronized with origin/main and the working tree is clean.
+4. Open a new task in ChatGPT Work:
+   M03 — Between Us Brand and Public Shell
+5. Send:
+   Read docs/MILESTONES/M03.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
+6. Wait for Work to finish.
+7. Return the complete M03 report to between-us-master.
+8. Perform the required owner visual review.
+9. Do not merge M03 or begin M04 until visual acceptance.
 
 OPERATING RULES
-- Use one short Terminal action at a time.
-- Do not rename the repository folder.
+- Do not rename the repository folder yet.
 - Do not start from scratch.
-- Preserve current visible behavior, QR/share behavior, and item.html?id=N compatibility.
-- No rebranding, new routes, framework, backend, database, package manager, or new dependency is approved in M02.
+- Preserve all data, IDs, slugs, routes, QR/share behavior, relationships, statuses, and image paths.
+- No collection filtering, reservation messaging, new routes, framework, backend, database, package manager, or new dependency is approved in M03.
+- M03 must remain unpushed and unmerged until owner visual acceptance.
+- MASTER defines and approves; Work implements, validates, commits locally, and reports.
