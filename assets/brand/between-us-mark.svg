@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="between-us-mark-title">
+  <title id="between-us-mark-title">Between Us BU monogram</title>
+  <circle cx="80" cy="80" r="75" fill="#F6F1E7" stroke="#252525" stroke-width="4" />
+  <circle cx="80" cy="80" r="65" fill="none" stroke="#6F7652" stroke-width="2" />
+  <path d="M40 112 C57 126 101 132 122 104" fill="none" stroke="#C66F49" stroke-width="5" stroke-linecap="round" aria-hidden="true" />
+  <text x="77" y="102" fill="#252525" font-family="Georgia, 'Times New Roman', serif" font-size="62" text-anchor="middle" letter-spacing="-5">BU</text>
+  <path class="brand-sparkle" d="M124 27 L128 38 L139 42 L128 46 L124 57 L120 46 L109 42 L120 38 Z" fill="#C79A43" aria-hidden="true" />
+</svg>

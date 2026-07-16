@@ -14,7 +14,7 @@ Run the complete M01 compatibility and M02 domain suite with:
 node scripts/validate-baseline.mjs
 ```
 
-The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs` and `tests/domain/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
+The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, and `tests/brand/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
 
 ## Individual commands
 
@@ -26,6 +26,7 @@ node --check item.js
 node --check data/items.js
 node --test tests/baseline/*.test.mjs
 node --test tests/domain/*.test.mjs
+node --test tests/brand/*.test.mjs
 node scripts/validate-baseline.mjs
 git diff --check
 git diff --cached --check
@@ -71,6 +72,19 @@ The suite evaluates `data/items.js` in an isolated Node context and verifies:
 
 The suite verifies that `index.html` and `item.html` exist, retain `#catalogGrid` and `#itemDetail`, load `styles.css`, and load the required scripts in their current order. It also protects the current responsive grid and detail-layout breakpoints.
 
+### Brand and public-shell contracts
+
+The suite verifies:
+
+- the local SVG mark, accessible title, scalable view box, circle, `BU` monogram, and four-point gold sparkle;
+- the absence of embedded raster images and external logo dependencies;
+- Between Us titles, descriptions, shared semantic landmarks, brand assets, and favicon links;
+- Home, Collections, Explore, and About anchors and navigation;
+- approved hero, collection, Explore, About, detail, Related Finds, and invalid-state language;
+- the current Jewelry collection and five noninteractive Coming Soon labels;
+- approved color and font tokens, visible focus styling, existing responsive breakpoints, and reduced-motion handling; and
+- the absence of external font imports.
+
 ### Legacy URL contracts
 
 The catalog renderer is executed in an isolated DOM stub to prove that it creates `item.html?id=N` for every current item. The detail renderer is then executed once for every numeric ID to prove that the correct item, related links, and share URL render. Missing, nonnumeric, and unknown IDs must continue to show the current not-found response.
@@ -100,7 +114,7 @@ A **warning** records an accepted but unresolved baseline condition. Warnings do
 
 ## Adding or changing a contract
 
-1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior or `tests/domain/` for normalized model and adapter behavior.
+1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior, `tests/domain/` for normalized model and adapter behavior, or `tests/brand/` for Between Us assets and public-shell behavior.
 2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, and `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants.
 3. Give the test a name that describes public behavior rather than implementation trivia.
 4. Add a fixed baseline value when removal or silent change must be detected; do not derive both the expected and actual value from the same source.

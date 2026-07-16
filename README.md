@@ -1,51 +1,37 @@
-# QR Jewelry Catalog
+# Between Us Platform
 
-A lean mobile-first QR jewelry catalog MVP for Facebook Marketplace selling.
+Between Us is a mobile-first local discovery catalog for curated, distinctive, and honestly priced Finds. The public experience is presented as **Between Us Finds** under the tagline **Hidden Gems. Honest Prices.**
 
-## Purpose
+The platform evolved from the QR Jewelry Catalog MVP. Its five original jewelry records, numeric detail URLs, QR codes, share links, availability states, relationships, and image fallbacks remain protected compatibility contracts while the public brand expands.
 
-Help the seller organize boxed jewelry into a simple visual catalog where buyers can browse available items through shareable and QR-ready product links.
+## Current experience
 
-## Business Goal
+- Branded Home, Collections preview, Explore, and About sections
+- Responsive Find cards and detail pages
+- Local Between Us SVG mark and system-font visual language
+- Five current Jewelry Finds in their original order
+- Available, Reserved, and Sold states
+- Numeric `item.html?id=N` routes with QR and copy-link behavior
+- Accessible missing-image and invalid-Find states
 
-Help the seller present jewelry more professionally and make it easier for buyers to browse related available items before asking questions or making purchase decisions.
+Future collections are shown as **Coming Soon**. Collection filtering, discovery views, reservation messaging, permanent Find routes, and broader inventory remain deferred to their approved milestones.
 
-## MVP Goal
+## Local preview
 
-Create a lightweight catalog that supports:
+From the repository root:
 
-- jewelry item photos
-- item name
-- price
-- short description
-- availability status
-- mobile-first browsing
-- simple product detail pages
-- future QR-ready item links
+```bash
+python3 -m http.server 4175 --bind 127.0.0.1
+```
 
-## Working Model
+Then open `http://127.0.0.1:4175/`.
 
-- ChatGPT Project = orchestrator and architecture authority
-- Claude in VS Code = implementation assistant
-- VS Code = development workspace
-- GitHub = version control and continuity
-- Repo = source of truth
+## Validation
 
-## Current Phase
+The project has no package-manager or build dependency. Run the complete compatibility, domain, and brand/public-shell suite with:
 
-PHASE 0 — Project Initialization
+```bash
+node scripts/validate-baseline.mjs
+```
 
-## MVP Restrictions
-
-Not included at the beginning:
-
-- payments
-- shipping
-- authentication
-- complex backend
-- inventory automation
-- admin dashboard complexity
-
-## Development Rule
-
-Keep it lean. Build one step at a time.
+See `docs/VALIDATION.md` for individual commands and the contracts protected by the suite.

@@ -22,7 +22,7 @@ function renderDetail(query) {
     qrDownloadBtn: { style: {}, addEventListener() {} }
   };
   const document = {
-    title: "Item Detail — Jewelry Catalog",
+    title: "Find Details | Between Us Finds",
     getElementById(id) {
       return elements[id] ?? null;
     },
@@ -87,10 +87,10 @@ for (const item of items) {
   test(`item.html?id=${item.id} resolves the baseline item`, () => {
     const result = renderDetail(`?id=${item.id}`);
 
-    assert.equal(result.document.title, `${item.name} — Jewelry Catalog`);
+    assert.equal(result.document.title, `${item.name} | Between Us Finds`);
     assert.ok(result.elements.itemDetail.innerHTML.includes(item.name));
     assert.ok(result.elements.itemDetail.innerHTML.includes(result.href));
-    assert.doesNotMatch(result.elements.itemDetail.innerHTML, /Item not found/);
+    assert.doesNotMatch(result.elements.itemDetail.innerHTML, /Find not found/);
     assert.equal(result.elements.qrFallback.style.display, "block");
     assert.equal(result.elements.qrDownloadBtn.style.display, "none");
 
@@ -104,10 +104,10 @@ for (const item of items) {
 }
 
 for (const query of ["", "?id=not-a-number", "?id=999"] ) {
-  test(`invalid route ${query || "<no query>"} retains not-found behavior`, () => {
+  test(`invalid route ${query || "<no query>"} retains branded not-found behavior`, () => {
     const result = renderDetail(query);
 
-    assert.match(result.elements.itemDetail.innerHTML, /Item not found/);
-    assert.match(result.elements.itemDetail.innerHTML, /href=["']index\.html["']/);
+    assert.match(result.elements.itemDetail.innerHTML, /Find not found/);
+    assert.match(result.elements.itemDetail.innerHTML, /href=["']index\.html#explore["']/);
   });
 }

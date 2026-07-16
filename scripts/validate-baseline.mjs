@@ -20,6 +20,7 @@ function findTestFiles(relativeDirectory) {
 
 const baselineTestFiles = findTestFiles("tests/baseline");
 const domainTestFiles = findTestFiles("tests/domain");
+const brandTestFiles = findTestFiles("tests/brand");
 
 const checks = [
   {
@@ -46,12 +47,17 @@ const checks = [
     label: "Find domain and compatibility adapter tests",
     displayCommand: "node --test tests/domain/*.test.mjs",
     arguments: ["--test", ...domainTestFiles]
+  },
+  {
+    label: "Between Us brand and public shell tests",
+    displayCommand: "node --test tests/brand/*.test.mjs",
+    arguments: ["--test", ...brandTestFiles]
   }
 ];
 
 const failures = [];
 
-console.log("M02 repository validation\n");
+console.log("M03 repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -100,11 +106,11 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM02 repository validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM03 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
-  const relativeTests = [...baselineTestFiles, ...domainTestFiles]
+  const relativeTests = [...baselineTestFiles, ...domainTestFiles, ...brandTestFiles]
     .map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline and domain test files.`);
-  console.log("M02 repository validation: PASS");
+  console.log(`\nValidated ${relativeTests.length} baseline, domain, and brand test files.`);
+  console.log("M03 repository validation: PASS");
 }

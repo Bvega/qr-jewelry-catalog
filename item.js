@@ -1,4 +1,4 @@
-// item.js — Renders the product detail view on item.html.
+// item.js — Renders the Find detail view on item.html.
 // Reads the item id from the URL, finds the matching item in
 // window.JEWELRY_ITEMS (set by data/items.js), and renders it
 // into #itemDetail.
@@ -40,10 +40,14 @@ else {
   // --- Step 5: Show "not found" if no match ------------------
 
   if (!item) {
+    document.title = "Find not found | Between Us Finds";
     detail.innerHTML =
-      '<p class="catalog-placeholder">' +
-        'Item not found. <a href="index.html">Back to catalog</a>.' +
-      '</p>';
+      '<div class="not-found-state">' +
+        '<p class="eyebrow">Between Us Finds</p>' +
+        '<h1>Find not found.</h1>' +
+        '<p>This Find may no longer be available, or the link may be incomplete.</p>' +
+        '<a class="button button-primary" href="index.html#explore">Back to Explore</a>' +
+      '</div>';
   }
 
 
@@ -52,7 +56,7 @@ else {
   else {
 
     // Update the browser tab title to match the item name
-    document.title = item.name + " — Jewelry Catalog";
+    document.title = item.name + " | Between Us Finds";
 
     // --- Image ---
     var imageHTML;
@@ -109,13 +113,14 @@ else {
               '<p class="card-title">' + related.name + '</p>' +
               '<p class="card-price">$' + related.price + '</p>' +
               '<span class="' + relatedBadgeClass + '">' + relatedBadgeLabel + '</span>' +
+              '<span class="card-link">View Find <span aria-hidden="true">&rarr;</span></span>' +
             '</div>' +
           '</a>';
       });
 
       relatedHTML =
         '<section class="related-section">' +
-          '<h2 class="related-heading">You may also like</h2>' +
+          '<h2 class="related-heading">Related Finds</h2>' +
           '<div class="related-grid">' + relatedCardsHTML + '</div>' +
         '</section>';
     }
@@ -128,7 +133,7 @@ else {
     var shareLinkHTML =
       '<div class="share-link-box">' +
         '<span class="share-url">' + shareURL + '</span>' +
-        '<button class="copy-btn" id="copyLinkBtn">Copy item link</button>' +
+        '<button class="copy-btn" id="copyLinkBtn">Copy Find link</button>' +
         '<span class="copy-confirm" id="copyConfirm">Link copied</span>' +
       '</div>';
 
@@ -151,7 +156,7 @@ else {
         imageHTML +
         '<div class="detail-body">' +
           '<p class="detail-category">' + categoryLabel + '</p>' +
-          '<h2 class="detail-title">' + item.name + '</h2>' +
+          '<h1 class="detail-title">' + item.name + '</h1>' +
           '<p class="detail-price">$' + item.price + '</p>' +
           '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
           '<p class="detail-description">' + item.description + '</p>' +

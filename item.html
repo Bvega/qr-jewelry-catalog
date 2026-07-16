@@ -2,35 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Ensures proper scaling on mobile screens -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Item Detail — Jewelry Catalog</title>
+  <meta name="description" content="View a curated local Find from Between Us Finds." />
+  <title>Find Details | Between Us Finds</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand/between-us-mark.svg" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
-
-  <header>
-    <h1>Jewelry Catalog</h1>
-    <!-- Back link lets buyers return to the full catalog -->
-    <p><a href="index.html">&larr; Back to catalog</a></p>
+<body class="detail-page">
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand-link" href="index.html#home" aria-label="Between Us home">
+        <img class="brand-mark" src="assets/brand/between-us-mark.svg" alt="" width="48" height="48" />
+        <span class="brand-wordmark">
+          <span class="brand-name">Between Us</span>
+          <span class="brand-descriptor">Finds</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <ul>
+          <li><a href="index.html#home">Home</a></li>
+          <li><a href="index.html#collections">Collections</a></li>
+          <li><a href="index.html#explore">Explore</a></li>
+          <li><a href="index.html#about">About</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <!-- Product detail will be rendered into this container by item.js -->
-    <section id="itemDetail" aria-label="Product detail">
-      <p class="catalog-placeholder">Loading product details&hellip;</p>
+  <main class="detail-main">
+    <a class="back-link" href="index.html#explore"><span aria-hidden="true">&larr;</span> Back to Explore</a>
+    <section id="itemDetail" aria-label="Find details">
+      <p class="catalog-placeholder">Loading Find details&hellip;</p>
     </section>
   </main>
 
-  <footer>
-    <p>Message to ask about availability or request a photo.</p>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/brand/between-us-mark.svg" alt="" width="40" height="40" />
+        <div><strong>Between Us</strong><span>Hidden Gems. Honest Prices.</span></div>
+      </div>
+      <p>Curated locally and shared thoughtfully with our community.</p>
+      <p class="footer-meta">&copy; Between Us.</p>
+    </div>
   </footer>
 
-  <!-- Load item data first so item.js can read window.JEWELRY_ITEMS -->
   <script src="data/items.js"></script>
-  <!-- QR code generation library (no install needed, loaded from CDN) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="item.js"></script>
-
 </body>
 </html>

@@ -1,4 +1,4 @@
-// app.js — Renders the jewelry catalog grid on index.html.
+// app.js — Renders the current Finds grid on index.html.
 // Reads from window.JEWELRY_ITEMS (set by data/items.js).
 // Builds one card per item and injects them into #catalogGrid.
 
@@ -18,7 +18,7 @@ if (!grid) {
 // --- Step 3: Guard — stop if item data wasn't loaded ----------
 
 else if (!window.JEWELRY_ITEMS || window.JEWELRY_ITEMS.length === 0) {
-  grid.innerHTML = '<p class="catalog-placeholder">No jewelry items found.</p>';
+  grid.innerHTML = '<p class="catalog-placeholder">No Finds found.</p>';
 }
 
 
@@ -59,6 +59,7 @@ else {
         '<p class="card-price">$' + item.price + '</p>' +
         '<p class="card-description">' + item.description + '</p>' +
         '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
+        '<span class="card-link">View Find <span aria-hidden="true">&rarr;</span></span>' +
       '</div>';
 
     // Add the finished card to the grid

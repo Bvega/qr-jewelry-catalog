@@ -2,32 +2,131 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <!-- Ensures proper scaling on mobile screens -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jewelry Catalog</title>
+  <meta name="description" content="Between Us Finds is a curated local catalog of distinctive, useful, and honestly priced finds." />
+  <title>Between Us Finds | Hidden Gems. Honest Prices.</title>
+  <link rel="icon" type="image/svg+xml" href="assets/brand/between-us-mark.svg" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
-  <header>
-    <h1>Jewelry Catalog</h1>
-    <p>Handpicked boxed jewelry — browse available pieces below.</p>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand-link" href="#home" aria-label="Between Us home">
+        <img class="brand-mark" src="assets/brand/between-us-mark.svg" alt="" width="48" height="48" />
+        <span class="brand-wordmark">
+          <span class="brand-name">Between Us</span>
+          <span class="brand-descriptor">Finds</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#collections">Collections</a></li>
+          <li><a href="#explore">Explore</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <main>
-    <!-- Product cards will be rendered into this container by app.js -->
-    <section id="catalogGrid" aria-label="Jewelry catalog">
-      <p class="catalog-placeholder">Loading jewelry items&hellip;</p>
+    <section class="hero section-shell" id="home" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Between Us Finds</p>
+        <h1 id="hero-title">Hidden Gems. Honest Prices.</h1>
+        <p class="hero-statement">Discover Something Worth Keeping.</p>
+        <p class="hero-intro">A considered collection of local Finds, chosen for their character, usefulness, and value.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#explore">Explore Finds</a>
+          <a class="button button-secondary" href="#collections">Explore Collections</a>
+        </div>
+      </div>
+      <div class="hero-emblem" aria-hidden="true">
+        <span class="hero-emblem-kicker">Curated locally</span>
+        <img src="assets/brand/between-us-mark.svg" alt="" width="160" height="160" />
+        <span class="hero-emblem-note">Selected with care</span>
+      </div>
+    </section>
+
+    <section class="collections-section section-shell" id="collections" aria-labelledby="collections-title">
+      <div class="section-heading-row">
+        <div>
+          <p class="eyebrow">Browse by character</p>
+          <h2 id="collections-title">Explore Collections</h2>
+        </div>
+        <p>Jewelry is only the beginning. New collections will unfold here as distinctive Finds are added.</p>
+      </div>
+      <div class="collection-grid">
+        <article class="collection-card collection-card-active">
+          <span class="collection-number" aria-hidden="true">01</span>
+          <h3>Jewelry</h3>
+          <p>Current Collection</p>
+        </article>
+        <article class="collection-card">
+          <span class="collection-number" aria-hidden="true">02</span>
+          <h3>Vintage</h3>
+          <p>Coming Soon</p>
+        </article>
+        <article class="collection-card">
+          <span class="collection-number" aria-hidden="true">03</span>
+          <h3>Home &amp; Decor</h3>
+          <p>Coming Soon</p>
+        </article>
+        <article class="collection-card">
+          <span class="collection-number" aria-hidden="true">04</span>
+          <h3>Kitchen</h3>
+          <p>Coming Soon</p>
+        </article>
+        <article class="collection-card">
+          <span class="collection-number" aria-hidden="true">05</span>
+          <h3>Collectibles</h3>
+          <p>Coming Soon</p>
+        </article>
+        <article class="collection-card">
+          <span class="collection-number" aria-hidden="true">06</span>
+          <h3>New Items</h3>
+          <p>Coming Soon</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="explore-section section-shell" id="explore" aria-labelledby="explore-title">
+      <div class="section-heading-row">
+        <div>
+          <p class="eyebrow">The current edit</p>
+          <h2 id="explore-title">Explore Finds</h2>
+        </div>
+        <p>Each piece is available locally, and the collection changes over time. If something catches your eye, open the Find for details.</p>
+      </div>
+      <div id="catalogGrid" aria-label="Between Us Finds catalog">
+        <p class="catalog-placeholder">Loading Finds&hellip;</p>
+      </div>
+    </section>
+
+    <section class="about-section" id="about" aria-labelledby="about-title">
+      <div class="about-inner section-shell">
+        <p class="eyebrow">A little context</p>
+        <h2 id="about-title">About Between Us</h2>
+        <div class="about-copy">
+          <p>Between Us is a curated local catalog of useful, distinctive, and well-priced finds selected for our community.</p>
+          <p>Each Find is available locally and inventory changes over time.</p>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>Message to ask about availability or request a photo.</p>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/brand/between-us-mark.svg" alt="" width="40" height="40" />
+        <div><strong>Between Us</strong><span>Hidden Gems. Honest Prices.</span></div>
+      </div>
+      <p>Curated locally and shared thoughtfully with our community.</p>
+      <p class="footer-meta">&copy; Between Us.</p>
+    </div>
   </footer>
 
-  <!-- Load item data first so app.js can read window.JEWELRY_ITEMS -->
   <script src="data/items.js"></script>
   <script src="app.js"></script>
-
 </body>
 </html>
