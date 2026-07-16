@@ -1,0 +1,29 @@
+name: M01 Baseline Validation
+
+on:
+  push:
+    branches:
+      - "migration/**"
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate-baseline:
+    name: Validate migration baseline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run M01 baseline validation
+        run: node scripts/validate-baseline.mjs
