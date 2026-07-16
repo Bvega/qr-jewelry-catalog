@@ -1,34 +1,37 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Thursday, July 16, 2026 — 12:40 PM ET
+Updated: Thursday, July 16, 2026
 Project: Between Us Platform
 
 CURRENT STATUS
-- The existing repository /Users/miniboli/DEV/qr-jewelry-catalog was opened in ChatGPT Work.
-- M00 — Repository Audit and Migration Baseline was completed as a read-only audit.
-- Work confirmed the repository is clean, functional, and unchanged on main.
-- The current application is a static HTML/CSS/JavaScript catalog with item detail pages, related items, sharing, QR generation, and responsive behavior.
-- The main migration risks are QR/URL permanence, fragile numeric IDs, global window state, innerHTML rendering, missing automated tests, and undefined long-term platform boundaries.
-- MASTER review decision: M00 ACCEPTED.
+- Repository restored successfully.
+- Current branch: main.
+- main is synchronized with origin/main.
+- Working tree is clean.
+- Incorrect branch migration/m02-domain-compatibilityclear was deleted.
+- Accidental files were removed.
+- M00 and M01 are complete and accepted.
+- M02 has been prepared but is not yet stored in the repository.
+- M02 implementation has not started.
 
 TOP TASK
-Create and approve BETWEEN US PLATFORM — MASTER SPECIFICATION v1.0 before authorizing code changes.
+Install the M02 planning package safely on main.
 
 NEXT ACTIONS
-1. Define the official purpose, audience, and scope of Between Us Platform.
-2. Define the permanent domain language: Find, Collection, availability states, reservations, and related Finds.
-3. Define the initial collections and which existing jewelry records remain.
-4. Define the permanent URL, public ID, legacy QR, and redirect compatibility rules.
-5. Define the MVP public experience and explicitly exclude future seller/admin features.
-6. Define the approved visual identity, branding, copy, and navigation.
-7. Convert the specification into M01 — Migration Safety and Compatibility Baseline.
-8. Send M01 to ChatGPT Work only after MASTER approval.
-9. Validate M01 and return its technical report to MASTER before rebranding.
+1. Download BETWEEN_US_M02_SETUP.zip.
+2. Extract it directly into:
+   /Users/miniboli/DEV/qr-jewelry-catalog
+3. Confirm these files exist:
+   chatGPT_Todo.txt
+   docs/MILESTONES/M02.md
+4. Commit and push the planning package to main.
+5. Open a new ChatGPT Work task.
+6. Execute docs/MILESTONES/M02.md exactly as written.
+7. Return the complete M02 report to between-us-master.
+8. Do not begin M03 until MASTER accepts M02.
 
 OPERATING RULES
+- Use one short Terminal action at a time.
+- Do not rename the repository folder.
 - Do not start from scratch.
-- Do not rename the repository folder yet.
-- Do not modify code until the Master Specification is approved.
-- Preserve existing QR links and item.html?id=N compatibility.
-- Preserve the current catalog, detail pages, images, availability states, related items, sharing, and mobile behavior.
-- MASTER defines and approves; Work implements and validates.
-- One complete milestone per Work task.
+- Preserve current visible behavior, QR/share behavior, and item.html?id=N compatibility.
+- No rebranding, new routes, framework, backend, database, package manager, or new dependency is approved in M02.
