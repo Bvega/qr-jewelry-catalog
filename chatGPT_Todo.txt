@@ -1,53 +1,34 @@
-QR JEWELRY CATALOG — chatGPT_Todo.txt
+chatGPT_Todo.txt — REPLACE THE EXISTING FILE
+Updated: Thursday, July 16, 2026 — 12:40 PM ET
+Project: Between Us Platform
 
-Current Phase:
-PHASE 1E — Seller Workflow Polish
+CURRENT STATUS
+- The existing repository /Users/miniboli/DEV/qr-jewelry-catalog was opened in ChatGPT Work.
+- M00 — Repository Audit and Migration Baseline was completed as a read-only audit.
+- Work confirmed the repository is clean, functional, and unchanged on main.
+- The current application is a static HTML/CSS/JavaScript catalog with item detail pages, related items, sharing, QR generation, and responsive behavior.
+- The main migration risks are QR/URL permanence, fragile numeric IDs, global window state, innerHTML rendering, missing automated tests, and undefined long-term platform boundaries.
+- MASTER review decision: M00 ACCEPTED.
 
-Current Top Task:
-Review the catalog as a seller would use it and polish the layout and experience.
+TOP TASK
+Create and approve BETWEEN US PLATFORM — MASTER SPECIFICATION v1.0 before authorizing code changes.
 
-Completed:
-1. Created local project folder:
-   /Users/miniboli/DEV/qr-jewelry-catalog
-2. Opened project in VS Code.
-3. Initialized Git repository.
-4. Renamed branch to main.
-5. Created documentation scaffold:
-   - README.md
-   - docs/PROJECT_STATE.md
-   - docs/SESSION_HANDOFF.md
-   - docs/MVP_SCOPE.md
-   - qr-jewelry-claude.md
-   - chatGPT_Todo.txt
-   - .gitignore
-6. Created Claude implementation rules file.
-7. Built Phase 1 static MVP:
-   - data/items.js (5 sample jewelry items)
-   - index.html (catalog homepage)
-   - item.html (product detail page shell)
-   - styles.css (mobile-first, two-column desktop detail layout)
-   - app.js (renders product cards on homepage)
-   - item.js (renders product detail and related items)
-8. Tested layout locally with python3 -m http.server 5500.
-9. Added share link box with copy button to detail pages.
-10. Added QR code generator using qrcodejs CDN.
-11. Added Download QR code button (saves PNG).
-12. Published to GitHub Pages.
-13. Confirmed phone QR scan opens correct item page.
-14. Added 3 real product photos:
-    - gold-twisted-rope-bracelet-01.jpeg
-    - layered-gold-chain-necklace-01.jpeg
-    - crystal-stud-earrings-01.jpeg
-15. Updated image paths in data/items.js.
-16. Confirmed GitHub Pages live after cache refresh.
-17. 2 products remain on placeholder (no real photo yet):
-    - Silver Stackable Ring Set
-    - Pearl Drop Earrings
+NEXT ACTIONS
+1. Define the official purpose, audience, and scope of Between Us Platform.
+2. Define the permanent domain language: Find, Collection, availability states, reservations, and related Finds.
+3. Define the initial collections and which existing jewelry records remain.
+4. Define the permanent URL, public ID, legacy QR, and redirect compatibility rules.
+5. Define the MVP public experience and explicitly exclude future seller/admin features.
+6. Define the approved visual identity, branding, copy, and navigation.
+7. Convert the specification into M01 — Migration Safety and Compatibility Baseline.
+8. Send M01 to ChatGPT Work only after MASTER approval.
+9. Validate M01 and return its technical report to MASTER before rebranding.
 
-Next Actions:
-1. Review full catalog as seller.
-2. Identify layout or copy improvements.
-3. Polish detail page and card presentation.
-4. Add remaining real photos when available.
-5. Commit and push PHASE 1E updates.
-6. Start PHASE 2 planning.
+OPERATING RULES
+- Do not start from scratch.
+- Do not rename the repository folder yet.
+- Do not modify code until the Master Specification is approved.
+- Preserve existing QR links and item.html?id=N compatibility.
+- Preserve the current catalog, detail pages, images, availability states, related items, sharing, and mobile behavior.
+- MASTER defines and approves; Work implements and validates.
+- One complete milestone per Work task.
