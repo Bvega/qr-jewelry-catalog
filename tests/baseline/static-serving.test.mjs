@@ -35,7 +35,9 @@ for (const publicPath of [
   "/styles.css",
   "/app.js",
   "/item.js",
-  "/data/items.js"
+  "/data/items.js",
+  "/data/collections.js",
+  "/data/discovery.js"
 ]) {
   test(`${publicPath} resolves as a static resource`, () => {
     const response = readStaticRoute(publicPath);

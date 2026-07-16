@@ -21,15 +21,31 @@ The `#home` hero presents the Between Us Finds identity, tagline, supporting sta
 
 ## Collections preview
 
-`#collections` presents the six approved collection names. Jewelry is labeled **Current Collection**. Vintage, Home & Decor, Kitchen, Collectibles, and New Items are labeled **Coming Soon**.
+`#collections` renders the six approved Collections from `window.BETWEEN_US_COLLECTIONS`. Each card shows its registry label and approved description. Jewelry is labeled **Current Collection** and provides an **Explore Jewelry** anchor to `#explore`. Vintage, Home & Decor, Kitchen, Collectibles, and New Items are labeled **Coming Soon** and remain noninteractive.
 
-The preview is informational in M03. Future collection cards are not interactive, and no filter, collection route, or discovery logic is present.
+No card displays a fake Find count, icon, emoji, or Collection route.
+
+## M04 home order and discovery
+
+The home main landmark uses this stable section order:
+
+1. `#home`
+2. `#collections`
+3. `#featured`
+4. `#latest`
+5. `#weekly`
+6. `#explore`
+7. `#about`
+
+`#featured` and `#latest` resolve exact editorial public-ID lists and render them through the shared standard Find-card path. `#weekly` resolves one normalized Find into a restrained responsive feature with its public ID and numeric detail action. Latest is an editorial order, not a timestamp-derived view.
 
 ## Explore
 
-`#explore` retains `#catalogGrid`, the existing renderer anchor. `app.js` still reads the derived `window.JEWELRY_ITEMS` compatibility array and creates the same five numeric `item.html?id=N` links in the same order.
+`#explore` retains `#catalogGrid`, the existing renderer anchor. `app.js` uses normalized `window.BETWEEN_US_FINDS` for display and creates the same five numeric `item.html?id=N` links in the same order. The derived `window.JEWELRY_ITEMS` remains available for compatibility.
 
 Cards preserve the image or fallback, title, price, description, availability label, and detail link. The public action label is **View Find**.
+
+The Explore toolbar renders **All Finds** plus every active Collection from the registry. M04 currently enables **Jewelry** only. Buttons expose `aria-pressed`, and the polite result summary reports the current count and selected Collection. Coming Soon Collections never become enabled filters. Selection is page-local, and an active Collection without Finds receives the approved honest empty state.
 
 ## About
 
@@ -43,4 +59,4 @@ The invalid route state uses **Find not found**, a page-level heading, and a ret
 
 ## Deferred behavior
 
-M04 owns collection browsing, filters, and Featured, Latest, and Weekly discovery views. M05 owns Reserve by Message and further Find-detail improvements. The M03 shell does not introduce either set of behavior.
+M05 owns Reserve by Message and further Find-detail improvements. Search, sorting, advanced filters, Collection routes, URL filter state, and timestamp-derived chronology remain deferred. M04 introduces none of those behaviors.

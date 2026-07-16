@@ -8,13 +8,13 @@
 
 ## Primary command
 
-Run the complete M01 compatibility and M02 domain suite with:
+Run the complete M01–M04 compatibility, domain, brand, and discovery suite with:
 
 ```bash
 node scripts/validate-baseline.mjs
 ```
 
-The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, and `tests/brand/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
+The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, and `tests/discovery/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
 
 ## Individual commands
 
@@ -24,9 +24,12 @@ Use these commands when isolating a failure or completing a milestone review:
 node --check app.js
 node --check item.js
 node --check data/items.js
+node --check data/collections.js
+node --check data/discovery.js
 node --test tests/baseline/*.test.mjs
 node --test tests/domain/*.test.mjs
 node --test tests/brand/*.test.mjs
+node --test tests/discovery/*.test.mjs
 node scripts/validate-baseline.mjs
 git diff --check
 git diff --cached --check
@@ -39,7 +42,7 @@ The GitHub Actions workflow at `.github/workflows/baseline-validation.yml` runs 
 
 ### JavaScript syntax
 
-Node parses `app.js`, `item.js`, and `data/items.js` without executing the browser application.
+Node parses `app.js`, `item.js`, `data/items.js`, `data/collections.js`, and `data/discovery.js` without executing the browser application.
 
 ### Data contracts
 
@@ -85,13 +88,30 @@ The suite verifies:
 - approved color and font tokens, visible focus styling, existing responsive breakpoints, and reduced-motion handling; and
 - the absence of external font imports.
 
+### Collection and discovery contracts
+
+The suite verifies:
+
+- the exact six Collection records, approved labels, descriptions, statuses, and stable order;
+- Jewelry as the only active Collection, unique IDs, valid statuses, read-only records, and the absence of duplicated Find fields or product icons;
+- the exact Featured, Latest, and weekly public-ID references and order;
+- resolution of every editorial reference without mutating Finds, `featured`, or nullable timestamps;
+- item, Collection, and Discovery script order before `app.js`;
+- the required Home, Collections, Featured, Latest, Weekly, Explore, and About section order and copy;
+- data-driven Collection cards, an active Jewelry action, and noninteractive Coming Soon cards;
+- All Finds and Jewelry results, original ordering, numeric detail links, accessible selected state, and live summaries;
+- exclusion of inactive and unknown Collection filters plus the reusable future empty state;
+- exact Featured, Latest, and weekly rendering through normalized Finds;
+- the shared standard card path, image fallback, prices, availability, and legacy detail URLs; and
+- visible focus, wrapping filters, visible selected text, and 44px filter targets.
+
 ### Legacy URL contracts
 
 The catalog renderer is executed in an isolated DOM stub to prove that it creates `item.html?id=N` for every current item. The detail renderer is then executed once for every numeric ID to prove that the correct item, related links, and share URL render. Missing, nonnumeric, and unknown IDs must continue to show the current not-found response.
 
 ### Static resource smoke checks
 
-The dependency-free smoke test resolves static request paths using the same path/query behavior expected from a static host. It reads `/`, `/index.html`, every `item.html?id=N` route, the stylesheet, both application scripts, the data script, and every real image. It does not pretend that known missing image files exist.
+The dependency-free smoke test resolves static request paths using the same path/query behavior expected from a static host. It reads `/`, `/index.html`, every `item.html?id=N` route, the stylesheet, both application scripts, all three data scripts, and every real image. It does not pretend that known missing image files exist.
 
 ### QR and sharing contracts
 
@@ -114,8 +134,8 @@ A **warning** records an accepted but unresolved baseline condition. Warnings do
 
 ## Adding or changing a contract
 
-1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior, `tests/domain/` for normalized model and adapter behavior, or `tests/brand/` for Between Us assets and public-shell behavior.
-2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, and `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants.
+1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior, `tests/domain/` for normalized model and adapter behavior, `tests/brand/` for Between Us assets and public-shell behavior, or `tests/discovery/` for Collections and discovery behavior.
+2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants, and `scripts/lib/discovery-contracts.mjs` for fixed Collection and editorial expectations.
 3. Give the test a name that describes public behavior rather than implementation trivia.
 4. Add a fixed baseline value when removal or silent change must be detected; do not derive both the expected and actual value from the same source.
 5. Run the primary command and the individual review commands above.

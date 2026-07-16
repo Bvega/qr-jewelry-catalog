@@ -38,12 +38,12 @@ test("hero contains all approved public brand copy and Explore action", () => {
   assert.equal((indexHtml.match(/<h1\b/g) || []).length, 1);
 });
 
-test("collections preview distinguishes the current collection from future collections", () => {
-  for (const name of ["Jewelry", "Vintage", "Home &amp; Decor", "Kitchen", "Collectibles", "New Items"]) {
-    assert.match(indexHtml, new RegExp(`>${name}<`));
-  }
-  assert.match(indexHtml, />Current Collection</);
-  assert.equal((indexHtml.match(/>Coming Soon</g) || []).length, 5);
+test("collections preview retains the M03 section while using the M04 registry renderer", () => {
+  assert.match(indexHtml, /<h2\b[^>]*>Explore Collections<\/h2>/);
+  assert.match(indexHtml, /\bid=["']collectionGrid["']/);
+  assert.match(appSource, /renderCollections\(collectionGrid, collections\)/);
+  assert.match(appSource, /Current Collection/);
+  assert.match(appSource, /Coming Soon/);
 });
 
 test("Explore and About preserve the catalog anchor and approved message", () => {

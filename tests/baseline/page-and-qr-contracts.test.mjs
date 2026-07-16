@@ -24,7 +24,12 @@ test("required public pages and DOM anchors exist", () => {
 
 test("catalog page loads the shared stylesheet, data, and renderer in order", () => {
   assert.ok(extractStylesheetLinks(indexHtml).includes("styles.css"));
-  assert.deepEqual(extractScriptSources(indexHtml), ["data/items.js", "app.js"]);
+  assert.deepEqual(extractScriptSources(indexHtml), [
+    "data/items.js",
+    "data/collections.js",
+    "data/discovery.js",
+    "app.js"
+  ]);
 });
 
 test("detail page loads data, approved QR library, and renderer in order", () => {

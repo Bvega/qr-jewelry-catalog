@@ -1,68 +1,268 @@
-// app.js — Renders the current Finds grid on index.html.
-// Reads from window.JEWELRY_ITEMS (set by data/items.js).
-// Builds one card per item and injects them into #catalogGrid.
+// app.js — Renders Collections and discovery views on index.html.
+// The normalized Finds in data/items.js are the display source. The legacy
+// adapter remains available for numeric route compatibility.
 
-
-// --- Step 1: Get the catalog container from the page ----------
-
-var grid = document.getElementById("catalogGrid");
-
-
-// --- Step 2: Guard — stop if the container isn't found --------
-
-if (!grid) {
-  console.error("app.js: Could not find #catalogGrid on the page.");
+function escapeHTML(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-
-// --- Step 3: Guard — stop if item data wasn't loaded ----------
-
-else if (!window.JEWELRY_ITEMS || window.JEWELRY_ITEMS.length === 0) {
-  grid.innerHTML = '<p class="catalog-placeholder">No Finds found.</p>';
+function availabilityLabel(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+function getNormalizedFinds() {
+  if (Array.isArray(window.BETWEEN_US_FINDS)) {
+    return window.BETWEEN_US_FINDS;
+  }
 
-// --- Step 4: Render a card for each item ----------------------
+  // Preserve the isolated M01 renderer contract when only the legacy global is
+  // supplied. Production index.html always loads the normalized global.
+  if (Array.isArray(window.JEWELRY_ITEMS)) {
+    return window.JEWELRY_ITEMS.map(function (item) {
+      return {
+        publicId: "",
+        legacyId: item.id,
+        title: item.name,
+        collection: "jewelry",
+        description: item.description,
+        availability: item.status,
+        price: { amount: item.price, currency: "USD" },
+        primaryPhoto: item.image,
+        altText: item.name
+      };
+    });
+  }
 
-else {
+  return [];
+}
 
-  // Clear the loading placeholder before inserting real cards
-  grid.innerHTML = "";
+function findImageHTML(find, imageClass, placeholderClass) {
+  if (!find.primaryPhoto) {
+    return '<div class="' + placeholderClass + '">No photo yet</div>';
+  }
 
-  window.JEWELRY_ITEMS.forEach(function (item) {
+  return '<img class="' + imageClass + '" src="' + escapeHTML(find.primaryPhoto) + '" alt="' +
+    escapeHTML(find.altText) + '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">' +
+    '<div class="' + placeholderClass + '" style="display:none;">No photo yet</div>';
+}
 
-    // Build the card element
-    var card = document.createElement("a");
-    card.className = "card";
-    card.href = "item.html?id=" + item.id;
+// One renderer supplies every standard card in Explore, Featured, and Latest.
+function createFindCard(find) {
+  var item = {
+    id: find.legacyId,
+    name: find.title,
+    price: find.price.amount,
+    description: find.description,
+    status: find.availability,
+    image: find.primaryPhoto,
+    altText: find.altText
+  };
+  var card = document.createElement("a");
+  var badgeClass = "badge badge-" + item.status;
+  var badgeLabel = availabilityLabel(item.status);
 
-    // --- Image area ---
-    // Use a styled div as a placeholder when no real image exists yet
-    var imageHTML;
-    if (item.image) {
-      imageHTML = '<img class="card-image" src="' + item.image + '" alt="' + item.name + '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">'
-               + '<div class="card-image-placeholder" style="display:none;">No photo yet</div>';
-    } else {
-      imageHTML = '<div class="card-image-placeholder">No photo yet</div>';
-    }
+  card.className = "card";
+  card.href = "item.html?id=" + item.id;
+  card.innerHTML =
+    findImageHTML({ primaryPhoto: item.image, altText: item.altText }, "card-image", "card-image-placeholder") +
+    '<div class="card-body">' +
+      '<p class="card-title">' + escapeHTML(item.name) + '</p>' +
+      '<p class="card-price">$' + escapeHTML(item.price) + '</p>' +
+      '<p class="card-description">' + escapeHTML(item.description) + '</p>' +
+      '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
+      '<span class="card-link">View Find <span aria-hidden="true">&rarr;</span></span>' +
+    '</div>';
 
-    // --- Availability badge ---
-    // Map the status value to the matching CSS class
-    var badgeClass = "badge badge-" + item.status;
-    var badgeLabel = item.status.charAt(0).toUpperCase() + item.status.slice(1);
+  return card;
+}
 
-    // --- Assemble the full card HTML ---
-    card.innerHTML =
-      imageHTML +
-      '<div class="card-body">' +
-        '<p class="card-title">' + item.name + '</p>' +
-        '<p class="card-price">$' + item.price + '</p>' +
-        '<p class="card-description">' + item.description + '</p>' +
-        '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
-        '<span class="card-link">View Find <span aria-hidden="true">&rarr;</span></span>' +
-      '</div>';
+function renderFindCards(container, finds) {
+  if (!container) return;
 
-    // Add the finished card to the grid
-    grid.appendChild(card);
+  container.innerHTML = "";
+
+  if (finds.length === 0) {
+    var emptyState = document.createElement("p");
+    emptyState.className = "catalog-placeholder catalog-empty-state";
+    emptyState.textContent = "No Finds are available in this Collection yet.";
+    container.appendChild(emptyState);
+    return;
+  }
+
+  finds.forEach(function (find) {
+    container.appendChild(createFindCard(find));
   });
+}
+
+function renderCollections(container, collections) {
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  collections.forEach(function (collection, index) {
+    var card = document.createElement("article");
+    var isActive = collection.status === "active";
+    var number = String(index + 1).padStart(2, "0");
+
+    card.className = "collection-card " +
+      (isActive ? "collection-card-active" : "collection-card-coming-soon");
+    card.innerHTML =
+      '<span class="collection-number" aria-hidden="true">' + number + '</span>' +
+      '<h3>' + escapeHTML(collection.label) + '</h3>' +
+      '<p class="collection-description">' + escapeHTML(collection.description) + '</p>' +
+      '<p class="collection-status">' + (isActive ? "Current Collection" : "Coming Soon") + '</p>' +
+      (isActive
+        ? '<a class="collection-action" href="#explore">Explore ' + escapeHTML(collection.label) + '</a>'
+        : "");
+    container.appendChild(card);
+  });
+}
+
+function resolveFinds(publicIds) {
+  if (!window.BETWEEN_US_DATA || typeof window.BETWEEN_US_DATA.findByPublicId !== "function") {
+    return [];
+  }
+
+  return publicIds.map(function (publicId) {
+    return window.BETWEEN_US_DATA.findByPublicId(publicId);
+  }).filter(function (find) {
+    return find !== null;
+  });
+}
+
+function renderWeeklyFind(container, find) {
+  if (!container || !find) return;
+
+  var badgeClass = "badge badge-" + find.availability;
+  var badgeLabel = availabilityLabel(find.availability);
+
+  container.innerHTML =
+    '<div class="weekly-media">' +
+      findImageHTML(find, "weekly-image", "card-image-placeholder weekly-image-placeholder") +
+    '</div>' +
+    '<div class="weekly-body">' +
+      '<p class="weekly-public-id">' + escapeHTML(find.publicId) + '</p>' +
+      '<h3>' + escapeHTML(find.title) + '</h3>' +
+      '<p class="weekly-description">' + escapeHTML(find.description) + '</p>' +
+      '<p class="weekly-price">$' + escapeHTML(find.price.amount) + '</p>' +
+      '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
+      '<a class="button button-primary weekly-action" href="item.html?id=' + find.legacyId + '">View Find</a>' +
+    '</div>';
+}
+
+var finds = getNormalizedFinds();
+var collections = Array.isArray(window.BETWEEN_US_COLLECTIONS)
+  ? window.BETWEEN_US_COLLECTIONS
+  : [];
+var discovery = window.BETWEEN_US_DISCOVERY || null;
+var collectionGrid = document.getElementById("collectionGrid");
+var catalogGrid = document.getElementById("catalogGrid");
+var featuredGrid = document.getElementById("featuredGrid");
+var latestGrid = document.getElementById("latestGrid");
+var weeklyFeature = document.getElementById("weeklyFeature");
+var collectionFilters = document.getElementById("collectionFilters");
+var resultsSummary = document.getElementById("resultsSummary");
+
+renderCollections(collectionGrid, collections);
+
+if (discovery) {
+  renderFindCards(featuredGrid, resolveFinds(discovery.featuredFindIds));
+  renderFindCards(latestGrid, resolveFinds(discovery.latestFindIds));
+  renderWeeklyFind(
+    weeklyFeature,
+    window.BETWEEN_US_DATA.findByPublicId(discovery.weeklyFindId)
+  );
+}
+
+if (!catalogGrid) {
+  console.error("app.js: Could not find #catalogGrid on the page.");
+} else if (finds.length === 0) {
+  catalogGrid.innerHTML = '<p class="catalog-placeholder">No Finds found.</p>';
+} else {
+  var activeFilterId = null;
+  var filterButtons = [];
+  var activeCollections = collections.filter(function (collection) {
+    return collection.status === "active";
+  });
+
+  function collectionById(collectionId) {
+    return activeCollections.find(function (collection) {
+      return collection.id === collectionId;
+    }) || null;
+  }
+
+  function updateFilter(collectionId) {
+    var selectedCollection = collectionId === null ? null : collectionById(collectionId);
+
+    if (collectionId !== null && !selectedCollection) return;
+
+    activeFilterId = selectedCollection ? selectedCollection.id : null;
+    var filteredFinds = selectedCollection
+      ? finds.filter(function (find) { return find.collection === selectedCollection.id; })
+      : finds.slice();
+
+    filterButtons.forEach(function (button) {
+      var buttonId = button.getAttribute("data-collection-id");
+      var isSelected = activeFilterId === null
+        ? buttonId === "all"
+        : buttonId === activeFilterId;
+      button.setAttribute("aria-pressed", String(isSelected));
+    });
+
+    renderFindCards(catalogGrid, filteredFinds);
+
+    if (resultsSummary) {
+      var countLabel = filteredFinds.length + (filteredFinds.length === 1 ? " Find" : " Finds");
+      resultsSummary.textContent = selectedCollection
+        ? countLabel + " in " + selectedCollection.label
+        : countLabel;
+    }
+  }
+
+  function addFilterButton(label, collectionId) {
+    if (!collectionFilters) return;
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "collection-filter";
+    button.textContent = label;
+    button.setAttribute("data-collection-id", collectionId || "all");
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", function () {
+      updateFilter(collectionId);
+    });
+    filterButtons.push(button);
+    collectionFilters.appendChild(button);
+  }
+
+  if (collectionFilters) {
+    collectionFilters.innerHTML = "";
+    addFilterButton("All Finds", null);
+    activeCollections.forEach(function (collection) {
+      addFilterButton(collection.label, collection.id);
+    });
+  }
+
+  updateFilter(null);
+}
+
+// Direct hash loads happen before the data-driven sections finish rendering.
+// Re-align the approved in-page target once the final layout is present.
+if (window.location && window.location.hash) {
+  var hashTarget = document.getElementById(window.location.hash.slice(1));
+
+  if (hashTarget && typeof hashTarget.scrollIntoView === "function") {
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(function () {
+        hashTarget.scrollIntoView({ block: "start", behavior: "instant" });
+      });
+    } else {
+      hashTarget.scrollIntoView({ block: "start", behavior: "instant" });
+    }
+  }
 }
