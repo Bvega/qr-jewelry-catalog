@@ -1,38 +1,42 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Thursday, July 16, 2026
+Updated: Thursday, July 16, 2026 — 6:55 PM ET
 Project: Between Us Platform
 
 CURRENT STATUS
-- M00 through M03 are accepted, merged, validated, and pushed.
-- M04 — Collections and Discovery has been prepared.
-- The M04 setup package was extracted successfully.
-- Current uncommitted files:
-  - chatGPT_Todo.txt
-  - docs/MILESTONES/M04.md
-- A feature branch was created too early:
-  feature/m04-collections-discovery
-- M04 implementation has not started.
+- M00 through M04 are owner-approved, merged, validated, and pushed.
+- M04 implementation commit:
+  e8fec2ffef2f2d17f40f9171715fd565a75e5fa5
+- M05 — Find Details and Reservation has been prepared.
+- M05 implementation has not started.
+- M05 will require owner visual acceptance before merge.
 
 TOP TASK
-Move the M04 planning files back to main, commit and push them, then let ChatGPT Work create the implementation branch.
+Install and commit the M05 planning package on main, then execute it in a new ChatGPT Work task.
 
 NEXT ACTIONS
-1. Switch back to main while preserving the current uncommitted planning files.
-2. Delete the premature local feature branch.
-3. Commit:
+1. Install:
+   docs/MILESTONES/M05.md
    chatGPT_Todo.txt
-   docs/MILESTONES/M04.md
-4. Push main to origin.
-5. Confirm main is synchronized and the working tree is clean.
-6. In ChatGPT Work, create a new task:
-   M04 — Collections and Discovery
-7. Send:
-   Read docs/MILESTONES/M04.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
-8. Return the complete M04 report to between-us-master.
-9. Do not begin M05 until MASTER accepts M04.
+2. Commit and push the M05 planning package to main.
+3. Confirm main is synchronized with origin/main and working tree is clean.
+4. Open a new ChatGPT Work task:
+   M05 — Find Details and Reservation
+5. Send:
+   Read docs/MILESTONES/M05.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
+6. Wait for Work to finish.
+7. Return the complete M05 report to between-us-master.
+8. Perform owner visual review.
+9. Do not merge M05 or begin M06 until visual acceptance.
 
 OPERATING RULES
-- Do not rename the repository folder yet.
-- Preserve all M01–M03 accepted behavior.
-- Preserve data, IDs, slugs, routes, relationships, images, availability, QR, and sharing.
-- No reservation messaging, new routes, framework, backend, database, package manager, or new dependency is approved in M04.
+- Do not manually create the M05 branch.
+- Do not rename the repository folder.
+- Preserve all accepted M01–M04 behavior.
+- Preserve data, IDs, slugs, routes, Collections, discovery, relationships, images, availability, QR, and existing sharing.
+- Do not invent a phone number, email, WhatsApp number, Messenger account, or recipient.
+- Reservation remains manual.
+- Payment remains cash.
+- Pickup details are arranged locally after availability confirmation.
+- No permanent route, framework, backend, database, package manager, or new dependency is approved in M05.
+- M05 must remain unpushed and unmerged until owner visual acceptance.
+- MASTER defines and approves; Work implements, validates, commits locally, and reports.
