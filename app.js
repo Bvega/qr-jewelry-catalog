@@ -41,8 +41,17 @@ function getNormalizedFinds() {
   return [];
 }
 
+function isUnavailablePhoto(path) {
+  return Boolean(
+    path &&
+    window.BETWEEN_US_MEDIA &&
+    typeof window.BETWEEN_US_MEDIA.isUnavailable === "function" &&
+    window.BETWEEN_US_MEDIA.isUnavailable(path)
+  );
+}
+
 function findImageHTML(find, imageClass, placeholderClass) {
-  if (!find.primaryPhoto) {
+  if (!find.primaryPhoto || isUnavailablePhoto(find.primaryPhoto)) {
     return '<div class="' + placeholderClass + '">No photo yet</div>';
   }
 

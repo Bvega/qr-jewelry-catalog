@@ -8,13 +8,13 @@
 
 ## Primary command
 
-Run the complete M01–M04 compatibility, domain, brand, and discovery suite with:
+Run the complete M01–M05 compatibility, domain, brand, discovery, Find-detail, gallery, media, and reservation suite with:
 
 ```bash
 node scripts/validate-baseline.mjs
 ```
 
-The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, and `tests/discovery/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
+The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, `tests/discovery/*.test.mjs`, and `tests/detail/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
 
 ## Individual commands
 
@@ -26,10 +26,13 @@ node --check item.js
 node --check data/items.js
 node --check data/collections.js
 node --check data/discovery.js
+node --check data/media.js
+node --check data/reservation.js
 node --test tests/baseline/*.test.mjs
 node --test tests/domain/*.test.mjs
 node --test tests/brand/*.test.mjs
 node --test tests/discovery/*.test.mjs
+node --test tests/detail/*.test.mjs
 node scripts/validate-baseline.mjs
 git diff --check
 git diff --cached --check
@@ -42,7 +45,7 @@ The GitHub Actions workflow at `.github/workflows/baseline-validation.yml` runs 
 
 ### JavaScript syntax
 
-Node parses `app.js`, `item.js`, `data/items.js`, `data/collections.js`, and `data/discovery.js` without executing the browser application.
+Node parses `app.js`, `item.js`, `data/items.js`, `data/collections.js`, `data/discovery.js`, `data/media.js`, and `data/reservation.js` without executing the browser application.
 
 ### Data contracts
 
@@ -82,7 +85,7 @@ The suite verifies:
 - the local SVG mark, accessible title, scalable view box, circle, `BU` monogram, and four-point gold sparkle;
 - the absence of embedded raster images and external logo dependencies;
 - Between Us titles, descriptions, shared semantic landmarks, brand assets, and favicon links;
-- Home, Collections, Explore, and About anchors and navigation;
+- Home, Collections, Explore, About, and Reserve by Message anchors and navigation;
 - approved hero, collection, Explore, About, detail, Related Finds, and invalid-state language;
 - the current Jewelry collection and five noninteractive Coming Soon labels;
 - approved color and font tokens, visible focus styling, existing responsive breakpoints, and reduced-motion handling; and
@@ -96,8 +99,8 @@ The suite verifies:
 - Jewelry as the only active Collection, unique IDs, valid statuses, read-only records, and the absence of duplicated Find fields or product icons;
 - the exact Featured, Latest, and weekly public-ID references and order;
 - resolution of every editorial reference without mutating Finds, `featured`, or nullable timestamps;
-- item, Collection, and Discovery script order before `app.js`;
-- the required Home, Collections, Featured, Latest, Weekly, Explore, and About section order and copy;
+- item, Collection, Discovery, and media script order before `app.js`;
+- the required Home, Collections, Featured, Latest, Weekly, Explore, About, and Reserve section order and copy;
 - data-driven Collection cards, an active Jewelry action, and noninteractive Coming Soon cards;
 - All Finds and Jewelry results, original ordering, numeric detail links, accessible selected state, and live summaries;
 - exclusion of inactive and unknown Collection filters plus the reusable future empty state;
@@ -109,9 +112,42 @@ The suite verifies:
 
 The catalog renderer is executed in an isolated DOM stub to prove that it creates `item.html?id=N` for every current item. The detail renderer is then executed once for every numeric ID to prove that the correct item, related links, and share URL render. Missing, nonnumeric, and unknown IDs must continue to show the current not-found response.
 
+### Find Details and gallery contracts
+
+The detail suite verifies:
+
+- numeric resolution through `window.BETWEEN_US_DATA.findByLegacyId`;
+- normalized title, public ID, Collection label, price amount/currency, availability, description, and optional condition;
+- dynamic page titles and branded invalid-Find behavior;
+- exact Related Find public-ID resolution, order, and numeric links;
+- primary-first photo ordering with normalized remaining order;
+- no empty rail for one-photo Finds;
+- accessible multi-photo thumbnail labels, pressed state, click behavior, optional arrow behavior, live announcements, and alt text;
+- meaningful runtime image-error fallback; and
+- no package, carousel, autoplay, or new dependency.
+
+### Media registry contracts
+
+The suite loads `window.BETWEEN_US_MEDIA` and verifies that its frozen registry contains exactly the two accepted missing paths, excludes all three real paths, duplicates no Find fields, and is used by both standard cards and Find Details. Known unavailable paths must render the deliberate fallback without appearing in an image `src`; the protected Find records keep their original path values.
+
+### Reservation contracts
+
+The suite verifies:
+
+- the frozen six-field `window.BETWEEN_US_RESERVATION` configuration and exact approved message template;
+- default `share` channel, URL inclusion, manual confirmation, cash payment, and local-arrangement pickup mode;
+- absence of any invented phone, email, messaging account, recipient, or pickup address;
+- the home `#reserve` section and both navigation links;
+- active Available, inactive Reserved, and inactive Sold behavior;
+- exact title, public ID, and current URL in the reservation flow;
+- native Web Share success and neutral cancellation;
+- clipboard fallback after unavailable or failed Web Share;
+- selectable manual text after clipboard failure; and
+- polite live status, visible focus, minimum mobile target, and textual unavailable states.
+
 ### Static resource smoke checks
 
-The dependency-free smoke test resolves static request paths using the same path/query behavior expected from a static host. It reads `/`, `/index.html`, every `item.html?id=N` route, the stylesheet, both application scripts, all three data scripts, and every real image. It does not pretend that known missing image files exist.
+The dependency-free smoke test resolves static request paths using the same path/query behavior expected from a static host. It reads `/`, `/index.html`, every `item.html?id=N` route, the stylesheet, both application scripts, all five data scripts, and every real image. It does not pretend that known missing image files exist.
 
 ### QR and sharing contracts
 
@@ -127,15 +163,15 @@ A **failure** means a required compatibility contract was broken. The primary co
 
 A **warning** records an accepted but unresolved baseline condition. Warnings do not change the exit code. The M01 warnings are:
 
-- item 2 references `assets/images/placeholder-ring-silver.jpg`, which is absent;
-- item 3 references `assets/images/placeholder-earrings-pearl.jpg`, which is absent;
+- item 2 references `assets/images/placeholder-ring-silver.jpg`, which is absent and registered for direct fallback;
+- item 3 references `assets/images/placeholder-earrings-pearl.jpg`, which is absent and registered for direct fallback;
 - QR generation depends on an external CDN resource; and
 - the active GitHub Pages source branch/folder settings cannot be verified from repository files.
 
 ## Adding or changing a contract
 
-1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior, `tests/domain/` for normalized model and adapter behavior, `tests/brand/` for Between Us assets and public-shell behavior, or `tests/discovery/` for Collections and discovery behavior.
-2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants, and `scripts/lib/discovery-contracts.mjs` for fixed Collection and editorial expectations.
+1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior, `tests/domain/` for normalized model and adapter behavior, `tests/brand/` for Between Us assets and public-shell behavior, `tests/discovery/` for Collections and discovery behavior, or `tests/detail/` for Find Details, gallery, media, and reservation behavior.
+2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants, `scripts/lib/discovery-contracts.mjs` for fixed Collection and editorial expectations, and `scripts/lib/find-detail-contracts.mjs` for M05 runtime fixtures and DOM stubs.
 3. Give the test a name that describes public behavior rather than implementation trivia.
 4. Add a fixed baseline value when removal or silent change must be detected; do not derive both the expected and actual value from the same source.
 5. Run the primary command and the individual review commands above.

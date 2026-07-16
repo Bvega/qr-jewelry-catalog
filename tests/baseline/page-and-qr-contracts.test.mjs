@@ -28,6 +28,7 @@ test("catalog page loads the shared stylesheet, data, and renderer in order", ()
     "data/items.js",
     "data/collections.js",
     "data/discovery.js",
+    "data/media.js",
     "app.js"
   ]);
 });
@@ -36,6 +37,9 @@ test("detail page loads data, approved QR library, and renderer in order", () =>
   assert.ok(extractStylesheetLinks(itemHtml).includes("styles.css"));
   assert.deepEqual(extractScriptSources(itemHtml), [
     "data/items.js",
+    "data/collections.js",
+    "data/media.js",
+    "data/reservation.js",
     APPROVED_QR_LIBRARY,
     "item.js"
   ]);
@@ -46,8 +50,8 @@ test("catalog and detail renderers retain required DOM and legacy-link contracts
   assert.match(appSource, /card\.href\s*=\s*["']item\.html\?id=["']\s*\+\s*item\.id/);
   assert.match(itemSource, /getElementById\(["']itemDetail["']\)/);
   assert.match(itemSource, /new URLSearchParams\(window\.location\.search\)/);
-  assert.match(itemSource, /candidate\.id\s*===\s*itemId/);
-  assert.match(itemSource, /href=["']item\.html\?id=["']\s*\+\s*related\.id/);
+  assert.match(itemSource, /window\.BETWEEN_US_DATA\.findByLegacyId\(itemId\)/);
+  assert.match(itemSource, /href=["']item\.html\?id=["']\s*\+\s*relatedFind\.legacyId/);
 });
 
 test("share, copy-link, QR generation, fallback, and download paths remain", () => {
@@ -56,10 +60,10 @@ test("share, copy-link, QR generation, fallback, and download paths remain", () 
   assert.match(itemSource, /typeof QRCode\s*!==\s*["']undefined["']/);
   assert.match(itemSource, /new QRCode\(qrContainer,/);
   assert.match(itemSource, /text:\s*shareURL/);
-  assert.match(itemSource, /qrFallback\.style\.display\s*=\s*["']block["']/);
-  assert.match(itemSource, /qrDownloadBtn\.style\.display\s*=\s*["']none["']/);
+  assert.match(itemSource, /qrFallback\.hidden\s*=\s*false/);
+  assert.match(itemSource, /qrDownloadBtn\.hidden\s*=\s*true/);
   assert.match(itemSource, /canvas\.toDataURL\(["']image\/png["']\)/);
-  assert.match(itemSource, /link\.download\s*=\s*["']jewelry-item-["']\s*\+\s*item\.id/);
+  assert.match(itemSource, /link\.download\s*=\s*["']jewelry-item-["']\s*\+\s*find\.legacyId/);
 });
 
 test("shared CSS retains the current responsive layout breakpoints", () => {

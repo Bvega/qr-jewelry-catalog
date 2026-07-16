@@ -3,53 +3,20 @@ import vm from "node:vm";
 import test from "node:test";
 import {
   EXPECTED_LEGACY_IDS,
-  loadCatalog,
   pathFromRoot,
   readProjectFile
 } from "../../scripts/lib/baseline-contracts.mjs";
+import {
+  loadFindDetailRuntime,
+  renderFindDetail
+} from "../../scripts/lib/find-detail-contracts.mjs";
 
-const items = loadCatalog();
-const itemSource = readProjectFile("item.js");
+const runtime = loadFindDetailRuntime();
+const items = Array.from(runtime.legacyItems);
 const appSource = readProjectFile("app.js");
 
 function renderDetail(query) {
-  const elements = {
-    itemDetail: { innerHTML: "" },
-    copyLinkBtn: { addEventListener() {} },
-    copyConfirm: { style: {} },
-    qrCodeCanvas: { querySelector() { return null; } },
-    qrFallback: { style: {} },
-    qrDownloadBtn: { style: {}, addEventListener() {} }
-  };
-  const document = {
-    title: "Find Details | Between Us Finds",
-    getElementById(id) {
-      return elements[id] ?? null;
-    },
-    createElement() {
-      return {};
-    },
-    body: {
-      appendChild() {},
-      removeChild() {}
-    }
-  };
-  const href = `https://example.test/item.html${query}`;
-  const context = {
-    document,
-    navigator: { clipboard: { writeText: async () => {} } },
-    URLSearchParams,
-    window: {
-      JEWELRY_ITEMS: items,
-      location: { href, search: query }
-    }
-  };
-
-  vm.runInNewContext(itemSource, context, {
-    filename: pathFromRoot("item.js")
-  });
-
-  return { document, elements, href };
+  return renderFindDetail({ query, runtime });
 }
 
 test("catalog renderer creates one legacy numeric link per current item", () => {
@@ -91,8 +58,8 @@ for (const item of items) {
     assert.ok(result.elements.itemDetail.innerHTML.includes(item.name));
     assert.ok(result.elements.itemDetail.innerHTML.includes(result.href));
     assert.doesNotMatch(result.elements.itemDetail.innerHTML, /Find not found/);
-    assert.equal(result.elements.qrFallback.style.display, "block");
-    assert.equal(result.elements.qrDownloadBtn.style.display, "none");
+    assert.equal(result.elements.qrFallback.hidden, false);
+    assert.equal(result.elements.qrDownloadBtn.hidden, true);
 
     for (const relatedId of item.relatedIds) {
       assert.ok(

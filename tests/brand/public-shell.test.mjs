@@ -61,6 +61,9 @@ test("detail page shares the brand shell and preserves required script order", (
   assert.match(itemHtml, /\bid=["']itemDetail["']/);
   assert.deepEqual(extractScriptSources(itemHtml), [
     "data/items.js",
+    "data/collections.js",
+    "data/media.js",
+    "data/reservation.js",
     APPROVED_QR_LIBRARY,
     "item.js"
   ]);
@@ -69,7 +72,7 @@ test("detail page shares the brand shell and preserves required script order", (
 test("detail renderer uses Find vocabulary and dynamic Between Us title", () => {
   assert.match(itemSource, /Find not found/);
   assert.match(itemSource, /Related Finds/);
-  assert.match(itemSource, /document\.title\s*=\s*item\.name\s*\+\s*["'] \| Between Us Finds["']/);
+  assert.match(itemSource, /document\.title\s*=\s*find\.title\s*\+\s*["'] \| Between Us Finds["']/);
   assert.match(itemSource, /<h1 class=["']detail-title["']>/);
   assert.match(itemSource, /<h1>Find not found\.<\/h1>/);
 });

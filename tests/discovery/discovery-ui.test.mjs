@@ -110,6 +110,7 @@ test("home loads item, Collection, and Discovery data before app.js", () => {
     "data/items.js",
     "data/collections.js",
     "data/discovery.js",
+    "data/media.js",
     "app.js"
   ]);
 });

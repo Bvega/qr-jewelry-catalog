@@ -22,6 +22,7 @@ const baselineTestFiles = findTestFiles("tests/baseline");
 const domainTestFiles = findTestFiles("tests/domain");
 const brandTestFiles = findTestFiles("tests/brand");
 const discoveryTestFiles = findTestFiles("tests/discovery");
+const detailTestFiles = findTestFiles("tests/detail");
 
 const checks = [
   {
@@ -50,6 +51,16 @@ const checks = [
     arguments: ["--check", "data/discovery.js"]
   },
   {
+    label: "JavaScript syntax: data/media.js",
+    displayCommand: "node --check data/media.js",
+    arguments: ["--check", "data/media.js"]
+  },
+  {
+    label: "JavaScript syntax: data/reservation.js",
+    displayCommand: "node --check data/reservation.js",
+    arguments: ["--check", "data/reservation.js"]
+  },
+  {
     label: "Baseline contract tests",
     displayCommand: "node --test tests/baseline/*.test.mjs",
     arguments: ["--test", ...baselineTestFiles]
@@ -68,12 +79,17 @@ const checks = [
     label: "Collections and discovery tests",
     displayCommand: "node --test tests/discovery/*.test.mjs",
     arguments: ["--test", ...discoveryTestFiles]
+  },
+  {
+    label: "Find Details, gallery, media, and reservation tests",
+    displayCommand: "node --test tests/detail/*.test.mjs",
+    arguments: ["--test", ...detailTestFiles]
   }
 ];
 
 const failures = [];
 
-console.log("M04 repository validation\n");
+console.log("M05 repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -122,16 +138,17 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM04 repository validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM05 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
   const relativeTests = [
     ...baselineTestFiles,
     ...domainTestFiles,
     ...brandTestFiles,
-    ...discoveryTestFiles
+    ...discoveryTestFiles,
+    ...detailTestFiles
   ]
     .map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, and discovery test files.`);
-  console.log("M04 repository validation: PASS");
+  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, and detail test files.`);
+  console.log("M05 repository validation: PASS");
 }
