@@ -9,11 +9,17 @@ import {
   repositoryRoot
 } from "./lib/baseline-contracts.mjs";
 
-const testDirectory = resolve(repositoryRoot, "tests/baseline");
-const testFiles = readdirSync(testDirectory)
-  .filter((file) => file.endsWith(".test.mjs"))
-  .sort()
-  .map((file) => resolve(testDirectory, file));
+function findTestFiles(relativeDirectory) {
+  const testDirectory = resolve(repositoryRoot, relativeDirectory);
+
+  return readdirSync(testDirectory)
+    .filter((file) => file.endsWith(".test.mjs"))
+    .sort()
+    .map((file) => resolve(testDirectory, file));
+}
+
+const baselineTestFiles = findTestFiles("tests/baseline");
+const domainTestFiles = findTestFiles("tests/domain");
 
 const checks = [
   {
@@ -34,13 +40,18 @@ const checks = [
   {
     label: "Baseline contract tests",
     displayCommand: "node --test tests/baseline/*.test.mjs",
-    arguments: ["--test", ...testFiles]
+    arguments: ["--test", ...baselineTestFiles]
+  },
+  {
+    label: "Find domain and compatibility adapter tests",
+    displayCommand: "node --test tests/domain/*.test.mjs",
+    arguments: ["--test", ...domainTestFiles]
   }
 ];
 
 const failures = [];
 
-console.log("M01 baseline validation\n");
+console.log("M02 repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -89,10 +100,11 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM01 baseline validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM02 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
-  const relativeTests = testFiles.map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline test files.`);
-  console.log("M01 baseline validation: PASS");
+  const relativeTests = [...baselineTestFiles, ...domainTestFiles]
+    .map((file) => relative(repositoryRoot, file));
+  console.log(`\nValidated ${relativeTests.length} baseline and domain test files.`);
+  console.log("M02 repository validation: PASS");
 }

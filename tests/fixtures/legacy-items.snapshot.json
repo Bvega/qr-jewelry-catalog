@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "name": "Gold Twisted Rope Bracelet",
+    "price": 28,
+    "description": "Delicate 18k gold-tone twisted rope bracelet. Lightweight and elegant. Fits most wrist sizes. Lobster clasp closure.",
+    "status": "available",
+    "category": "bracelet",
+    "image": "assets/images/gold-twisted-rope-bracelet-01.jpeg",
+    "relatedIds": [
+      2,
+      4
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Silver Stackable Ring Set",
+    "price": 18,
+    "description": "Set of 3 thin silver-tone stackable rings. Smooth finish. Sold as a set. Size 7.",
+    "status": "available",
+    "category": "ring",
+    "image": "assets/images/placeholder-ring-silver.jpg",
+    "relatedIds": [
+      1,
+      5
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Pearl Drop Earrings",
+    "price": 22,
+    "description": "Faux pearl drop earrings with gold-tone posts. Classic style. Hypoallergenic posts. Approx 1.5 inches long.",
+    "status": "reserved",
+    "category": "earrings",
+    "image": "assets/images/placeholder-earrings-pearl.jpg",
+    "relatedIds": [
+      4,
+      5
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Layered Gold Chain Necklace",
+    "price": 35,
+    "description": "Two-layer gold-tone chain necklace. 16 and 18 inch layers. Lobster clasp. Great for everyday wear.",
+    "status": "available",
+    "category": "necklace",
+    "image": "assets/images/layered-gold-chain-necklace-01.jpeg",
+    "relatedIds": [
+      1,
+      3
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Crystal Stud Earrings",
+    "price": 14,
+    "description": "Small clear crystal stud earrings. Gold-tone setting. Hypoallergenic posts. Subtle sparkle.",
+    "status": "sold",
+    "category": "earrings",
+    "image": "assets/images/crystal-stud-earrings-01.jpeg",
+    "relatedIds": [
+      2,
+      3
+    ]
+  }
+]

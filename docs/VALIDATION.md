@@ -1,4 +1,4 @@
-# Baseline Validation
+# Repository Validation
 
 ## Prerequisites
 
@@ -8,13 +8,13 @@
 
 ## Primary command
 
-Run the complete M01 suite with:
+Run the complete M01 compatibility and M02 domain suite with:
 
 ```bash
 node scripts/validate-baseline.mjs
 ```
 
-The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
+The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs` and `tests/domain/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
 
 ## Individual commands
 
@@ -25,8 +25,10 @@ node --check app.js
 node --check item.js
 node --check data/items.js
 node --test tests/baseline/*.test.mjs
+node --test tests/domain/*.test.mjs
 node scripts/validate-baseline.mjs
 git diff --check
+git diff --cached --check
 git status --short
 ```
 
@@ -51,6 +53,19 @@ The suite evaluates `data/items.js` in an isolated Node context and verifies:
 - provided image paths are nonempty strings;
 - the three known real images exist; and
 - the two known missing placeholder paths remain explicit baseline warnings.
+
+### Find domain and adapter contracts
+
+The suite evaluates `data/items.js` in an isolated Node context and verifies:
+
+- `window.BETWEEN_US_FINDS`, `window.JEWELRY_ITEMS`, and `window.BETWEEN_US_DATA` exist;
+- all five Finds contain the required normalized fields;
+- public IDs, legacy IDs, and registered slugs have exact mappings, formats, uniqueness, and deterministic order;
+- collections, availability, prices, currency, media, alt text, nullable fields, and related public IDs follow the M02 model;
+- lookup by public ID, legacy ID, and slug returns the normalized record or `null`;
+- normalized records and the lookup surface are read-only;
+- legacy fields are derived from normalized fields, including numeric related-ID translation; and
+- the adapter has exact parity with `tests/fixtures/legacy-items.snapshot.json`.
 
 ### Static page contracts
 
@@ -85,11 +100,11 @@ A **warning** records an accepted but unresolved baseline condition. Warnings do
 
 ## Adding or changing a contract
 
-1. Add or update a focused `*.test.mjs` file under `tests/baseline/`.
-2. Reuse `scripts/lib/baseline-contracts.mjs` for catalog loading, baseline constants, and project paths.
+1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior or `tests/domain/` for normalized model and adapter behavior.
+2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, and `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants.
 3. Give the test a name that describes public behavior rather than implementation trivia.
 4. Add a fixed baseline value when removal or silent change must be detected; do not derive both the expected and actual value from the same source.
 5. Run the primary command and the individual review commands above.
-6. Update `docs/BASELINE_BEHAVIOR.md`, deployment instructions, and the active milestone report when the public contract changes.
+6. Update the relevant domain, compatibility, baseline, deployment, and milestone documentation when its contract changes.
 
 Future milestones must change tests intentionally in the same commit as an approved behavior change. A test must not be weakened merely to make a new implementation pass. Legacy numeric URLs and QR behavior remain mandatory migration contracts even after new routes or models are introduced.
