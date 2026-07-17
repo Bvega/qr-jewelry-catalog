@@ -1,42 +1,43 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Thursday, July 16, 2026 — 6:55 PM ET
+Updated: Friday, July 17, 2026 — 6:01 PM ET
 Project: Between Us Platform
 
 CURRENT STATUS
-- M00 through M04 are owner-approved, merged, validated, and pushed.
-- M04 implementation commit:
-  e8fec2ffef2f2d17f40f9171715fd565a75e5fa5
-- M05 — Find Details and Reservation has been prepared.
-- M05 implementation has not started.
-- M05 will require owner visual acceptance before merge.
+- M00 through M05 are owner-approved, merged, validated, and pushed.
+- M05 implementation commit:
+  d92853aab80a9486327766fbb7ded4698631f733
+- Last accepted validation:
+  115 of 115 tests passing.
+- M06 — QR, Sharing, and Permalinks has been prepared.
+- M06 implementation has not started.
+- M06 will require owner visual acceptance before merge.
 
 TOP TASK
-Install and commit the M05 planning package on main, then execute it in a new ChatGPT Work task.
+Install and commit the M06 planning package on main, then execute it in a new ChatGPT Work task.
 
 NEXT ACTIONS
 1. Install:
-   docs/MILESTONES/M05.md
+   docs/MILESTONES/M06.md
    chatGPT_Todo.txt
-2. Commit and push the M05 planning package to main.
+2. Commit and push the M06 planning package to main.
 3. Confirm main is synchronized with origin/main and working tree is clean.
 4. Open a new ChatGPT Work task:
-   M05 — Find Details and Reservation
+   M06 milestone
 5. Send:
-   Read docs/MILESTONES/M05.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
+   Read docs/MILESTONES/M06.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
 6. Wait for Work to finish.
-7. Return the complete M05 report to between-us-master.
+7. Return the complete M06 report to between-us-master.
 8. Perform owner visual review.
-9. Do not merge M05 or begin M06 until visual acceptance.
+9. Do not merge M06 or begin M07 until visual acceptance.
 
 OPERATING RULES
-- Do not manually create the M05 branch.
+- Do not manually create the M06 branch.
 - Do not rename the repository folder.
-- Preserve all accepted M01–M04 behavior.
-- Preserve data, IDs, slugs, routes, Collections, discovery, relationships, images, availability, QR, and existing sharing.
-- Do not invent a phone number, email, WhatsApp number, Messenger account, or recipient.
-- Reservation remains manual.
-- Payment remains cash.
-- Pickup details are arranged locally after availability confirmation.
-- No permanent route, framework, backend, database, package manager, or new dependency is approved in M05.
-- M05 must remain unpushed and unmerged until owner visual acceptance.
+- Preserve all accepted M01–M05 behavior.
+- Preserve all data, IDs, slugs, routes, Collections, Discovery, relationships, images, availability, reservation wording, QR compatibility, and existing sharing.
+- New canonical Find URLs use:
+  find.html?id=BU-NNNN
+- Legacy item.html?id=N URLs must continue to work.
+- No backend, hosting rewrite, framework, database, package manager, QR-library replacement, or new dependency is approved in M06.
+- M06 must remain unpushed and unmerged until owner visual acceptance.
 - MASTER defines and approves; Work implements, validates, commits locally, and reports.
