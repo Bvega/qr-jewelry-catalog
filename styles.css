@@ -691,6 +691,28 @@ h3 {
   margin-top: 10px;
 }
 
+.about-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.about-title-context {
+  color: #D7D2CA;
+  font-family: var(--font-body);
+  font-size: clamp(0.78rem, 2.4vw, 0.92rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.about-title-name {
+  display: block;
+  color: var(--color-white);
+}
+
 .about-copy {
   display: grid;
   gap: 16px;
