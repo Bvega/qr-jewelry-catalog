@@ -13,13 +13,20 @@ export const EXPECTED_UNAVAILABLE_MEDIA = Object.freeze([
 ]);
 
 export function loadFindDetailRuntime() {
-  const context = { window: {} };
+  const context = {
+    URL,
+    URLSearchParams,
+    window: {
+      location: { href: "https://example.test/item.html?id=1" }
+    }
+  };
 
   for (const relativePath of [
     "data/items.js",
     "data/collections.js",
     "data/media.js",
-    "data/reservation.js"
+    "data/reservation.js",
+    "data/permalinks.js"
   ]) {
     vm.runInNewContext(readProjectFile(relativePath), context, {
       filename: pathFromRoot(relativePath)
@@ -32,7 +39,8 @@ export function loadFindDetailRuntime() {
     legacyItems: context.window.JEWELRY_ITEMS,
     lookup: context.window.BETWEEN_US_DATA,
     media: context.window.BETWEEN_US_MEDIA,
-    reservation: context.window.BETWEEN_US_RESERVATION
+    reservation: context.window.BETWEEN_US_RESERVATION,
+    permalinks: context.window.BETWEEN_US_PERMALINKS
   };
 }
 
@@ -48,6 +56,8 @@ export class StubElement {
     this.alt = "";
     this.style = {};
     this.textContent = "";
+    this.value = "";
+    this.disabled = false;
     this._innerHTML = "";
     this.listeners = Object.create(null);
     this.nextElementSibling = null;
@@ -56,6 +66,7 @@ export class StubElement {
 
   set innerHTML(value) {
     this._innerHTML = String(value);
+    if (value === "") this.children = [];
   }
 
   get innerHTML() {
@@ -64,6 +75,14 @@ export class StubElement {
 
   appendChild(child) {
     this.children.push(child);
+    child.parentNode = this;
+    return child;
+  }
+
+  removeChild(child) {
+    const index = this.children.indexOf(child);
+    if (index >= 0) this.children.splice(index, 1);
+    child.parentNode = null;
     return child;
   }
 
@@ -79,6 +98,10 @@ export class StubElement {
     return this.attributes[name] ?? null;
   }
 
+  removeAttribute(name) {
+    delete this.attributes[name];
+  }
+
   click() {
     return this.listeners.click ? this.listeners.click({}) : undefined;
   }
@@ -92,8 +115,17 @@ export class StubElement {
     this.focused = true;
   }
 
-  querySelector() {
-    return null;
+  select() {
+    this.selected = true;
+  }
+
+  setSelectionRange(start, end) {
+    this.selection = [start, end];
+  }
+
+  querySelector(selector) {
+    const tagName = selector.toLowerCase();
+    return this.children.find((child) => child.tagName.toLowerCase() === tagName) ?? null;
   }
 }
 
@@ -122,10 +154,40 @@ export function renderFindDetail({
   runtime = loadFindDetailRuntime(),
   lookup = runtime.lookup,
   navigator = { clipboard: { writeText: async () => {} } },
-  qrCode
+  qrCode,
+  execCommand
 } = {}) {
-  const id = Number.parseInt(new URLSearchParams(query).get("id"), 10);
-  const resolvedFind = Number.isInteger(id) ? lookup.findByLegacyId(id) : null;
+  const routeRuntime = {
+    findByRoute(locationLike = href) {
+      const registered = runtime.permalinks.findByRoute(locationLike);
+      if (!registered) return null;
+      const routeURL = new URL(
+        typeof locationLike === "string" ? locationLike : locationLike.href
+      );
+      if (routeURL.pathname.endsWith("/item.html") && typeof lookup.findByLegacyId === "function") {
+        return lookup.findByLegacyId(registered.legacyId);
+      }
+      if (typeof lookup.findByPublicId === "function") {
+        return lookup.findByPublicId(registered.publicId);
+      }
+      return lookup.findByLegacyId(registered.legacyId);
+    },
+    permalinkFor(find, locationLike = href) {
+      return runtime.permalinks.permalinkFor(find, locationLike);
+    },
+    legacyUrlFor(find, locationLike = href) {
+      return runtime.permalinks.legacyUrlFor(find, locationLike);
+    },
+    slugAliasFor(find, locationLike = href) {
+      return runtime.permalinks.slugAliasFor(find, locationLike);
+    },
+    currentCanonicalUrl(locationLike = href) {
+      const find = this.findByRoute(locationLike);
+      return find ? this.permalinkFor(find, locationLike) : null;
+    }
+  };
+  const resolvedFind = routeRuntime.findByRoute(href);
+  const canonicalURL = routeRuntime.currentCanonicalUrl(href);
   const photos = usablePhotos(resolvedFind, runtime.media);
   const elements = Object.create(null);
   const detail = new StubElement("section", "itemDetail");
@@ -162,10 +224,14 @@ export function renderFindDetail({
     "reservationStatus",
     "reservationMessageFallback",
     "reservationFallbackLabel",
+    "shareFindBtn",
     "copyLinkBtn",
-    "copyConfirm",
+    "shareUrlDisplay",
+    "shareStatus",
+    "manualCopyInstruction",
     "qrCodeCanvas",
-    "qrFallback",
+    "qrStatus",
+    "qrRetryBtn",
     "qrDownloadBtn"
   ]) {
     elements[idValue] = new StubElement("div", idValue);
@@ -173,22 +239,28 @@ export function renderFindDetail({
 
   elements.reservationMessageFallback.hidden = true;
   elements.reservationFallbackLabel.hidden = true;
-  elements.copyConfirm.hidden = true;
-  elements.qrFallback.hidden = true;
+  elements.manualCopyInstruction.hidden = true;
+  elements.qrRetryBtn.hidden = true;
+  elements.qrDownloadBtn.disabled = true;
+  elements.canonicalLink = new StubElement("link", "canonicalLink");
+  elements.canonicalLink.setAttribute("rel", "canonical");
+  elements.canonicalLink.setAttribute("href", "");
 
+  const body = new StubElement("body");
+  const createdElements = [];
   const document = {
     title: "Find Details | Between Us Finds",
     getElementById(idValue) {
       return elements[idValue] ?? null;
     },
     createElement(tagName) {
-      return new StubElement(tagName);
+      const element = new StubElement(tagName);
+      createdElements.push(element);
+      return element;
     },
-    body: {
-      appendChild() {},
-      removeChild() {}
-    }
+    body
   };
+  if (execCommand !== undefined) document.execCommand = execCommand;
   const context = {
     console,
     document,
@@ -196,19 +268,25 @@ export function renderFindDetail({
     navigator,
     Promise,
     setTimeout() {},
+    URL,
     URLSearchParams,
     window: {
       BETWEEN_US_COLLECTIONS: runtime.collections,
       BETWEEN_US_DATA: lookup,
       BETWEEN_US_FINDS: runtime.finds,
       BETWEEN_US_MEDIA: runtime.media,
+      BETWEEN_US_PERMALINKS: routeRuntime,
       BETWEEN_US_RESERVATION: runtime.reservation,
       JEWELRY_ITEMS: runtime.legacyItems,
+      isSecureContext: true,
       location: { href, search: query }
     }
   };
 
-  if (qrCode !== undefined) context.QRCode = qrCode;
+  if (qrCode !== undefined) {
+    context.QRCode = qrCode;
+    context.window.QRCode = qrCode;
+  }
 
   vm.runInNewContext(readProjectFile("item.js"), context, {
     filename: pathFromRoot("item.js")
@@ -221,6 +299,8 @@ export function renderFindDetail({
     elements,
     find: resolvedFind,
     href,
+    canonicalURL,
+    createdElements,
     photos,
     thumbnailButtons
   };

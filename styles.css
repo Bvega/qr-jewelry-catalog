@@ -1036,6 +1036,12 @@ h3 {
   width: 100%;
 }
 
+.share-intro {
+  margin-top: 8px;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+}
+
 .detail-utilities {
   display: grid;
   gap: 24px;
@@ -1047,10 +1053,8 @@ h3 {
 }
 
 .share-link-box {
-  display: flex;
+  display: grid;
   width: 100%;
-  flex-wrap: wrap;
-  align-items: center;
   gap: 10px;
   margin-top: 10px;
   padding: 13px;
@@ -1058,17 +1062,40 @@ h3 {
   background: var(--color-ivory-soft);
 }
 
+.share-link-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
 .share-url {
+  display: block;
+  width: 100%;
   min-width: 0;
-  flex: 1;
+  min-height: 62px;
+  overflow: auto;
+  padding: 9px 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-white);
   color: var(--color-muted);
+  font-family: var(--font-body);
   font-size: 0.7rem;
-  word-break: break-all;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  resize: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.share-actions,
+.qr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .copy-btn,
 .qr-download-btn {
-  min-height: 36px;
+  min-height: 44px;
   padding: 7px 12px;
   border: 1px solid var(--color-charcoal);
   background: var(--color-white);
@@ -1087,19 +1114,40 @@ h3 {
   color: var(--color-white);
 }
 
-.copy-confirm {
+.copy-btn:disabled,
+.qr-download-btn:disabled {
+  border-color: var(--color-border);
+  background: #EEEEEC;
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.share-status,
+.manual-copy-instruction {
   color: #4D5735;
   font-size: 0.72rem;
   font-weight: 700;
 }
 
+.share-status {
+  min-height: 1.5em;
+}
+
+.manual-copy-instruction {
+  padding: 9px 10px;
+  border-left: 3px solid var(--color-terracotta);
+  background: var(--color-white);
+  color: var(--color-charcoal);
+}
+
 .qr-section {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   width: 100%;
   margin-top: 0;
+  text-align: center;
 }
 
 .qr-label {
@@ -1112,17 +1160,29 @@ h3 {
 
 .qr-canvas-wrapper {
   display: inline-block;
+  min-width: 180px;
+  min-height: 180px;
   padding: 9px;
   border: 1px solid var(--color-border);
   background: var(--color-white);
   line-height: 0;
 }
 
-.qr-fallback {
+.qr-description,
+.qr-status {
   color: var(--color-muted);
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-style: italic;
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.qr-description {
+  max-width: 270px;
+}
+
+.qr-status {
+  min-height: 2.3em;
+  max-width: 300px;
+  font-weight: 700;
 }
 
 .related-section {
@@ -1383,8 +1443,10 @@ h3 {
   }
 
   .qr-section {
+    align-items: flex-start;
     padding-left: 34px;
     border-left: 1px solid var(--color-border);
+    text-align: left;
   }
 }
 

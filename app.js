@@ -1,6 +1,7 @@
 // app.js — Renders Collections and discovery views on index.html.
-// The normalized Finds in data/items.js are the display source. The legacy
-// adapter remains available for numeric route compatibility.
+// The normalized Finds in data/items.js are the display source. Permanent
+// links come from the shared permalink runtime; numeric routes remain direct
+// compatibility surfaces for already-distributed URLs and QR codes.
 
 function escapeHTML(value) {
   return String(value)
@@ -60,6 +61,22 @@ function findImageHTML(find, imageClass, placeholderClass) {
     '<div class="' + placeholderClass + '" style="display:none;">No photo yet</div>';
 }
 
+function publicFindURL(find) {
+  if (
+    window.BETWEEN_US_PERMALINKS &&
+    typeof window.BETWEEN_US_PERMALINKS.permalinkFor === "function"
+  ) {
+    var permalink = window.BETWEEN_US_PERMALINKS.permalinkFor(find);
+    if (permalink) return permalink;
+  }
+
+  // Preserve the isolated pre-normalization renderer fallback. Production
+  // pages always load the permalink runtime and normalized public ID.
+  return find.publicId
+    ? "find.html?id=" + encodeURIComponent(find.publicId)
+    : "item.html?id=" + find.legacyId;
+}
+
 // One renderer supplies every standard card in Explore, Featured, and Latest.
 function createFindCard(find) {
   var item = {
@@ -76,7 +93,7 @@ function createFindCard(find) {
   var badgeLabel = availabilityLabel(item.status);
 
   card.className = "card";
-  card.href = "item.html?id=" + item.id;
+  card.href = publicFindURL(find);
   card.innerHTML =
     findImageHTML({ primaryPhoto: item.image, altText: item.altText }, "card-image", "card-image-placeholder") +
     '<div class="card-body">' +
@@ -160,7 +177,7 @@ function renderWeeklyFind(container, find) {
       '<p class="weekly-description">' + escapeHTML(find.description) + '</p>' +
       '<p class="weekly-price">$' + escapeHTML(find.price.amount) + '</p>' +
       '<span class="' + badgeClass + '">' + badgeLabel + '</span>' +
-      '<a class="button button-primary weekly-action" href="item.html?id=' + find.legacyId + '">View Find</a>' +
+      '<a class="button button-primary weekly-action" href="' + escapeHTML(publicFindURL(find)) + '">View Find</a>' +
     '</div>';
 }
 

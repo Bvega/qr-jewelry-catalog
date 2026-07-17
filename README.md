@@ -11,18 +11,22 @@ The platform evolved from the QR Jewelry Catalog MVP. Its five original jewelry 
 - Accessible All Finds and Jewelry filtering with a live result summary
 - Editorial Featured, Latest, and Find of the Week views sourced from the same Find catalog
 - Responsive Find cards and detail pages
+- Permanent static-safe `find.html?id=BU-NNNN` detail links with exact registered-slug aliases
 - Normalized Find Details with permanent public IDs, Collection labels, currency-aware prices, and accessible photo galleries
 - Manual Reserve by Message for available Finds, using browser sharing with clipboard and selectable-text fallbacks
+- Canonical Share Find, Copy Link, reservation, and QR payloads with accessible manual and QR-failure recovery
 - Local Between Us SVG mark and system-font visual language
 - Five current Jewelry Finds in their original order
 - Available, Reserved, and Sold states
-- Numeric `item.html?id=N` routes with QR and copy-link behavior
+- Protected numeric `item.html?id=N` routes for every existing shared link and QR destination
 - Accessible missing-image and invalid-Find states
 - Direct fallback for the two registered unavailable photo paths, avoiding preventable browser requests
 
 Reserve by Message does not complete or guarantee a reservation. The owner confirms availability manually; payment is cash, and local pickup details are arranged by message after confirmation. No direct recipient, customer data storage, backend, or online payment is configured.
 
-Future collections are shown as **Coming Soon** without fake links or counts. Latest Finds is currently an editorial order rather than timestamp-derived chronology. Search, advanced filtering, permanent Find routes, and broader inventory remain deferred to their approved milestones.
+Future collections are shown as **Coming Soon** without fake links or counts. Latest Finds is currently an editorial order rather than timestamp-derived chronology. Search, advanced filtering, clean-path routing, and broader inventory remain deferred to their approved milestones.
+
+New public links use the immutable public ID, for example `find.html?id=BU-0001`. A registered slug such as `find.html?slug=gold-twisted-rope-bracelet` resolves as an alias, while its canonical metadata, sharing, reservation, and QR actions all use the public-ID URL. The query-based route works under GitHub Pages project subpaths without rewrite rules.
 
 ## Local preview
 
@@ -36,7 +40,7 @@ Then open `http://127.0.0.1:4175/`.
 
 ## Validation
 
-The project has no package-manager or build dependency. Run the complete compatibility, domain, brand/public-shell, Collections/discovery, Find-detail, gallery, media, and reservation suite with:
+The project has no package-manager or build dependency. Run the complete compatibility, domain, brand/public-shell, Collections/discovery, Find-detail, reservation, permalink, sharing, Copy Link, and QR suite with:
 
 ```bash
 node scripts/validate-baseline.mjs

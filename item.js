@@ -1,5 +1,5 @@
-// item.js — Renders normalized Find Details and manual reservation controls.
-// Numeric item.html?id=N routes remain the public compatibility surface.
+// item.js — Renders normalized Find Details, permanent sharing utilities, and
+// manual reservation controls for canonical, slug-alias, and legacy routes.
 
 function escapeHTML(value) {
   return String(value)
@@ -140,7 +140,9 @@ function relatedHTML(find) {
   var cards = relatedFinds.map(function (relatedFind) {
     var badgeClass = "badge badge-" + relatedFind.availability;
 
-    return '<a class="card" href="item.html?id=' + relatedFind.legacyId + '">' +
+    var relatedURL = window.BETWEEN_US_PERMALINKS.permalinkFor(relatedFind);
+
+    return '<a class="card" href="' + escapeHTML(relatedURL) + '">' +
       relatedImageHTML(relatedFind) +
       '<div class="card-body">' +
         '<p class="card-title">' + escapeHTML(relatedFind.title) + '</p>' +
@@ -196,13 +198,21 @@ function reservationHTML(find, shareURL) {
   '</section>';
 }
 
-function sharingHTML(shareURL) {
+function sharingHTML(canonicalURL) {
   return '<section class="share-section" aria-labelledby="share-title">' +
     '<h2 id="share-title">Share This Find</h2>' +
+    '<p class="share-intro">Share or copy this permanent Find link.</p>' +
     '<div class="share-link-box">' +
-      '<span class="share-url">' + escapeHTML(shareURL) + '</span>' +
-      '<button class="copy-btn" type="button" id="copyLinkBtn">Copy Find link</button>' +
-      '<span class="copy-confirm" id="copyConfirm" role="status" aria-live="polite" hidden>Link copied</span>' +
+      '<label class="share-link-label" for="shareUrlDisplay">Permanent Find link</label>' +
+      '<textarea class="share-url" id="shareUrlDisplay" rows="2" readonly spellcheck="false">' +
+        escapeHTML(canonicalURL) + '</textarea>' +
+      '<div class="share-actions">' +
+        '<button class="copy-btn" type="button" id="shareFindBtn">Share Find</button>' +
+        '<button class="copy-btn" type="button" id="copyLinkBtn">Copy Link</button>' +
+      '</div>' +
+      '<p class="share-status" id="shareStatus" role="status" aria-live="polite" aria-atomic="true"></p>' +
+      '<p class="manual-copy-instruction" id="manualCopyInstruction" hidden>' +
+        'Select and copy this link manually.</p>' +
     '</div>' +
   '</section>';
 }
@@ -210,9 +220,14 @@ function sharingHTML(shareURL) {
 function qrHTML() {
   return '<section class="qr-section" aria-labelledby="qr-title">' +
     '<h2 class="qr-label" id="qr-title">Scan QR code</h2>' +
-    '<div id="qrCodeCanvas" class="qr-canvas-wrapper"></div>' +
-    '<p class="qr-fallback" id="qrFallback" hidden>QR code could not be generated.</p>' +
-    '<button class="qr-download-btn" type="button" id="qrDownloadBtn">Download QR code</button>' +
+    '<p class="qr-description">Scan to open this Find\'s permanent link.</p>' +
+    '<div id="qrCodeCanvas" class="qr-canvas-wrapper" aria-label="Permanent Find QR code"></div>' +
+    '<p class="qr-status" id="qrStatus" role="status" aria-live="polite" aria-atomic="true"></p>' +
+    '<div class="qr-actions">' +
+      '<button class="qr-download-btn" type="button" id="qrRetryBtn" hidden>Retry QR</button>' +
+      '<button class="qr-download-btn" type="button" id="qrDownloadBtn" disabled aria-disabled="true">' +
+        'Download QR code</button>' +
+    '</div>' +
   '</section>';
 }
 
@@ -341,66 +356,288 @@ function wireReservation(find, shareURL) {
   });
 }
 
-function wireGeneralCopy(shareURL) {
-  var copyBtn = document.getElementById("copyLinkBtn");
-  var copyConfirm = document.getElementById("copyConfirm");
-  if (!copyBtn || !copyConfirm) return;
+function secondaryCopy(text) {
+  if (
+    !document.body ||
+    typeof document.createElement !== "function" ||
+    typeof document.execCommand !== "function"
+  ) {
+    return false;
+  }
 
-  copyBtn.addEventListener("click", function () {
-    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") return;
+  var temporary = document.createElement("textarea");
+  temporary.value = text;
+  temporary.setAttribute("readonly", "");
+  temporary.setAttribute("aria-hidden", "true");
+  temporary.style.position = "fixed";
+  temporary.style.left = "-9999px";
 
-    navigator.clipboard.writeText(shareURL).then(function () {
-      copyConfirm.hidden = false;
-      setTimeout(function () {
-        copyConfirm.hidden = true;
-      }, 2000);
+  try {
+    document.body.appendChild(temporary);
+    if (typeof temporary.select !== "function") return false;
+    temporary.select();
+    if (typeof temporary.setSelectionRange === "function") {
+      temporary.setSelectionRange(0, temporary.value.length);
+    }
+    return document.execCommand("copy") === true;
+  } catch (error) {
+    return false;
+  } finally {
+    if (temporary.parentNode) {
+      temporary.parentNode.removeChild(temporary);
+    } else if (typeof document.body.removeChild === "function") {
+      try {
+        document.body.removeChild(temporary);
+      } catch (error) {
+        // The temporary control may already have been removed.
+      }
+    }
+  }
+}
+
+function copyText(text) {
+  var clipboardAvailable =
+    typeof navigator !== "undefined" &&
+    navigator.clipboard &&
+    typeof navigator.clipboard.writeText === "function" &&
+    (!window || window.isSecureContext !== false);
+
+  if (!clipboardAvailable) {
+    return Promise.resolve(secondaryCopy(text));
+  }
+
+  try {
+    return Promise.resolve(navigator.clipboard.writeText(text)).then(function () {
+      return true;
+    }).catch(function () {
+      return secondaryCopy(text);
     });
+  } catch (error) {
+    return Promise.resolve(secondaryCopy(text));
+  }
+}
+
+function wireGeneralSharing(find, canonicalURL) {
+  var shareButton = document.getElementById("shareFindBtn");
+  var copyButton = document.getElementById("copyLinkBtn");
+  var status = document.getElementById("shareStatus");
+  var manualInstruction = document.getElementById("manualCopyInstruction");
+  if (!shareButton || !copyButton || !status || !manualInstruction) return;
+
+  function prepareCopy() {
+    manualInstruction.hidden = true;
+    status.textContent = "";
+
+    return copyText(canonicalURL).then(function (copied) {
+      if (copied) {
+        status.textContent = "Link copied.";
+        return true;
+      }
+
+      manualInstruction.hidden = false;
+      status.textContent = "Copying was not available. Select and copy the link manually.";
+      return false;
+    });
+  }
+
+  copyButton.addEventListener("click", prepareCopy);
+  shareButton.addEventListener("click", function () {
+    manualInstruction.hidden = true;
+    status.textContent = "";
+
+    if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
+      prepareCopy();
+      return;
+    }
+
+    var shareData = {
+      title: find.title + " | Between Us",
+      text: "Take a look at " + find.title + " from Between Us.",
+      url: canonicalURL
+    };
+
+    try {
+      Promise.resolve(navigator.share(shareData)).then(function () {
+        status.textContent = "Find shared.";
+      }).catch(function (error) {
+        if (isShareCancellation(error)) {
+          status.textContent = "Share was canceled.";
+          return;
+        }
+
+        manualInstruction.hidden = false;
+        status.textContent = "Sharing was not available. Use Copy Link or select the link manually.";
+      });
+    } catch (error) {
+      manualInstruction.hidden = false;
+      status.textContent = "Sharing was not available. Use Copy Link or select the link manually.";
+    }
   });
 }
 
-function wireQRCode(find, shareURL) {
+function validImageURL(value) {
+  return typeof value === "string" && /^(?:data:image\/|blob:|https?:\/\/)/i.test(value);
+}
+
+function pngSourceFromImage(image) {
+  if (!image || !validImageURL(image.src)) return null;
+  if (/^data:image\/png(?:;|,)/i.test(image.src)) return image.src;
+
+  try {
+    var conversionCanvas = document.createElement("canvas");
+    conversionCanvas.width = image.naturalWidth || image.width || 160;
+    conversionCanvas.height = image.naturalHeight || image.height || 160;
+    var context = conversionCanvas.getContext("2d");
+    if (!context) return null;
+    context.drawImage(image, 0, 0, conversionCanvas.width, conversionCanvas.height);
+    var source = conversionCanvas.toDataURL("image/png");
+    return /^data:image\/png(?:;|,)/i.test(source) ? source : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function setDownloadAvailability(button, available) {
+  if (!button) return;
+  button.disabled = !available;
+  button.setAttribute("aria-disabled", String(!available));
+}
+
+function qrConstructor() {
+  if (window && typeof window.QRCode === "function") return window.QRCode;
+  if (typeof QRCode === "function") return QRCode;
+  return null;
+}
+
+function wireQRCode(find, canonicalURL) {
   var qrContainer = document.getElementById("qrCodeCanvas");
-  var qrFallback = document.getElementById("qrFallback");
+  var qrStatus = document.getElementById("qrStatus");
+  var qrRetryBtn = document.getElementById("qrRetryBtn");
   var qrDownloadBtn = document.getElementById("qrDownloadBtn");
 
-  if (qrContainer && typeof QRCode !== "undefined") {
+  if (!qrContainer || !qrStatus || !qrDownloadBtn) return;
+
+  function outputElements() {
+    return {
+      canvas: qrContainer.querySelector("canvas"),
+      image: qrContainer.querySelector("img")
+    };
+  }
+
+  function markOutputAccessible(output) {
+    if (output.canvas && typeof output.canvas.setAttribute === "function") {
+      output.canvas.setAttribute("role", "img");
+      output.canvas.setAttribute("aria-label", "QR code for " + find.title);
+    }
+    if (output.image) {
+      output.image.alt = "QR code for " + find.title;
+    }
+  }
+
+  function showGenerationFailure() {
+    setDownloadAvailability(qrDownloadBtn, false);
+    qrStatus.textContent = "QR generation is temporarily unavailable. Use Copy Link instead.";
+    if (qrRetryBtn) qrRetryBtn.hidden = false;
+  }
+
+  function renderQRCode() {
+    qrContainer.innerHTML = "";
+    qrStatus.textContent = "";
+    setDownloadAvailability(qrDownloadBtn, false);
+    if (qrRetryBtn) qrRetryBtn.hidden = true;
+
+    var Constructor = qrConstructor();
+    if (!Constructor) {
+      showGenerationFailure();
+      return;
+    }
+
     try {
-      new QRCode(qrContainer, {
-        text: shareURL,
+      new Constructor(qrContainer, {
+        text: canonicalURL,
         width: 160,
         height: 160,
         colorDark: "#2c2c2c",
         colorLight: "#ffffff"
       });
+    } catch (error) {
+      showGenerationFailure();
+      return;
+    }
 
-      if (qrDownloadBtn) {
-        qrDownloadBtn.addEventListener("click", function () {
-          var canvas = qrContainer.querySelector("canvas");
-          var img = qrContainer.querySelector("img");
-          var link = document.createElement("a");
+    var output = outputElements();
+    if (!output.canvas && !output.image) {
+      showGenerationFailure();
+      return;
+    }
 
-          link.download = "jewelry-item-" + find.legacyId + "-qr.png";
+    markOutputAccessible(output);
+    setDownloadAvailability(qrDownloadBtn, true);
+    qrStatus.textContent = "QR code ready for scanning.";
+  }
 
-          if (canvas) {
-            link.href = canvas.toDataURL("image/png");
-          } else if (img) {
-            link.href = img.src;
-          } else {
-            return;
-          }
+  if (qrRetryBtn) {
+    qrRetryBtn.addEventListener("click", renderQRCode);
+  }
 
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        });
+  qrDownloadBtn.addEventListener("click", function () {
+    var output = outputElements();
+    var pngSource = null;
+
+    try {
+      if (output.canvas && typeof output.canvas.toDataURL === "function") {
+        var canvasSource = output.canvas.toDataURL("image/png");
+        if (/^data:image\/png(?:;|,)/i.test(canvasSource)) {
+          pngSource = canvasSource;
+        }
       }
     } catch (error) {
-      if (qrFallback) qrFallback.hidden = false;
-      if (qrDownloadBtn) qrDownloadBtn.hidden = true;
+      pngSource = null;
     }
+
+    if (!pngSource && output.image) {
+      pngSource = pngSourceFromImage(output.image);
+    }
+
+    if (pngSource) {
+      var link = document.createElement("a");
+      link.download = "between-us-" + find.publicId + "-qr.png";
+      link.href = pngSource;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      qrStatus.textContent = "QR download prepared.";
+      return;
+    }
+
+    if (output.image && validImageURL(output.image.src)) {
+      var fallbackLink = document.createElement("a");
+      fallbackLink.href = output.image.src;
+      fallbackLink.target = "_blank";
+      fallbackLink.rel = "noopener";
+      document.body.appendChild(fallbackLink);
+      fallbackLink.click();
+      document.body.removeChild(fallbackLink);
+      qrStatus.textContent = "A PNG download could not be prepared. The QR image was opened so you can save it.";
+      return;
+    }
+
+    qrStatus.textContent = "The QR download could not be prepared. Use Copy Link instead.";
+  });
+
+  renderQRCode();
+}
+
+function updateCanonicalMetadata(canonicalURL) {
+  var canonicalLink = document.getElementById("canonicalLink");
+  if (!canonicalLink) return;
+
+  if (canonicalURL) {
+    canonicalLink.setAttribute("href", canonicalURL);
+  } else if (typeof canonicalLink.removeAttribute === "function") {
+    canonicalLink.removeAttribute("href");
   } else {
-    if (qrFallback) qrFallback.hidden = false;
-    if (qrDownloadBtn) qrDownloadBtn.hidden = true;
+    canonicalLink.setAttribute("href", "");
   }
 }
 
@@ -409,32 +646,34 @@ var detail = document.getElementById("itemDetail");
 if (!detail) {
   console.error("item.js: Could not find #itemDetail on the page.");
 } else {
-  var params = new URLSearchParams(window.location.search);
-  var itemId = parseInt(params.get("id"), 10);
+  var permalinks = window.BETWEEN_US_PERMALINKS;
   var find = null;
+  var canonicalURL = null;
 
   if (
-    window.BETWEEN_US_DATA &&
-    typeof window.BETWEEN_US_DATA.findByLegacyId === "function" &&
-    itemId
+    permalinks &&
+    typeof permalinks.findByRoute === "function" &&
+    typeof permalinks.currentCanonicalUrl === "function"
   ) {
-    find = window.BETWEEN_US_DATA.findByLegacyId(itemId);
+    find = permalinks.findByRoute(window.location);
+    canonicalURL = permalinks.currentCanonicalUrl(window.location);
   }
 
-  if (!find) {
+  if (!find || !canonicalURL) {
+    updateCanonicalMetadata(null);
     document.title = "Find not found | Between Us Finds";
     detail.innerHTML =
-      '<div class="not-found-state">' +
+      '<div class="not-found-state" role="status">' +
         '<p class="eyebrow">Between Us Finds</p>' +
         '<h1>Find not found.</h1>' +
         '<p>This Find may no longer be available, or the link may be incomplete.</p>' +
         '<a class="button button-primary" href="index.html#explore">Back to Explore</a>' +
       '</div>';
   } else {
+    updateCanonicalMetadata(canonicalURL);
     document.title = find.title + " | Between Us Finds";
 
     var photos = orderedUsablePhotos(find);
-    var shareURL = window.location.href;
     var badgeClass = "badge badge-" + find.availability;
     var conditionHTML = typeof find.condition === "string" && find.condition.trim().length > 0
       ? '<p class="detail-condition"><span>Condition:</span> ' + escapeHTML(find.condition.trim()) + '</p>'
@@ -452,18 +691,18 @@ if (!detail) {
             availabilityLabel(find.availability) + '</span></p>' +
           '<p class="detail-description">' + escapeHTML(find.description) + '</p>' +
           conditionHTML +
-          reservationHTML(find, shareURL) +
+          reservationHTML(find, canonicalURL) +
         '</div>' +
       '</article>' +
       '<div class="detail-utilities">' +
-        sharingHTML(shareURL) +
+        sharingHTML(canonicalURL) +
         qrHTML() +
       '</div>' +
       relatedHTML(find);
 
     wireGallery(find, photos, detail);
-    wireReservation(find, shareURL);
-    wireGeneralCopy(shareURL);
-    wireQRCode(find, shareURL);
+    wireReservation(find, canonicalURL);
+    wireGeneralSharing(find, canonicalURL);
+    wireQRCode(find, canonicalURL);
   }
 }

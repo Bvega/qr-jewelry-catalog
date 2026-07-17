@@ -19,7 +19,7 @@ function renderDetail(query) {
   return renderFindDetail({ query, runtime });
 }
 
-test("catalog renderer creates one legacy numeric link per current item", () => {
+test("catalog renderer creates one permanent public-ID link per current item", () => {
   const cards = [];
   const grid = {
     innerHTML: "loading",
@@ -37,7 +37,12 @@ test("catalog renderer creates one legacy numeric link per current item", () => 
         return { className: "", href: "", innerHTML: "" };
       }
     },
-    window: { JEWELRY_ITEMS: items }
+    window: {
+      BETWEEN_US_COLLECTIONS: [],
+      BETWEEN_US_FINDS: runtime.finds,
+      BETWEEN_US_PERMALINKS: runtime.permalinks,
+      JEWELRY_ITEMS: items
+    }
   };
 
   vm.runInNewContext(appSource, context, {
@@ -45,8 +50,8 @@ test("catalog renderer creates one legacy numeric link per current item", () => 
   });
 
   assert.deepEqual(
-    cards.map((card) => card.href),
-    EXPECTED_LEGACY_IDS.map((id) => `item.html?id=${id}`)
+    Array.from(cards, (card) => card.href),
+    Array.from(runtime.finds, (find) => `https://example.test/find.html?id=${find.publicId}`)
   );
 });
 
@@ -56,14 +61,17 @@ for (const item of items) {
 
     assert.equal(result.document.title, `${item.name} | Between Us Finds`);
     assert.ok(result.elements.itemDetail.innerHTML.includes(item.name));
-    assert.ok(result.elements.itemDetail.innerHTML.includes(result.href));
+    assert.ok(result.elements.itemDetail.innerHTML.includes(result.canonicalURL));
     assert.doesNotMatch(result.elements.itemDetail.innerHTML, /Find not found/);
-    assert.equal(result.elements.qrFallback.hidden, false);
-    assert.equal(result.elements.qrDownloadBtn.hidden, true);
+    assert.match(result.elements.qrStatus.textContent, /temporarily unavailable/);
+    assert.equal(result.elements.qrRetryBtn.hidden, false);
+    assert.equal(result.elements.qrDownloadBtn.disabled, true);
+    assert.equal(result.elements.canonicalLink.getAttribute("href"), result.canonicalURL);
 
     for (const relatedId of item.relatedIds) {
+      const relatedFind = runtime.lookup.findByLegacyId(relatedId);
       assert.ok(
-        result.elements.itemDetail.innerHTML.includes(`item.html?id=${relatedId}`),
+        result.elements.itemDetail.innerHTML.includes(`find.html?id=${relatedFind.publicId}`),
         `item ${item.id} did not retain related link ${relatedId}`
       );
     }

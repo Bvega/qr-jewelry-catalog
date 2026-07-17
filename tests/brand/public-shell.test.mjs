@@ -8,6 +8,7 @@ import {
 
 const indexHtml = readProjectFile("index.html");
 const itemHtml = readProjectFile("item.html");
+const findHtml = readProjectFile("find.html");
 const appSource = readProjectFile("app.js");
 const itemSource = readProjectFile("item.js");
 const styles = readProjectFile("styles.css");
@@ -64,9 +65,11 @@ test("detail page shares the brand shell and preserves required script order", (
     "data/collections.js",
     "data/media.js",
     "data/reservation.js",
+    "data/permalinks.js",
     APPROVED_QR_LIBRARY,
     "item.js"
   ]);
+  assert.deepEqual(extractScriptSources(findHtml), extractScriptSources(itemHtml));
 });
 
 test("detail renderer uses Find vocabulary and dynamic Between Us title", () => {
@@ -78,7 +81,7 @@ test("detail renderer uses Find vocabulary and dynamic Between Us title", () => 
 });
 
 test("shared shell uses the local mark in headers and favicon links", () => {
-  for (const html of [indexHtml, itemHtml]) {
+  for (const html of [indexHtml, itemHtml, findHtml]) {
     assert.match(html, /rel=["']icon["'][^>]*assets\/brand\/between-us-mark\.svg/);
     assert.match(html, /class=["']brand-mark["'][^>]*assets\/brand\/between-us-mark\.svg/);
   }

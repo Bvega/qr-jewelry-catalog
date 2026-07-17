@@ -32,6 +32,7 @@ function readStaticRoute(route) {
 for (const publicPath of [
   "/",
   "/index.html",
+  "/find.html",
   "/styles.css",
   "/app.js",
   "/item.js",
@@ -39,13 +40,23 @@ for (const publicPath of [
   "/data/collections.js",
   "/data/discovery.js",
   "/data/media.js",
-  "/data/reservation.js"
+  "/data/reservation.js",
+  "/data/permalinks.js"
 ]) {
   test(`${publicPath} resolves as a static resource`, () => {
     const response = readStaticRoute(publicPath);
 
     assert.equal(response.status, 200);
     assert.ok(response.body.length > 0);
+  });
+}
+
+for (const publicId of ["BU-0001", "BU-0002", "BU-0003", "BU-0004", "BU-0005"]) {
+  test(`/find.html?id=${publicId} resolves the permanent Find detail shell`, () => {
+    const response = readStaticRoute(`/find.html?id=${publicId}`);
+
+    assert.equal(response.status, 200);
+    assert.match(response.body.toString("utf8"), /\bid=["']itemDetail["']/);
   });
 }
 

@@ -11,6 +11,7 @@ import {
 
 const indexHtml = readProjectFile("index.html");
 const itemHtml = readProjectFile("item.html");
+const findHtml = readProjectFile("find.html");
 const appSource = readProjectFile("app.js");
 const itemSource = readProjectFile("item.js");
 const styles = readProjectFile("styles.css");
@@ -18,8 +19,10 @@ const styles = readProjectFile("styles.css");
 test("required public pages and DOM anchors exist", () => {
   assert.ok(existsSync(pathFromRoot("index.html")));
   assert.ok(existsSync(pathFromRoot("item.html")));
+  assert.ok(existsSync(pathFromRoot("find.html")));
   assert.match(indexHtml, /\bid=["']catalogGrid["']/);
   assert.match(itemHtml, /\bid=["']itemDetail["']/);
+  assert.match(findHtml, /\bid=["']itemDetail["']/);
 });
 
 test("catalog page loads the shared stylesheet, data, and renderer in order", () => {
@@ -29,6 +32,7 @@ test("catalog page loads the shared stylesheet, data, and renderer in order", ()
     "data/collections.js",
     "data/discovery.js",
     "data/media.js",
+    "data/permalinks.js",
     "app.js"
   ]);
 });
@@ -40,30 +44,32 @@ test("detail page loads data, approved QR library, and renderer in order", () =>
     "data/collections.js",
     "data/media.js",
     "data/reservation.js",
+    "data/permalinks.js",
     APPROVED_QR_LIBRARY,
     "item.js"
   ]);
+  assert.deepEqual(extractScriptSources(findHtml), extractScriptSources(itemHtml));
 });
 
-test("catalog and detail renderers retain required DOM and legacy-link contracts", () => {
+test("catalog and detail renderers use permanent links while retaining legacy route resolution", () => {
   assert.match(appSource, /getElementById\(["']catalogGrid["']\)/);
-  assert.match(appSource, /card\.href\s*=\s*["']item\.html\?id=["']\s*\+\s*item\.id/);
+  assert.match(appSource, /BETWEEN_US_PERMALINKS\.permalinkFor\(find\)/);
   assert.match(itemSource, /getElementById\(["']itemDetail["']\)/);
-  assert.match(itemSource, /new URLSearchParams\(window\.location\.search\)/);
-  assert.match(itemSource, /window\.BETWEEN_US_DATA\.findByLegacyId\(itemId\)/);
-  assert.match(itemSource, /href=["']item\.html\?id=["']\s*\+\s*relatedFind\.legacyId/);
+  assert.match(itemSource, /permalinks\.findByRoute\(window\.location\)/);
+  assert.match(itemSource, /currentCanonicalUrl\(window\.location\)/);
+  assert.match(itemSource, /BETWEEN_US_PERMALINKS\.permalinkFor\(relatedFind\)/);
 });
 
-test("share, copy-link, QR generation, fallback, and download paths remain", () => {
-  assert.match(itemSource, /var shareURL\s*=\s*window\.location\.href\s*;/);
-  assert.match(itemSource, /navigator\.clipboard\.writeText\(shareURL\)/);
-  assert.match(itemSource, /typeof QRCode\s*!==\s*["']undefined["']/);
-  assert.match(itemSource, /new QRCode\(qrContainer,/);
-  assert.match(itemSource, /text:\s*shareURL/);
-  assert.match(itemSource, /qrFallback\.hidden\s*=\s*false/);
-  assert.match(itemSource, /qrDownloadBtn\.hidden\s*=\s*true/);
+test("share, copy-link, QR generation, fallback, and PNG download paths remain", () => {
+  assert.match(itemSource, /navigator\.clipboard\.writeText\(text\)/);
+  assert.match(itemSource, /document\.execCommand\(["']copy["']\)/);
+  assert.match(itemSource, /navigator\.share\(shareData\)/);
+  assert.match(itemSource, /new Constructor\(qrContainer,/);
+  assert.match(itemSource, /text:\s*canonicalURL/);
+  assert.match(itemSource, /QR generation is temporarily unavailable\. Use Copy Link instead\./);
+  assert.match(itemSource, /qrContainer\.innerHTML\s*=\s*["']["']/);
   assert.match(itemSource, /canvas\.toDataURL\(["']image\/png["']\)/);
-  assert.match(itemSource, /link\.download\s*=\s*["']jewelry-item-["']\s*\+\s*find\.legacyId/);
+  assert.match(itemSource, /link\.download\s*=\s*["']between-us-["']\s*\+\s*find\.publicId\s*\+\s*["']-qr\.png["']/);
 });
 
 test("shared CSS retains the current responsive layout breakpoints", () => {

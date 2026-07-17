@@ -4,7 +4,7 @@ M05 completes the static Find Details experience and introduces a manual, config
 
 ## Normalized detail source
 
-`item.js` keeps the public `item.html?id=N` route and resolves its numeric ID with `window.BETWEEN_US_DATA.findByLegacyId`. The returned normalized Find supplies:
+`item.js` serves both the permanent `find.html?id=BU-NNNN` page and protected `item.html?id=N` page. It resolves permanent public IDs, exact registered-slug aliases, and numeric legacy IDs through `window.BETWEEN_US_PERMALINKS.findByRoute`. The returned normalized Find supplies:
 
 - `title`
 - `publicId`
@@ -52,7 +52,7 @@ paymentMethod: cash
 pickupMode: local-arrangement
 ```
 
-`{title}` and `{publicId}` resolve to the exact normalized values. The current numeric detail URL is added separately when `includeUrl` is true. No phone number, email address, messaging account, recipient, pickup address, or third-party SDK is configured.
+`{title}` and `{publicId}` resolve to the exact normalized values. The absolute canonical public-ID permalink is added separately when `includeUrl` is true, regardless of whether the visitor entered through a permanent, slug-alias, or legacy route. No phone number, email address, messaging account, recipient, pickup address, or third-party SDK is configured.
 
 The channel boundary is intentionally configurable. M05 implements `share` as the approved default and uses clipboard/manual text as channel-neutral fallbacks; a future direct channel requires separate approved configuration and contact information.
 
@@ -66,7 +66,7 @@ All states keep the public page, general copy-link control, QR control, Related 
 
 ## Web Share and fallbacks
 
-When the configured channel is `share` and the browser supports `navigator.share`, the action supplies a Between Us reservation-request title, the generated message, and the current detail URL. A resolved share reports success accessibly. User cancellation reports that nothing was sent and is not treated as a failure.
+When the configured channel is `share` and the browser supports `navigator.share`, the action supplies a Between Us reservation-request title, the generated message, and the canonical detail URL. A resolved share reports success accessibly. User cancellation reports that nothing was sent and is not treated as a failure.
 
 If Web Share is unavailable or fails for a non-cancellation reason, the complete message and URL are copied with the Clipboard API. The polite live status tells the visitor to paste the text into a preferred messaging application.
 
@@ -76,4 +76,4 @@ If clipboard access is unavailable or fails, a labeled read-only textarea is rev
 
 The browser holds the generated text only for the current page interaction. The application has no form submission, customer-name field, storage, account, database, API, backend, automatic reservation, inventory synchronization, notification, payment collection, shipping, or published pickup address.
 
-M06 owns permanent Find routes and must preserve every current numeric URL and QR payload during that migration. M07 owns final content and media replacement; until then, the media registry remains the authority for the two known unavailable paths.
+M06 preserves every current numeric URL and already-distributed QR destination while routing every newly generated card, share, reservation, and QR target to the public-ID permalink. M07 owns final content and media replacement; until then, the media registry remains the authority for the two known unavailable paths.

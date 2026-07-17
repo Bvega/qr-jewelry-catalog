@@ -38,9 +38,9 @@ Configured selections are:
 - Latest Finds: `BU-0004`, `BU-0005`, `BU-0001`
 - Find of the Week: `BU-0001`
 
-Featured and Latest use the same standard Find-card renderer as Explore. Cards resolve normalized Finds through `window.BETWEEN_US_DATA`, preserve current values and image fallback, and continue linking to `item.html?id=N`.
+Featured and Latest use the same standard Find-card renderer as Explore. Cards resolve normalized Finds through `window.BETWEEN_US_DATA`, preserve current values and image fallback, and link to canonical `find.html?id=BU-NNNN` routes through `window.BETWEEN_US_PERMALINKS`.
 
-Find of the Week resolves the same normalized Find and presents its image or fallback, title, public ID, description, price, availability, and numeric **View Find** action in a distinct responsive feature.
+Find of the Week resolves the same normalized Find and presents its image or fallback, title, public ID, description, price, availability, and permanent **View Find** action in a distinct responsive feature.
 
 ## Latest editorial limitation
 

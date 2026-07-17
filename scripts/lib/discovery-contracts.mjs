@@ -56,12 +56,19 @@ export const EXPECTED_DISCOVERY = Object.freeze({
 });
 
 export function loadCollectionAndDiscoveryData() {
-  const context = { window: {} };
+  const context = {
+    URL,
+    URLSearchParams,
+    window: {
+      location: { href: "https://example.test/finds/index.html" }
+    }
+  };
 
   for (const relativePath of [
     "data/items.js",
     "data/collections.js",
-    "data/discovery.js"
+    "data/discovery.js",
+    "data/permalinks.js"
   ]) {
     vm.runInNewContext(readProjectFile(relativePath), context, {
       filename: pathFromRoot(relativePath)
@@ -73,7 +80,8 @@ export function loadCollectionAndDiscoveryData() {
     discovery: context.window.BETWEEN_US_DISCOVERY,
     finds: context.window.BETWEEN_US_FINDS,
     lookup: context.window.BETWEEN_US_DATA,
-    legacyItems: context.window.JEWELRY_ITEMS
+    legacyItems: context.window.JEWELRY_ITEMS,
+    permalinks: context.window.BETWEEN_US_PERMALINKS
   };
 }
 

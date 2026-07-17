@@ -51,7 +51,7 @@ test("reserved and sold Finds show exact inactive text without an active action"
   }
 });
 
-test("available action uses channel-neutral Web Share with title, message, public ID, and current URL", async () => {
+test("available action uses channel-neutral Web Share with title, message, public ID, and canonical URL", async () => {
   const shareCalls = [];
   const clipboardCalls = [];
   const navigator = {
@@ -67,7 +67,7 @@ test("available action uses channel-neutral Web Share with title, message, publi
   assert.equal(shareCalls[0].title, "Between Us reservation request");
   assert.match(shareCalls[0].text, /Gold Twisted Rope Bracelet/);
   assert.match(shareCalls[0].text, /BU-0001/);
-  assert.equal(shareCalls[0].url, result.href);
+  assert.equal(shareCalls[0].url, result.canonicalURL);
   assert.equal(clipboardCalls.length, 0);
   assert.match(result.elements.reservationStatus.textContent, /shared/);
 });
@@ -99,7 +99,7 @@ test("unavailable or failed Web Share copies the complete message and URL", asyn
 
   assert.equal(clipboardCalls.length, 1);
   assert.match(clipboardCalls[0], /Gold Twisted Rope Bracelet \(BU-0001\)/);
-  assert.match(clipboardCalls[0], new RegExp(result.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.match(clipboardCalls[0], new RegExp(result.canonicalURL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(result.elements.reservationStatus.textContent, /Paste it into your preferred messaging application/);
 
   const failedShareClipboard = [];
@@ -131,7 +131,7 @@ test("clipboard failure reveals an honest selectable manual message fallback", a
   assert.match(result.elements.reservationStatus.textContent, /Select and copy the message below/);
   assert.match(result.detail.innerHTML, /<textarea[^>]*id="reservationMessageFallback"[^>]*readonly/);
   assert.match(result.detail.innerHTML, /Gold Twisted Rope Bracelet \(BU-0001\)/);
-  assert.match(result.detail.innerHTML, /https:\/\/example\.test\/item\.html\?id=1/);
+  assert.match(result.detail.innerHTML, /https:\/\/example\.test\/find\.html\?id=BU-0001/);
 });
 
 test("reservation controls retain mobile target, focus, and non-color-only states", () => {

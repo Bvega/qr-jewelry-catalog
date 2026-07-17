@@ -9,8 +9,8 @@ import {
 const runtime = loadFindDetailRuntime();
 const itemSource = readProjectFile("item.js");
 
-test("numeric routes resolve normalized Finds through the compatibility lookup", () => {
-  assert.match(itemSource, /window\.BETWEEN_US_DATA\.findByLegacyId\(itemId\)/);
+test("numeric routes resolve normalized Finds through the authoritative route runtime", () => {
+  assert.match(itemSource, /permalinks\.findByRoute\(window\.location\)/);
 
   for (const find of runtime.finds) {
     const result = renderFindDetail({ query: `?id=${find.legacyId}`, runtime });
@@ -20,6 +20,7 @@ test("numeric routes resolve normalized Finds through the compatibility lookup",
     assert.match(result.detail.innerHTML, new RegExp(find.publicId));
     assert.match(result.detail.innerHTML, new RegExp(find.title));
     assert.doesNotMatch(result.detail.innerHTML, /Find not found/);
+    assert.equal(result.elements.canonicalLink.getAttribute("href"), result.canonicalURL);
   }
 });
 
@@ -67,16 +68,17 @@ test("invalid numeric, nonnumeric, and missing IDs retain the branded invalid st
     assert.equal(result.document.title, "Find not found | Between Us Finds");
     assert.match(result.detail.innerHTML, /<h1>Find not found\.<\/h1>/);
     assert.match(result.detail.innerHTML, /href="index\.html#explore"/);
+    assert.equal(result.elements.canonicalLink.getAttribute("href"), null);
   }
 });
 
 test("Related Finds resolve normalized public IDs in their exact configured order", () => {
   const result = renderFindDetail({ query: "?id=1", runtime });
-  const first = result.detail.innerHTML.indexOf("item.html?id=2");
-  const second = result.detail.innerHTML.indexOf("item.html?id=4");
+  const first = result.detail.innerHTML.indexOf("find.html?id=BU-0002");
+  const second = result.detail.innerHTML.indexOf("find.html?id=BU-0004");
 
   assert.ok(first >= 0);
   assert.ok(second > first);
   assert.match(itemSource, /find\.relatedFindIds\.map/);
-  assert.doesNotMatch(result.detail.innerHTML, /reservation[^>]*item\.html\?id=2/i);
+  assert.doesNotMatch(result.detail.innerHTML, /reservation[^>]*find\.html\?id=BU-0002/i);
 });

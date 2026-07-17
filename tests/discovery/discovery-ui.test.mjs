@@ -90,6 +90,7 @@ function renderHome({ collections = runtimeData.collections } = {}) {
       BETWEEN_US_DATA: runtimeData.lookup,
       BETWEEN_US_COLLECTIONS: collections,
       BETWEEN_US_DISCOVERY: runtimeData.discovery,
+      BETWEEN_US_PERMALINKS: runtimeData.permalinks,
       JEWELRY_ITEMS: runtimeData.legacyItems
     }
   };
@@ -111,6 +112,7 @@ test("home loads item, Collection, and Discovery data before app.js", () => {
     "data/collections.js",
     "data/discovery.js",
     "data/media.js",
+    "data/permalinks.js",
     "app.js"
   ]);
 });
@@ -145,12 +147,13 @@ test("Collection preview is rendered from the registry with honest states", () =
   }
 });
 
-test("Explore defaults to all five Finds in original order", () => {
+test("Explore defaults to all five Finds in original order with permanent links", () => {
   const elements = renderHome();
 
   assert.deepEqual(
     elements.catalogGrid.children.map((card) => card.href),
-    [1, 2, 3, 4, 5].map((id) => `item.html?id=${id}`)
+    ["BU-0001", "BU-0002", "BU-0003", "BU-0004", "BU-0005"]
+      .map((id) => `https://example.test/finds/find.html?id=${id}`)
   );
   assert.equal(elements.resultsSummary.textContent, "5 Finds");
 });
@@ -170,13 +173,14 @@ test("only active Collections become accessible filter buttons", () => {
   }
 });
 
-test("Jewelry filter preserves order, numeric URLs, selected state, and summary", () => {
+test("Jewelry filter preserves order, permanent URLs, selected state, and summary", () => {
   const elements = renderHome();
   filterByLabel(elements, "Jewelry").click();
 
   assert.deepEqual(
     elements.catalogGrid.children.map((card) => card.href),
-    [1, 2, 3, 4, 5].map((id) => `item.html?id=${id}`)
+    ["BU-0001", "BU-0002", "BU-0003", "BU-0004", "BU-0005"]
+      .map((id) => `https://example.test/finds/find.html?id=${id}`)
   );
   assert.equal(elements.resultsSummary.textContent, "5 Finds in Jewelry");
   assert.equal(filterByLabel(elements, "All Finds").getAttribute("aria-pressed"), "false");
@@ -210,11 +214,13 @@ test("Featured and Latest use exact configured order through shared cards", () =
 
   assert.deepEqual(
     elements.featuredGrid.children.map((card) => card.href),
-    ["item.html?id=1", "item.html?id=4", "item.html?id=5"]
+    ["BU-0001", "BU-0004", "BU-0005"]
+      .map((id) => `https://example.test/finds/find.html?id=${id}`)
   );
   assert.deepEqual(
     elements.latestGrid.children.map((card) => card.href),
-    ["item.html?id=4", "item.html?id=5", "item.html?id=1"]
+    ["BU-0004", "BU-0005", "BU-0001"]
+      .map((id) => `https://example.test/finds/find.html?id=${id}`)
   );
   assert.equal((appSource.match(/renderFindCards\(/g) || []).length, 4);
   assert.equal((appSource.match(/function createFindCard\(/g) || []).length, 1);
@@ -241,7 +247,7 @@ test("Find of the Week presents the exact configured normalized Find", () => {
   assert.ok(html.includes(runtimeData.finds[0].description));
   assert.match(html, /\$28/);
   assert.match(html, /badge-available[^>]*>Available/);
-  assert.match(html, /href="item\.html\?id=1">View Find/);
+  assert.match(html, /href="https:\/\/example\.test\/finds\/find\.html\?id=BU-0001">View Find/);
 });
 
 test("filter controls expose live state, visible selection, focus, and mobile targets", () => {

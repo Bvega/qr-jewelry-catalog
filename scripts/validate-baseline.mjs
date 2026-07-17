@@ -23,6 +23,7 @@ const domainTestFiles = findTestFiles("tests/domain");
 const brandTestFiles = findTestFiles("tests/brand");
 const discoveryTestFiles = findTestFiles("tests/discovery");
 const detailTestFiles = findTestFiles("tests/detail");
+const permalinkTestFiles = findTestFiles("tests/permalinks");
 
 const checks = [
   {
@@ -61,6 +62,11 @@ const checks = [
     arguments: ["--check", "data/reservation.js"]
   },
   {
+    label: "JavaScript syntax: data/permalinks.js",
+    displayCommand: "node --check data/permalinks.js",
+    arguments: ["--check", "data/permalinks.js"]
+  },
+  {
     label: "Baseline contract tests",
     displayCommand: "node --test tests/baseline/*.test.mjs",
     arguments: ["--test", ...baselineTestFiles]
@@ -84,12 +90,17 @@ const checks = [
     label: "Find Details, gallery, media, and reservation tests",
     displayCommand: "node --test tests/detail/*.test.mjs",
     arguments: ["--test", ...detailTestFiles]
+  },
+  {
+    label: "Permalink, sharing, Copy Link, and QR tests",
+    displayCommand: "node --test tests/permalinks/*.test.mjs",
+    arguments: ["--test", ...permalinkTestFiles]
   }
 ];
 
 const failures = [];
 
-console.log("M05 repository validation\n");
+console.log("M06 repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -138,7 +149,7 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM05 repository validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM06 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
   const relativeTests = [
@@ -146,9 +157,10 @@ if (failures.length > 0) {
     ...domainTestFiles,
     ...brandTestFiles,
     ...discoveryTestFiles,
-    ...detailTestFiles
+    ...detailTestFiles,
+    ...permalinkTestFiles
   ]
     .map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, and detail test files.`);
-  console.log("M05 repository validation: PASS");
+  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, and permalink test files.`);
+  console.log("M06 repository validation: PASS");
 }
