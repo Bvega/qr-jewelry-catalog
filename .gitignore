@@ -17,3 +17,9 @@ build/
 
 # Editor
 .vscode/
+
+# Owner-supplied content intake (keep folder placeholders only)
+content-intake/photos/*
+!content-intake/photos/.gitkeep
+content-intake/archive/*
+!content-intake/archive/.gitkeep

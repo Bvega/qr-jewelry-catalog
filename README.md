@@ -28,6 +28,10 @@ Future collections are shown as **Coming Soon** without fake links or counts. La
 
 New public links use the immutable public ID, for example `find.html?id=BU-0001`. A registered slug such as `find.html?slug=gold-twisted-rope-bracelet` resolves as an alias, while its canonical metadata, sharing, reservation, and QR actions all use the public-ID URL. The query-based route works under GitHub Pages project subpaths without rewrite rules.
 
+## Content intake
+
+M07A adds a private staging workspace under `content-intake/` for owner-supplied Find records and photographs. Intake files are validated and summarized locally; they are not published, assigned permanent public IDs, or copied into the live catalog automatically. See `docs/CONTENT_INTAKE_WORKFLOW.md` before preparing owner content.
+
 ## Local preview
 
 From the repository root:
@@ -40,7 +44,7 @@ Then open `http://127.0.0.1:4175/`.
 
 ## Validation
 
-The project has no package-manager or build dependency. Run the complete compatibility, domain, brand/public-shell, Collections/discovery, Find-detail, reservation, permalink, sharing, Copy Link, and QR suite with:
+The project has no package-manager or build dependency. Run the complete compatibility, domain, brand/public-shell, Collections/discovery, Find-detail, reservation, permalink, sharing, Copy Link, QR, and content-intake suite with:
 
 ```bash
 node scripts/validate-baseline.mjs

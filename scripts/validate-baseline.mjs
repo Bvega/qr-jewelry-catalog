@@ -24,6 +24,7 @@ const brandTestFiles = findTestFiles("tests/brand");
 const discoveryTestFiles = findTestFiles("tests/discovery");
 const detailTestFiles = findTestFiles("tests/detail");
 const permalinkTestFiles = findTestFiles("tests/permalinks");
+const contentIntakeTestFiles = findTestFiles("tests/content-intake");
 
 const checks = [
   {
@@ -67,6 +68,21 @@ const checks = [
     arguments: ["--check", "data/permalinks.js"]
   },
   {
+    label: "JavaScript syntax: scripts/lib/content-intake.mjs",
+    displayCommand: "node --check scripts/lib/content-intake.mjs",
+    arguments: ["--check", "scripts/lib/content-intake.mjs"]
+  },
+  {
+    label: "JavaScript syntax: scripts/validate-content-intake.mjs",
+    displayCommand: "node --check scripts/validate-content-intake.mjs",
+    arguments: ["--check", "scripts/validate-content-intake.mjs"]
+  },
+  {
+    label: "JavaScript syntax: scripts/summarize-content-intake.mjs",
+    displayCommand: "node --check scripts/summarize-content-intake.mjs",
+    arguments: ["--check", "scripts/summarize-content-intake.mjs"]
+  },
+  {
     label: "Baseline contract tests",
     displayCommand: "node --test tests/baseline/*.test.mjs",
     arguments: ["--test", ...baselineTestFiles]
@@ -95,12 +111,27 @@ const checks = [
     label: "Permalink, sharing, Copy Link, and QR tests",
     displayCommand: "node --test tests/permalinks/*.test.mjs",
     arguments: ["--test", ...permalinkTestFiles]
+  },
+  {
+    label: "Content intake tests",
+    displayCommand: "node --test tests/content-intake/*.test.mjs",
+    arguments: ["--test", ...contentIntakeTestFiles]
+  },
+  {
+    label: "Content intake default validation",
+    displayCommand: "node scripts/validate-content-intake.mjs",
+    arguments: ["scripts/validate-content-intake.mjs"]
+  },
+  {
+    label: "Content intake default summary",
+    displayCommand: "node scripts/summarize-content-intake.mjs",
+    arguments: ["scripts/summarize-content-intake.mjs"]
   }
 ];
 
 const failures = [];
 
-console.log("M06 repository validation\n");
+console.log("M07A repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -149,7 +180,7 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM06 repository validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM07A repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
   const relativeTests = [
@@ -158,9 +189,10 @@ if (failures.length > 0) {
     ...brandTestFiles,
     ...discoveryTestFiles,
     ...detailTestFiles,
-    ...permalinkTestFiles
+    ...permalinkTestFiles,
+    ...contentIntakeTestFiles
   ]
     .map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, and permalink test files.`);
-  console.log("M06 repository validation: PASS");
+  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, and content-intake test files.`);
+  console.log("M07A repository validation: PASS");
 }

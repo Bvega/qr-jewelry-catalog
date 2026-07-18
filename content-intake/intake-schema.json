@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Between Us content intake contract",
+  "version": 1,
+  "inventory": {
+    "headers": [
+      "intake_key",
+      "title",
+      "collection",
+      "price_amount",
+      "price_currency",
+      "availability",
+      "description",
+      "condition",
+      "primary_photo_filename",
+      "additional_photo_filenames",
+      "alt_text",
+      "related_public_ids",
+      "featured",
+      "owner_notes"
+    ],
+    "requiredFields": [
+      "intake_key",
+      "title",
+      "collection",
+      "price_amount",
+      "price_currency",
+      "availability",
+      "description",
+      "primary_photo_filename",
+      "alt_text"
+    ],
+    "optionalFields": [
+      "condition",
+      "additional_photo_filenames",
+      "related_public_ids",
+      "featured",
+      "owner_notes"
+    ],
+    "intakeKeyPattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+    "pricePattern": "^[0-9]+(?:\\.[0-9]{1,2})?$",
+    "currency": "USD",
+    "collectionIds": [
+      "jewelry",
+      "vintage",
+      "home-decor",
+      "kitchen",
+      "collectibles",
+      "new-items"
+    ],
+    "comingSoonCollectionIds": [
+      "vintage",
+      "home-decor",
+      "kitchen",
+      "collectibles",
+      "new-items"
+    ],
+    "availabilityValues": [
+      "available",
+      "reserved",
+      "sold"
+    ],
+    "featuredValues": [
+      "true",
+      "false",
+      ""
+    ],
+    "pipeSeparatedFields": [
+      "additional_photo_filenames",
+      "related_public_ids"
+    ]
+  },
+  "photoManifest": {
+    "headers": [
+      "filename",
+      "intake_key",
+      "role",
+      "sequence",
+      "orientation",
+      "background",
+      "owner_approved",
+      "notes"
+    ],
+    "requiredFields": [
+      "filename",
+      "intake_key",
+      "role",
+      "sequence",
+      "orientation",
+      "owner_approved"
+    ],
+    "optionalFields": [
+      "background",
+      "notes"
+    ],
+    "roleValues": [
+      "primary",
+      "additional"
+    ],
+    "orientationValues": [
+      "square",
+      "portrait",
+      "landscape",
+      "unknown"
+    ],
+    "ownerApprovedValues": [
+      "true",
+      "false"
+    ],
+    "sequencePattern": "^[1-9][0-9]*$"
+  },
+  "photos": {
+    "filenamePattern": "^([a-z0-9]+(?:-[a-z0-9]+)*)-([0-9]{2})\\.(jpg|jpeg|png|webp)$",
+    "allowedExtensions": [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp"
+    ],
+    "primarySequence": 1,
+    "sequenceDigits": 2,
+    "heicAcceptedAsFinal": false,
+    "rawDirectory": "content-intake/photos"
+  },
+  "relationships": {
+    "existingPublicIdPattern": "^BU-[0-9]{4}$",
+    "proposedIntakeKeysRemainPendingUntilPublicIdAssignment": true,
+    "unresolvedReferencesAreWarnings": true
+  },
+  "booleanBehavior": {
+    "caseSensitive": true,
+    "featuredMayBeBlank": true,
+    "ownerApprovedMayBeBlank": false
+  },
+  "notesBoundary": {
+    "owner_notes": "Internal only. Never copied to public fields automatically.",
+    "notes": "Internal only. Never copied to public fields automatically."
+  }
+}

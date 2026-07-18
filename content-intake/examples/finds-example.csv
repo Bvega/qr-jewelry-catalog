@@ -1,0 +1,2 @@
+intake_key,title,collection,price_amount,price_currency,availability,description,condition,primary_photo_filename,additional_photo_filenames,alt_text,related_public_ids,featured,owner_notes
+sample-find-do-not-publish,Sample Find - Do Not Publish,jewelry,1.00,USD,available,Fictional example used only to demonstrate the intake structure.,,sample-find-do-not-publish-01.jpg,,Fictional sample object on a plain background.,,false,NON-PRODUCTION EXAMPLE - never publish this record.

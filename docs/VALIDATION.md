@@ -8,13 +8,13 @@
 
 ## Primary command
 
-Run the complete M01–M06 compatibility, domain, brand, discovery, Find-detail, gallery, media, reservation, permalink, sharing, Copy Link, and QR suite with:
+Run the complete M01–M07A compatibility, domain, brand, discovery, Find-detail, gallery, media, reservation, permalink, sharing, Copy Link, QR, and content-intake suite with:
 
 ```bash
 node scripts/validate-baseline.mjs
 ```
 
-The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, `tests/discovery/*.test.mjs`, `tests/detail/*.test.mjs`, and `tests/permalinks/*.test.mjs` contract, prints known warnings in a separate section, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
+The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, `tests/discovery/*.test.mjs`, `tests/detail/*.test.mjs`, `tests/permalinks/*.test.mjs`, and `tests/content-intake/*.test.mjs` contract, validates the tracked examples when owner intake is absent, prints known warnings separately, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
 
 ## Individual commands
 
@@ -29,19 +29,25 @@ node --check data/discovery.js
 node --check data/media.js
 node --check data/reservation.js
 node --check data/permalinks.js
+node --check scripts/lib/content-intake.mjs
+node --check scripts/validate-content-intake.mjs
+node --check scripts/summarize-content-intake.mjs
 node --test tests/baseline/*.test.mjs
 node --test tests/domain/*.test.mjs
 node --test tests/brand/*.test.mjs
 node --test tests/discovery/*.test.mjs
 node --test tests/detail/*.test.mjs
 node --test tests/permalinks/*.test.mjs
+node scripts/validate-content-intake.mjs
+node scripts/summarize-content-intake.mjs
+node --test tests/content-intake/*.test.mjs
 node scripts/validate-baseline.mjs
 git diff --check
 git diff --cached --check
 git status --short
 ```
 
-The GitHub Actions workflow at `.github/workflows/baseline-validation.yml` runs the same primary validation command on pushes to `migration/**` and `feature/**` branches and on pull requests targeting `main`.
+The unchanged GitHub Actions workflow at `.github/workflows/baseline-validation.yml` runs the same primary validation command on pushes to `migration/**` and `feature/**` branches and on pull requests targeting `main`. The local M07A `content/**` branch must run the primary command before review; a later pull request to `main` is covered by the existing workflow.
 
 ## What the validation checks
 
@@ -163,6 +169,12 @@ The suite protects the approved qrcodejs 1.0.0 CDN reference and its position be
 
 QR contracts verify the canonical payload, constructor readiness, controlled failure text, Copy Link availability, stale-output clearing, duplicate prevention, retry, accessible canvas/image treatment, canvas PNG output, image output/conversion or valid-image fallback, exact `between-us-{publicId}-qr.png` naming, and honest download failure states.
 
+### Content intake contracts
+
+The M07A suite verifies the exact inventory and photo-manifest headers, fictional example boundary, parseable machine-readable schema, required and optional metadata, allowed Collections and enums, price and temporary-key rules, approved filenames and extensions, manifest resolution, primary-photo matching, duplicate rejection, relationship warnings, and internal-notes boundary. It also verifies default no-owner behavior, summary counts, raw-photo warnings, and byte-for-byte non-mutation of protected live-catalog files.
+
+For a completed owner intake, the validator returns nonzero on errors and reports warnings separately. The summary reports proposed Finds, Collection and availability counts, missing condition, missing or unapproved photos, unresolved relationships, ready records, and blocked records. Neither command publishes data, creates IDs, or moves photos.
+
 ### Repository workflow contract
 
 The suite reviews the workflow's required branch triggers, official Node setup action, Node version, primary command, lack of package-install steps, and lack of deployment behavior.
@@ -180,8 +192,8 @@ A **warning** records an accepted but unresolved baseline condition. Warnings do
 
 ## Adding or changing a contract
 
-1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior, `tests/domain/` for normalized model and adapter behavior, `tests/brand/` for Between Us assets and public-shell behavior, `tests/discovery/` for Collections and discovery behavior, `tests/detail/` for Find Details, gallery, media, and reservation behavior, or `tests/permalinks/` for routing, sharing, Copy Link, canonical, and QR behavior.
-2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants, `scripts/lib/discovery-contracts.mjs` for fixed Collection and editorial expectations, `scripts/lib/find-detail-contracts.mjs` for detail runtime fixtures and DOM stubs, and `scripts/lib/permalink-contracts.mjs` for M06 routing fixtures.
+1. Add or update a focused `*.test.mjs` file under `tests/baseline/` for existing public behavior, `tests/domain/` for normalized model and adapter behavior, `tests/brand/` for Between Us assets and public-shell behavior, `tests/discovery/` for Collections and discovery behavior, `tests/detail/` for Find Details, gallery, media, and reservation behavior, `tests/permalinks/` for routing, sharing, Copy Link, canonical, and QR behavior, or `tests/content-intake/` for M07A intake behavior.
+2. Reuse `scripts/lib/baseline-contracts.mjs` for public compatibility and project paths, `scripts/lib/find-contracts.mjs` for normalized data fixtures and identifier constants, `scripts/lib/discovery-contracts.mjs` for fixed Collection and editorial expectations, `scripts/lib/find-detail-contracts.mjs` for detail runtime fixtures and DOM stubs, `scripts/lib/permalink-contracts.mjs` for M06 routing fixtures, and `scripts/lib/content-intake.mjs` for the shared M07A CSV/schema contracts.
 3. Give the test a name that describes public behavior rather than implementation trivia.
 4. Add a fixed baseline value when removal or silent change must be detected; do not derive both the expected and actual value from the same source.
 5. Run the primary command and the individual review commands above.
