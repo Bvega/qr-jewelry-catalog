@@ -1,43 +1,40 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Friday, July 17, 2026 — 6:01 PM ET
+Updated: Friday, July 17, 2026
 Project: Between Us Platform
 
 CURRENT STATUS
-- M00 through M05 are owner-approved, merged, validated, and pushed.
-- M05 implementation commit:
-  d92853aab80a9486327766fbb7ded4698631f733
+- M00 through M06 are owner-approved, merged, validated, and pushed.
+- M06 final commit on main:
+  1b2a0ae2439a743748b507c6864faf62d60c5c62
 - Last accepted validation:
-  115 of 115 tests passing.
-- M06 — QR, Sharing, and Permalinks has been prepared.
-- M06 implementation has not started.
-- M06 will require owner visual acceptance before merge.
+  153 of 153 tests passing.
+- M07 cannot begin because the complete owner content package is not ready.
+- M07A — Content Intake Foundation has been prepared.
+- M07A does not publish inventory or modify the public catalog.
 
 TOP TASK
-Install and commit the M06 planning package on main, then execute it in a new ChatGPT Work task.
+Install and commit the M07A planning package on main, then execute it in ChatGPT Work.
 
 NEXT ACTIONS
 1. Install:
-   docs/MILESTONES/M06.md
+   docs/MILESTONES/M07A.md
    chatGPT_Todo.txt
-2. Commit and push the M06 planning package to main.
+2. Commit and push the M07A planning package to main.
 3. Confirm main is synchronized with origin/main and working tree is clean.
-4. Open a new ChatGPT Work task:
-   M06 milestone
+4. In ChatGPT Work, start:
+   M07A — Content Intake Foundation
 5. Send:
-   Read docs/MILESTONES/M06.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
-6. Wait for Work to finish.
-7. Return the complete M06 report to between-us-master.
-8. Perform owner visual review.
-9. Do not merge M06 or begin M07 until visual acceptance.
+   Read docs/MILESTONES/M07A.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
+6. Return the complete M07A report to between-us-master.
+7. MASTER reviews and accepts M07A.
+8. Owner completes the intake templates and supplies raw photos.
+9. Do not begin M07B until the completed intake passes validation.
 
 OPERATING RULES
-- Do not manually create the M06 branch.
-- Do not rename the repository folder.
-- Preserve all accepted M01–M05 behavior.
-- Preserve all data, IDs, slugs, routes, Collections, Discovery, relationships, images, availability, reservation wording, QR compatibility, and existing sharing.
-- New canonical Find URLs use:
-  find.html?id=BU-NNNN
-- Legacy item.html?id=N URLs must continue to work.
-- No backend, hosting rewrite, framework, database, package manager, QR-library replacement, or new dependency is approved in M06.
-- M06 must remain unpushed and unmerged until owner visual acceptance.
+- Do not manually create the M07A branch.
+- Do not modify the live catalog in M07A.
+- Do not assign permanent public IDs.
+- Do not copy raw photos into public assets.
+- Do not invent owner content.
+- Do not add dependencies.
 - MASTER defines and approves; Work implements, validates, commits locally, and reports.
