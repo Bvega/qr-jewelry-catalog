@@ -4,51 +4,61 @@ Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
 - M00 through M07A are complete.
-- M07A implementation commit:
-  900f141e31ead334f3ada520e9cbc8a4bc18ec39
-- First four owner intake Finds checkpoint:
-  4e15db2
-- Intake:
+- M07B-1 Supabase Foundation is complete and accepted.
+- M07B-1 implementation commit:
+  806bf149a5a0f3043f9a10b7d20234f83060770a
+- Remote Supabase bootstrap is complete:
+  Project: between-us-catalog
+  Region: East US (North Virginia)
+  Project ref: vyjyzieteuwvniuhbpqu
+  Migration 20260720120000 is synchronized locally and remotely.
+  Owner Auth user exists and is allowlisted with role owner.
+  Security Advisor: 0 errors; 1 non-blocking Free-plan warning.
+- Browser-safe remote configuration is stored only in ignored .env.local.
+- .env.local is confirmed ignored by Git.
+- Intake remains:
   4 proposed
   4 ready
   0 blocked
 - main is synchronized and clean.
-- Approved architecture:
-  Supabase + private Seller Catalog Manager + later Cloudflare Pages.
 
 M07B PLAN
-- M07B-1 Supabase Foundation
-- M07B-2 Seller Catalog Manager
+- M07B-1 Supabase Foundation — COMPLETE
+- Remote Supabase bootstrap — COMPLETE
+- M07B-2 Seller Catalog Manager — NEXT
 - M07B-3 Catalog Data Migration
 - M07B-4 Deployment and Acceptance
 
 TOP TASK
-Install, commit, and push the M07B-1 planning package on main, then execute M07B-1 in Codex.
+Install, commit, and push the M07B-2 planning package on main, then execute M07B-2 in Codex.
 
 NEXT ACTIONS
 1. Install:
-   docs/MILESTONES/M07B1.md
+   docs/MILESTONES/M07B2.md
+   docs/REPORTS/M07B1_REMOTE_BOOTSTRAP.md
    chatGPT_Todo.txt
 2. Commit and push the planning package to main.
 3. Confirm main is synchronized and clean.
-4. Open Codex project:
+4. Keep Docker Desktop running for local Supabase validation.
+5. Open Codex project:
    qr-jewelry-catalog
-5. Confirm:
+6. Confirm:
    Local
    main
    GPT-5.6 Sol
    Extra High
-6. Send:
-   Read docs/MILESTONES/M07B1.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
-7. Return the report to between-us-master.
-8. Do not begin M07B-2.
+7. Send:
+   Read docs/MILESTONES/M07B2.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
+8. Return the report to the MASTER chat.
+9. Do not begin M07B-3.
 
 IMPORTANT
 - Codex creates the implementation branch.
-- A Docker-compatible runtime is required for local Supabase RLS testing.
-- Do not install system software automatically.
-- Do not create a remote project yet.
-- Do not enter real credentials.
-- Do not migrate products.
-- Do not modify public catalog runtime files.
+- M07B-2 builds the private Seller Catalog Manager at /admin/.
+- Use local Supabase for automated implementation tests.
+- Do not migrate the four intake Finds yet.
+- Do not change the public catalog data source yet.
+- Do not deploy Cloudflare yet.
+- Do not commit .env.local, credentials, owner email, owner UUID, passwords, access tokens, secret keys, or service-role keys.
+- Only browser-safe Project URL and publishable key may be used by generated local browser configuration.
 - Do not push or merge the implementation branch.
