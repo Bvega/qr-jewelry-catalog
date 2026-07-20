@@ -1,40 +1,54 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Friday, July 17, 2026
-Project: Between Us Platform
+Updated: Monday, July 20, 2026
+Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
-- M00 through M06 are owner-approved, merged, validated, and pushed.
-- M06 final commit on main:
-  1b2a0ae2439a743748b507c6864faf62d60c5c62
-- Last accepted validation:
-  153 of 153 tests passing.
-- M07 cannot begin because the complete owner content package is not ready.
-- M07A — Content Intake Foundation has been prepared.
-- M07A does not publish inventory or modify the public catalog.
+- M00 through M07A are complete.
+- M07A implementation commit:
+  900f141e31ead334f3ada520e9cbc8a4bc18ec39
+- First four owner intake Finds checkpoint:
+  4e15db2
+- Intake:
+  4 proposed
+  4 ready
+  0 blocked
+- main is synchronized and clean.
+- Approved architecture:
+  Supabase + private Seller Catalog Manager + later Cloudflare Pages.
+
+M07B PLAN
+- M07B-1 Supabase Foundation
+- M07B-2 Seller Catalog Manager
+- M07B-3 Catalog Data Migration
+- M07B-4 Deployment and Acceptance
 
 TOP TASK
-Install and commit the M07A planning package on main, then execute it in ChatGPT Work.
+Install, commit, and push the M07B-1 planning package on main, then execute M07B-1 in Codex.
 
 NEXT ACTIONS
 1. Install:
-   docs/MILESTONES/M07A.md
+   docs/MILESTONES/M07B1.md
    chatGPT_Todo.txt
-2. Commit and push the M07A planning package to main.
-3. Confirm main is synchronized with origin/main and working tree is clean.
-4. In ChatGPT Work, start:
-   M07A — Content Intake Foundation
-5. Send:
-   Read docs/MILESTONES/M07A.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
-6. Return the complete M07A report to between-us-master.
-7. MASTER reviews and accepts M07A.
-8. Owner completes the intake templates and supplies raw photos.
-9. Do not begin M07B until the completed intake passes validation.
+2. Commit and push the planning package to main.
+3. Confirm main is synchronized and clean.
+4. Open Codex project:
+   qr-jewelry-catalog
+5. Confirm:
+   Local
+   main
+   GPT-5.6 Sol
+   Extra High
+6. Send:
+   Read docs/MILESTONES/M07B1.md and execute the complete milestone exactly as written. Do not push or merge. Return the required final report.
+7. Return the report to between-us-master.
+8. Do not begin M07B-2.
 
-OPERATING RULES
-- Do not manually create the M07A branch.
-- Do not modify the live catalog in M07A.
-- Do not assign permanent public IDs.
-- Do not copy raw photos into public assets.
-- Do not invent owner content.
-- Do not add dependencies.
-- MASTER defines and approves; Work implements, validates, commits locally, and reports.
+IMPORTANT
+- Codex creates the implementation branch.
+- A Docker-compatible runtime is required for local Supabase RLS testing.
+- Do not install system software automatically.
+- Do not create a remote project yet.
+- Do not enter real credentials.
+- Do not migrate products.
+- Do not modify public catalog runtime files.
+- Do not push or merge the implementation branch.
