@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  copyFileSync,
   mkdtempSync,
   mkdirSync,
   rmSync,
@@ -19,13 +20,31 @@ const findHeaders = "intake_key,title,collection,price_amount,price_currency,ava
 const photoHeaders = "filename,intake_key,role,sequence,orientation,background,owner_approved,notes";
 
 test("default summary handles the no-owner-intake state exactly", () => {
-  const result = spawnSync(process.execPath, ["scripts/summarize-content-intake.mjs"], {
-    cwd: repositoryRoot,
-    encoding: "utf8"
-  });
+  const directory = mkdtempSync(join(tmpdir(), "between-us-empty-intake-"));
+  const scriptsDirectory = join(directory, "scripts");
+  const libraryDirectory = join(scriptsDirectory, "lib");
+  mkdirSync(libraryDirectory, { recursive: true });
 
-  assert.equal(result.status, 0);
-  assert.equal(result.stdout.trim(), "No owner intake file is present yet.");
+  copyFileSync(
+    join(repositoryRoot, "scripts/summarize-content-intake.mjs"),
+    join(scriptsDirectory, "summarize-content-intake.mjs")
+  );
+  copyFileSync(
+    join(repositoryRoot, "scripts/lib/content-intake.mjs"),
+    join(libraryDirectory, "content-intake.mjs")
+  );
+
+  try {
+    const result = spawnSync(process.execPath, ["scripts/summarize-content-intake.mjs"], {
+      cwd: directory,
+      encoding: "utf8"
+    });
+
+    assert.equal(result.status, 0);
+    assert.equal(result.stdout.trim(), "No owner intake file is present yet.");
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
 
 test("summary reports collection, availability, readiness, and blocking counts", () => {
