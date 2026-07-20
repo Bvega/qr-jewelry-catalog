@@ -3,10 +3,14 @@
 
 # Environment files
 .env
+.env.*
+!.env.example
 .env.local
 
 # Dependencies
 node_modules/
+supabase/.branches/
+supabase/.temp/
 
 # Build output
 dist/

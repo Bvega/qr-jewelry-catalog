@@ -22,7 +22,7 @@ The platform evolved from the QR Jewelry Catalog MVP. Its five original jewelry 
 - Accessible missing-image and invalid-Find states
 - Direct fallback for the two registered unavailable photo paths, avoiding preventable browser requests
 
-Reserve by Message does not complete or guarantee a reservation. The owner confirms availability manually; payment is cash, and local pickup details are arranged by message after confirmation. No direct recipient, customer data storage, backend, or online payment is configured.
+Reserve by Message does not complete or guarantee a reservation. The owner confirms availability manually; payment is cash, and local pickup details are arranged by message after confirmation. No direct recipient, customer data storage, public backend connection, or online payment is configured.
 
 Future collections are shown as **Coming Soon** without fake links or counts. Latest Finds is currently an editorial order rather than timestamp-derived chronology. Search, advanced filtering, clean-path routing, and broader inventory remain deferred to their approved milestones.
 
@@ -31,6 +31,12 @@ New public links use the immutable public ID, for example `find.html?id=BU-0001`
 ## Content intake
 
 M07A adds a private staging workspace under `content-intake/` for owner-supplied Find records and photographs. Intake files are validated and summarized locally; they are not published, assigned permanent public IDs, or copied into the live catalog automatically. See `docs/CONTENT_INTAKE_WORKFLOW.md` before preparing owner content.
+
+## Supabase foundation
+
+M07B-1 adds a non-public Supabase database, authorization, Storage-policy, migration, and automated-test foundation for future catalog management. The current public catalog still uses the accepted static data. The Seller Catalog Manager is not available yet, and no existing or intake products have been migrated.
+
+The local database workflow requires Node.js, npm, and a running Docker-compatible container runtime. See `docs/SUPABASE_LOCAL_DEVELOPMENT.md`. No hosted project or browser configuration is part of M07B-1.
 
 ## Local preview
 
@@ -44,10 +50,10 @@ Then open `http://127.0.0.1:4175/`.
 
 ## Validation
 
-The project has no package-manager or build dependency. Run the complete compatibility, domain, brand/public-shell, Collections/discovery, Find-detail, reservation, permalink, sharing, Copy Link, QR, and content-intake suite with:
+The public catalog has no build step or runtime package dependency. Run the complete compatibility, domain, brand/public-shell, Collections/discovery, Find-detail, reservation, permalink, sharing, Copy Link, QR, content-intake, and static Supabase foundation suite without Docker with:
 
 ```bash
 node scripts/validate-baseline.mjs
 ```
 
-See `docs/VALIDATION.md` for individual commands and the contracts protected by the suite.
+Run `npm install` once to install the repository-local Supabase CLI before using the Docker-backed database commands. See `docs/VALIDATION.md` for individual commands and the contracts protected by the suite.

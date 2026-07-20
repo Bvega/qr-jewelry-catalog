@@ -4,17 +4,18 @@
 
 - Run commands from the repository root.
 - Use Node.js 22 or a compatible newer release with the built-in Node test runner.
-- No package installation, package manager, browser driver, or third-party project dependency is required.
+- Static validation requires no running database or browser driver.
+- Docker-backed database validation requires npm dependencies installed with `npm install` and a running Docker-compatible container runtime.
 
 ## Primary command
 
-Run the complete M01–M07A compatibility, domain, brand, discovery, Find-detail, gallery, media, reservation, permalink, sharing, Copy Link, QR, and content-intake suite with:
+Run the complete M01–M07B-1 compatibility, domain, brand, discovery, Find-detail, gallery, media, reservation, permalink, sharing, Copy Link, QR, content-intake, and static Supabase foundation suite with:
 
 ```bash
 node scripts/validate-baseline.mjs
 ```
 
-The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, `tests/discovery/*.test.mjs`, `tests/detail/*.test.mjs`, `tests/permalinks/*.test.mjs`, and `tests/content-intake/*.test.mjs` contract, validates the tracked examples when owner intake is absent, prints known warnings separately, and returns exit code `0` only when every required contract passes. A failed syntax check or test produces a nonzero exit code.
+The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, `tests/discovery/*.test.mjs`, `tests/detail/*.test.mjs`, `tests/permalinks/*.test.mjs`, `tests/content-intake/*.test.mjs`, and `tests/supabase-foundation/*.test.mjs` contract, runs the dependency-free Supabase static validator, validates current owner intake, prints known warnings separately, and returns exit code `0` only when every required contract passes. It remains runnable without Docker.
 
 ## Individual commands
 
@@ -32,6 +33,7 @@ node --check data/permalinks.js
 node --check scripts/lib/content-intake.mjs
 node --check scripts/validate-content-intake.mjs
 node --check scripts/summarize-content-intake.mjs
+node --check scripts/validate-supabase-foundation.mjs
 node --test tests/baseline/*.test.mjs
 node --test tests/domain/*.test.mjs
 node --test tests/brand/*.test.mjs
@@ -41,13 +43,22 @@ node --test tests/permalinks/*.test.mjs
 node scripts/validate-content-intake.mjs
 node scripts/summarize-content-intake.mjs
 node --test tests/content-intake/*.test.mjs
+node scripts/validate-supabase-foundation.mjs
+node --test tests/supabase-foundation/*.test.mjs
 node scripts/validate-baseline.mjs
+npm run supabase:start
+npm run supabase:reset
+npm run supabase:test
+npm run supabase:lint
+npm run supabase:stop
 git diff --check
 git diff --cached --check
 git status --short
 ```
 
 The unchanged GitHub Actions workflow at `.github/workflows/baseline-validation.yml` runs the same primary validation command on pushes to `migration/**` and `feature/**` branches and on pull requests targeting `main`. The local M07A `content/**` branch must run the primary command before review; a later pull request to `main` is covered by the existing workflow.
+
+The Supabase database integration suite remains separate because it requires the local container stack. `supabase:reset` rebuilds the local database from the one ordered migration and local seed, `supabase:test` runs pgTAP against real RLS roles and Storage metadata, and `supabase:lint` checks the resulting local schema.
 
 ## What the validation checks
 
@@ -174,6 +185,12 @@ QR contracts verify the canonical payload, constructor readiness, controlled fai
 The M07A suite verifies the exact inventory and photo-manifest headers, fictional example boundary, parseable machine-readable schema, required and optional metadata, allowed Collections and enums, price and temporary-key rules, approved filenames and extensions, manifest resolution, primary-photo matching, duplicate rejection, relationship warnings, and internal-notes boundary. It also verifies default no-owner behavior, summary counts, raw-photo warnings, and byte-for-byte non-mutation of protected live-catalog files.
 
 For a completed owner intake, the validator returns nonzero on errors and reports warnings separately. The summary reports proposed Finds, Collection and availability counts, missing condition, missing or unapproved photos, unresolved relationships, ready records, and blocked records. Neither command publishes data, creates IDs, or moves photos.
+
+### Supabase foundation contracts
+
+The M07B-1 static and Node suite verifies the project structure, pinned repository-local CLI, migration ordering, required schemas and tables, constraints, automatic public-ID contract, audit trigger, RLS enablement, published-only public reads, explicit private admin allowlist, Storage bucket restrictions and admin-only write policies, safe environment example, documentation, secret boundary, local-only Collection seed, and unchanged protected public runtime and owner intake.
+
+The separate pgTAP suite verifies the actual local database structure and constraints; anonymous draft/published/archive visibility; authenticated non-admin denial; allowlisted admin creation and updates; generated and explicit IDs; audit behavior; photo visibility; self-relation rejection; Storage denial/success; and rollback of all fictional fixtures.
 
 ### Repository workflow contract
 

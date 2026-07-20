@@ -25,6 +25,7 @@ const discoveryTestFiles = findTestFiles("tests/discovery");
 const detailTestFiles = findTestFiles("tests/detail");
 const permalinkTestFiles = findTestFiles("tests/permalinks");
 const contentIntakeTestFiles = findTestFiles("tests/content-intake");
+const supabaseFoundationTestFiles = findTestFiles("tests/supabase-foundation");
 
 const checks = [
   {
@@ -83,6 +84,11 @@ const checks = [
     arguments: ["--check", "scripts/summarize-content-intake.mjs"]
   },
   {
+    label: "JavaScript syntax: scripts/validate-supabase-foundation.mjs",
+    displayCommand: "node --check scripts/validate-supabase-foundation.mjs",
+    arguments: ["--check", "scripts/validate-supabase-foundation.mjs"]
+  },
+  {
     label: "Baseline contract tests",
     displayCommand: "node --test tests/baseline/*.test.mjs",
     arguments: ["--test", ...baselineTestFiles]
@@ -126,12 +132,22 @@ const checks = [
     label: "Content intake default summary",
     displayCommand: "node scripts/summarize-content-intake.mjs",
     arguments: ["scripts/summarize-content-intake.mjs"]
+  },
+  {
+    label: "Supabase foundation static validation",
+    displayCommand: "node scripts/validate-supabase-foundation.mjs",
+    arguments: ["scripts/validate-supabase-foundation.mjs"]
+  },
+  {
+    label: "Supabase foundation tests",
+    displayCommand: "node --test tests/supabase-foundation/*.test.mjs",
+    arguments: ["--test", ...supabaseFoundationTestFiles]
   }
 ];
 
 const failures = [];
 
-console.log("M07A repository validation\n");
+console.log("M07B-1 repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -180,7 +196,7 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM07A repository validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM07B-1 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
   const relativeTests = [
@@ -190,9 +206,10 @@ if (failures.length > 0) {
     ...discoveryTestFiles,
     ...detailTestFiles,
     ...permalinkTestFiles,
-    ...contentIntakeTestFiles
+    ...contentIntakeTestFiles,
+    ...supabaseFoundationTestFiles
   ]
     .map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, and content-intake test files.`);
-  console.log("M07A repository validation: PASS");
+  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, content-intake, and Supabase foundation test files.`);
+  console.log("M07B-1 repository validation: PASS");
 }

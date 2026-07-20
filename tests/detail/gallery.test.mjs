@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
 import test from "node:test";
-import { pathFromRoot, readProjectFile } from "../../scripts/lib/baseline-contracts.mjs";
+import { readProjectFile } from "../../scripts/lib/baseline-contracts.mjs";
 import {
   loadFindDetailRuntime,
   renderFindDetail
@@ -9,6 +8,7 @@ import {
 
 const runtime = loadFindDetailRuntime();
 const itemSource = readProjectFile("item.js");
+const packageJson = JSON.parse(readProjectFile("package.json"));
 
 test("one-photo Finds render a primary image without an empty thumbnail rail", () => {
   const result = renderFindDetail({ query: "?id=1", runtime });
@@ -80,7 +80,8 @@ test("gallery image errors reveal a meaningful deliberate fallback", () => {
 });
 
 test("gallery remains dependency-free and uses no automatic carousel behavior", () => {
-  assert.equal(existsSync(pathFromRoot("package.json")), false);
+  assert.equal(packageJson.dependencies, undefined);
+  assert.deepEqual(Object.keys(packageJson.devDependencies), ["supabase"]);
   assert.doesNotMatch(itemSource, /setInterval|autoplay|carousel/i);
   assert.match(itemSource, /find\.photos\.forEach\(addPhoto\)/);
 });
