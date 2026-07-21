@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob: https://*.supabase.co; font-src 'self';">
+    <title>Seller Account Setup | Between Us</title>
+    <link rel="icon" href="../assets/brand/between-us-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="./config.js" defer></script>
+    <script src="./assets/activate.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to account setup</a>
+    <header class="site-header">
+      <a class="brand" href="../index.html" aria-label="Between Us home">
+        <img src="../assets/brand/between-us-mark.svg" width="48" height="48" alt="">
+        <span>Between Us</span>
+      </a>
+      <div>
+        <p class="eyebrow">Private workspace</p>
+        <h1>Seller Account Setup</h1>
+      </div>
+    </header>
+
+    <main id="main-content" class="page-shell activation-shell">
+      <div id="activationStatus" class="status" role="status" aria-live="polite" aria-atomic="true">Checking invitation…</div>
+
+      <section id="activationLoadingSection" class="panel activation-panel" aria-labelledby="activationLoadingTitle">
+        <p class="eyebrow">Invitation</p>
+        <h2 id="activationLoadingTitle">Checking account setup link</h2>
+        <p>Please wait while the invitation is verified.</p>
+      </section>
+
+      <section id="invitationInvalidSection" class="panel activation-panel denied-panel" aria-labelledby="invitationInvalidTitle" hidden>
+        <p class="eyebrow">Invitation unavailable</p>
+        <h2 id="invitationInvalidTitle">This account setup link cannot be used</h2>
+        <p id="invitationInvalidMessage">This invitation is invalid, expired, or missing. Request a new invitation and try again.</p>
+      </section>
+
+      <section id="accessDeniedSection" class="panel activation-panel denied-panel" aria-labelledby="accessDeniedTitle" hidden>
+        <p class="eyebrow">Access denied</p>
+        <h2 id="accessDeniedTitle">Seller access is not available</h2>
+        <p id="accessDeniedMessage">Seller access is not available for this account.</p>
+      </section>
+
+      <section id="passwordSetupSection" class="panel activation-panel" aria-labelledby="passwordSetupTitle" hidden>
+        <p class="eyebrow">Access verified</p>
+        <h2 id="passwordSetupTitle">Set your password</h2>
+        <p>Use 12–128 characters. Your password is sent directly to the authentication service and is never displayed.</p>
+        <form id="passwordSetupForm" novalidate>
+          <label for="newPassword">New password</label>
+          <input id="newPassword" name="new-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required aria-describedby="newPasswordHelp newPasswordError">
+          <small id="newPasswordHelp" class="password-guidance">Use at least 12 characters.</small>
+          <span id="newPasswordError" class="field-error"></span>
+
+          <label for="confirmPassword">Confirm new password</label>
+          <input id="confirmPassword" name="confirm-password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required aria-describedby="confirmPasswordError">
+          <span id="confirmPasswordError" class="field-error"></span>
+
+          <button id="setPasswordButton" class="button button-primary" type="submit">Set password</button>
+        </form>
+      </section>
+
+      <section id="signOutFailureSection" class="panel activation-panel denied-panel" aria-labelledby="signOutFailureTitle" hidden>
+        <p class="eyebrow">Password set</p>
+        <h2 id="signOutFailureTitle">Sign-out needs another try</h2>
+        <p id="signOutFailureMessage">Your password was set, but this session could not be closed. Try signing out again.</p>
+        <button id="retrySignOutButton" class="button button-secondary" type="button">Try sign out again</button>
+      </section>
+
+      <section id="activationSuccessSection" class="panel activation-panel" aria-labelledby="activationSuccessTitle" hidden>
+        <p class="eyebrow">Setup complete</p>
+        <h2 id="activationSuccessTitle">Your seller password is set</h2>
+        <p>The invitation session is closed. Sign in again with your email and new password.</p>
+        <p class="activation-actions"><a class="button button-primary" href="/admin/">Go to Seller Catalog Manager sign-in</a></p>
+      </section>
+    </main>
+  </body>
+</html>

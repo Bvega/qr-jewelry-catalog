@@ -150,14 +150,33 @@ a:focus-visible {
 }
 
 .auth-panel,
-.denied-panel {
+.denied-panel,
+.activation-panel {
   max-width: 32rem;
   margin: 2rem auto;
 }
 
-.auth-panel form {
+.auth-panel form,
+.activation-panel form {
   display: grid;
   gap: 0.65rem;
+}
+
+.activation-shell {
+  max-width: 42rem;
+}
+
+.activation-panel .button {
+  margin-top: 0.5rem;
+}
+
+.password-guidance {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.activation-actions {
+  margin-top: 1rem;
 }
 
 h2,

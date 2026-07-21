@@ -69,7 +69,9 @@ test("generated config is ignored and committed bundle contains no generated val
   const root = resolve(import.meta.dirname, "../..");
   const ignored = spawnSync("git", ["check-ignore", "-q", "admin/config.js"], { cwd: root });
   assert.equal(ignored.status, 0);
-  const bundle = readFileSync(resolve(root, "admin/assets/app.js"), "utf8");
-  assert.doesNotMatch(bundle, new RegExp(projectRef));
-  assert.doesNotMatch(bundle, new RegExp(publishableKey));
+  for (const bundleName of ["app.js", "activate.js"]) {
+    const bundle = readFileSync(resolve(root, `admin/assets/${bundleName}`), "utf8");
+    assert.doesNotMatch(bundle, new RegExp(projectRef));
+    assert.doesNotMatch(bundle, new RegExp(publishableKey));
+  }
 });

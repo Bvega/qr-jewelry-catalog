@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createAuthManager } from "../../admin-src/auth.js";
+import { createAuthManager, isCatalogAdminRole } from "../../admin-src/auth.js";
 
 function createClient({ role = null, signInError = null } = {}) {
   const calls = { signOut: 0, signInArguments: null };
@@ -26,6 +26,14 @@ function createClient({ role = null, signInError = null } = {}) {
   };
   return { client, calls };
 }
+
+test("only the exact owner and editor roles satisfy the shared admin predicate", () => {
+  assert.equal(isCatalogAdminRole("owner"), true);
+  assert.equal(isCatalogAdminRole("editor"), true);
+  for (const role of [null, "", "viewer", "Owner", "administrator"]) {
+    assert.equal(isCatalogAdminRole(role), false, String(role));
+  }
+});
 
 test("authentication alone does not unlock an unallowlisted account", async () => {
   const { client, calls } = createClient({ role: null });

@@ -1,5 +1,9 @@
 const ALLOWED_ROLES = new Set(["owner", "editor"]);
 
+export function isCatalogAdminRole(role) {
+  return ALLOWED_ROLES.has(role);
+}
+
 export function createAuthManager(client, onStateChange = () => {}) {
   let subscription = null;
   let denying = false;
@@ -21,7 +25,7 @@ export function createAuthManager(client, onStateChange = () => {}) {
       return { allowed: false, reason: "probe_error" };
     }
 
-    if (!ALLOWED_ROLES.has(result.data)) {
+    if (!isCatalogAdminRole(result.data)) {
       denying = true;
       await client.auth.signOut();
       denying = false;

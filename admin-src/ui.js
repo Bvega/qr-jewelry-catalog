@@ -276,3 +276,106 @@ export function createUI(documentRoot = document) {
     setSaving
   };
 }
+
+export function createActivationUI(documentRoot = document) {
+  const byId = (id) => documentRoot.getElementById(id);
+  const refs = {
+    activationStatus: byId("activationStatus"),
+    activationLoadingSection: byId("activationLoadingSection"),
+    invitationInvalidSection: byId("invitationInvalidSection"),
+    invitationInvalidMessage: byId("invitationInvalidMessage"),
+    accessDeniedSection: byId("accessDeniedSection"),
+    accessDeniedMessage: byId("accessDeniedMessage"),
+    passwordSetupSection: byId("passwordSetupSection"),
+    passwordSetupForm: byId("passwordSetupForm"),
+    newPassword: byId("newPassword"),
+    confirmPassword: byId("confirmPassword"),
+    newPasswordError: byId("newPasswordError"),
+    confirmPasswordError: byId("confirmPasswordError"),
+    setPasswordButton: byId("setPasswordButton"),
+    signOutFailureSection: byId("signOutFailureSection"),
+    signOutFailureMessage: byId("signOutFailureMessage"),
+    retrySignOutButton: byId("retrySignOutButton"),
+    activationSuccessSection: byId("activationSuccessSection")
+  };
+
+  function setStatus(message, tone = "neutral") {
+    if (message) refs.activationStatus.textContent = message;
+    refs.activationStatus.dataset.tone = tone;
+  }
+
+  function clearPasswordFields() {
+    refs.newPassword.value = "";
+    refs.confirmPassword.value = "";
+  }
+
+  function clearPasswordErrors() {
+    for (const field of [refs.newPassword, refs.confirmPassword]) {
+      field.removeAttribute("aria-invalid");
+      field.setCustomValidity("");
+    }
+    refs.newPasswordError.textContent = "";
+    refs.confirmPasswordError.textContent = "";
+  }
+
+  function showPasswordErrors(errors) {
+    clearPasswordErrors();
+    if (errors.password) {
+      refs.newPassword.setAttribute("aria-invalid", "true");
+      refs.newPassword.setCustomValidity(errors.password);
+      refs.newPasswordError.textContent = errors.password;
+    }
+    if (errors.confirmation) {
+      refs.confirmPassword.setAttribute("aria-invalid", "true");
+      refs.confirmPassword.setCustomValidity(errors.confirmation);
+      refs.confirmPasswordError.textContent = errors.confirmation;
+    }
+    (errors.password ? refs.newPassword : refs.confirmPassword).focus();
+  }
+
+  function setState(state, message) {
+    const invalidStates = new Set([
+      "invalid", "configuration_error", "initialization_error", "role_error", "authorization_error"
+    ]);
+    const passwordStates = new Set(["authorized", "validation_error", "updating", "update_error"]);
+    const pending = state === "updating" || state === "signing_out";
+
+    refs.activationLoadingSection.hidden = state !== "initializing" && state !== "checking_access";
+    refs.invitationInvalidSection.hidden = !invalidStates.has(state);
+    refs.accessDeniedSection.hidden = state !== "denied";
+    refs.passwordSetupSection.hidden = !passwordStates.has(state);
+    refs.signOutFailureSection.hidden = state !== "sign_out_error";
+    refs.activationSuccessSection.hidden = state !== "success";
+    refs.setPasswordButton.disabled = pending;
+    refs.retrySignOutButton.disabled = state === "signing_out";
+
+    if (invalidStates.has(state) && message) refs.invitationInvalidMessage.textContent = message;
+    if (state === "denied" && message) refs.accessDeniedMessage.textContent = message;
+    if (state === "sign_out_error" && message) {
+      refs.signOutFailureMessage.textContent = message;
+    }
+
+    const defaults = {
+      initializing: "Checking invitation…",
+      checking_access: "Verifying seller access…",
+      authorized: "Seller access verified. Set a password to finish account setup.",
+      updating: "Setting password…",
+      signing_out: "Closing the invitation session…",
+      success: "Account setup is complete."
+    };
+    const tone = ["invalid", "configuration_error", "initialization_error", "role_error", "authorization_error",
+      "denied", "validation_error", "update_error", "sign_out_error"].includes(state)
+      ? "error"
+      : state === "success" ? "success" : "neutral";
+    setStatus(message || defaults[state] || "Account setup is unavailable.", tone);
+  }
+
+  return {
+    refs,
+    setState,
+    setStatus,
+    clearPasswordFields,
+    clearPasswordErrors,
+    showPasswordErrors
+  };
+}

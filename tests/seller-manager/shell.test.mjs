@@ -47,6 +47,7 @@ test("shell has no signup flow and uses a strict local-asset CSP", () => {
 test("local server binds to loopback, maps /admin/, blocks secrets, and has no write API", () => {
   assert.equal(HOST, "127.0.0.1");
   assert.equal(resolveStaticRequest("/admin/", root), resolve(root, "admin/index.html"));
+  assert.equal(resolveStaticRequest("/admin/activate.html", root), resolve(root, "admin/activate.html"));
   assert.equal(resolveStaticRequest("/.env.local", root), null);
   assert.equal(resolveStaticRequest("/%2e%2e/%2e%2e/.env.local", root), null);
 
@@ -77,10 +78,11 @@ test("public runtime, accepted intake, and product images are unchanged", () => 
     "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
     "data/reservation.js", "data/permalinks.js", "assets/images",
     "content-intake/finds.csv", "content-intake/photo-manifest.csv", "content-intake/photos",
-    "tests/fixtures/legacy-items.snapshot.json", "docs/IDENTIFIER_REGISTRY.md"
+    "tests/fixtures/legacy-items.snapshot.json", "docs/IDENTIFIER_REGISTRY.md",
+    "supabase/migrations", "supabase/tests/database"
   ];
   const diff = spawnSync("git", [
-    "diff", "--name-only", "7cf635d69f926141e9b3f3e3ffaf378898329473", "--", ...protectedPaths
+    "diff", "--name-only", "852c8a0616c84ef197cc0fc20cd22c1ffb165739", "--", ...protectedPaths
   ], { cwd: root, encoding: "utf8" });
   const status = spawnSync("git", ["status", "--porcelain=v1", "--", ...protectedPaths], {
     cwd: root,

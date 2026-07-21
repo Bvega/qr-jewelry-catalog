@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const appOutput = resolve(repositoryRoot, "admin/assets/app.js");
+const activationOutput = resolve(repositoryRoot, "admin/assets/activate.js");
 const stylesOutput = resolve(repositoryRoot, "admin/assets/styles.css");
 
 const sharedOptions = {
@@ -29,11 +30,19 @@ await build({
 
 await build({
   ...sharedOptions,
+  entryPoints: [resolve(repositoryRoot, "admin-src/activation.js")],
+  format: "iife",
+  outfile: activationOutput,
+  platform: "browser"
+});
+
+await build({
+  ...sharedOptions,
   entryPoints: [resolve(repositoryRoot, "admin-src/styles.css")],
   outfile: stylesOutput
 });
 
-for (const outputFile of [appOutput, stylesOutput]) {
+for (const outputFile of [appOutput, activationOutput, stylesOutput]) {
   const output = await readFile(outputFile, "utf8");
   await writeFile(outputFile, output.replace(/[\t ]+$/gm, ""), "utf8");
 }
