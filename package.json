@@ -1,18 +1,27 @@
 {
   "name": "between-us-platform",
   "private": true,
+  "type": "module",
   "scripts": {
     "validate": "npm run validate:baseline",
     "validate:baseline": "node scripts/validate-baseline.mjs",
     "validate:intake": "node scripts/validate-content-intake.mjs && node scripts/summarize-content-intake.mjs",
     "validate:supabase": "node scripts/validate-supabase-foundation.mjs && node --test tests/supabase-foundation/*.test.mjs",
+    "admin:config": "node scripts/generate-admin-config.mjs",
+    "admin:build": "node scripts/build-admin.mjs",
+    "admin:serve": "node scripts/serve-static.mjs",
+    "admin:validate": "node scripts/validate-seller-manager.mjs",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:reset": "supabase db reset",
     "supabase:test": "supabase test db",
     "supabase:lint": "supabase db lint --local"
   },
+  "dependencies": {
+    "@supabase/supabase-js": "2.110.7"
+  },
   "devDependencies": {
+    "esbuild": "0.28.1",
     "supabase": "2.109.1"
   }
 }

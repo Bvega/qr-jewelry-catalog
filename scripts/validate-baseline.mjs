@@ -26,6 +26,7 @@ const detailTestFiles = findTestFiles("tests/detail");
 const permalinkTestFiles = findTestFiles("tests/permalinks");
 const contentIntakeTestFiles = findTestFiles("tests/content-intake");
 const supabaseFoundationTestFiles = findTestFiles("tests/supabase-foundation");
+const sellerManagerTestFiles = findTestFiles("tests/seller-manager");
 
 const checks = [
   {
@@ -88,6 +89,22 @@ const checks = [
     displayCommand: "node --check scripts/validate-supabase-foundation.mjs",
     arguments: ["--check", "scripts/validate-supabase-foundation.mjs"]
   },
+  ...[
+    "admin-src/app.js",
+    "admin-src/auth.js",
+    "admin-src/catalog.js",
+    "admin-src/photos.js",
+    "admin-src/validation.js",
+    "admin-src/ui.js",
+    "scripts/build-admin.mjs",
+    "scripts/generate-admin-config.mjs",
+    "scripts/serve-static.mjs",
+    "scripts/validate-seller-manager.mjs"
+  ].map((file) => ({
+    label: `JavaScript syntax: ${file}`,
+    displayCommand: `node --check ${file}`,
+    arguments: ["--check", file]
+  })),
   {
     label: "Baseline contract tests",
     displayCommand: "node --test tests/baseline/*.test.mjs",
@@ -142,12 +159,17 @@ const checks = [
     label: "Supabase foundation tests",
     displayCommand: "node --test tests/supabase-foundation/*.test.mjs",
     arguments: ["--test", ...supabaseFoundationTestFiles]
+  },
+  {
+    label: "Seller Catalog Manager tests",
+    displayCommand: "node --test tests/seller-manager/*.test.mjs",
+    arguments: ["--test", ...sellerManagerTestFiles]
   }
 ];
 
 const failures = [];
 
-console.log("M07B-1 repository validation\n");
+console.log("M07B-2 repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -196,7 +218,7 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM07B-1 repository validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM07B-2 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
   const relativeTests = [
@@ -207,9 +229,10 @@ if (failures.length > 0) {
     ...detailTestFiles,
     ...permalinkTestFiles,
     ...contentIntakeTestFiles,
-    ...supabaseFoundationTestFiles
+    ...supabaseFoundationTestFiles,
+    ...sellerManagerTestFiles
   ]
     .map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, content-intake, and Supabase foundation test files.`);
-  console.log("M07B-1 repository validation: PASS");
+  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, content-intake, Supabase foundation, and Seller Manager test files.`);
+  console.log("M07B-2 repository validation: PASS");
 }

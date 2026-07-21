@@ -10,7 +10,10 @@ const read = (path) => readFileSync(resolve(repositoryRoot, path), "utf8");
 const migrations = readdirSync(resolve(repositoryRoot, "supabase/migrations"))
   .filter((file) => file.endsWith(".sql"))
   .sort();
-const migration = migrations.length === 1 ? read(`supabase/migrations/${migrations[0]}`) : "";
+const foundationMigration = "20260720120000_m07b1_catalog_foundation.sql";
+const migration = migrations.includes(foundationMigration)
+  ? read(`supabase/migrations/${foundationMigration}`)
+  : "";
 const config = read("supabase/config.toml");
 const seed = read("supabase/seed.sql");
 
@@ -29,9 +32,11 @@ test("project structure and repository-local CLI scripts are complete", () => {
 
   const packageJson = JSON.parse(read("package.json"));
   assert.equal(packageJson.private, true);
-  assert.deepEqual(Object.keys(packageJson.devDependencies), ["supabase"]);
+  assert.deepEqual(Object.keys(packageJson.devDependencies), ["esbuild", "supabase"]);
+  assert.match(packageJson.devDependencies.esbuild, /^\d+\.\d+\.\d+$/);
   assert.match(packageJson.devDependencies.supabase, /^\d+\.\d+\.\d+$/);
-  assert.equal(packageJson.dependencies, undefined);
+  assert.deepEqual(Object.keys(packageJson.dependencies), ["@supabase/supabase-js"]);
+  assert.match(packageJson.dependencies["@supabase/supabase-js"], /^\d+\.\d+\.\d+$/);
   for (const name of [
     "validate", "validate:baseline", "validate:intake", "validate:supabase",
     "supabase:start", "supabase:stop", "supabase:reset", "supabase:test", "supabase:lint"
@@ -40,8 +45,11 @@ test("project structure and repository-local CLI scripts are complete", () => {
   }
 });
 
-test("exactly one ordered M07B-1 migration is the schema source of truth", () => {
-  assert.deepEqual(migrations, ["20260720120000_m07b1_catalog_foundation.sql"]);
+test("the ordered M07B-1 foundation remains the schema source of truth beneath later migrations", () => {
+  assert.deepEqual(migrations, [
+    "20260720120000_m07b1_catalog_foundation.sql",
+    "20260720130000_m07b2_catalog_admin_role_probe.sql"
+  ]);
   assert.match(migration, /create schema if not exists private/i);
   assert.doesNotMatch(config, /schemas\s*=\s*\[[^\]]*"private"/);
 });

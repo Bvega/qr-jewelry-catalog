@@ -79,9 +79,10 @@ test("gallery image errors reveal a meaningful deliberate fallback", () => {
   assert.match(result.detail.innerHTML, /Details are still available below\./);
 });
 
-test("gallery remains dependency-free and uses no automatic carousel behavior", () => {
-  assert.equal(packageJson.dependencies, undefined);
-  assert.deepEqual(Object.keys(packageJson.devDependencies), ["supabase"]);
+test("public gallery remains dependency-free and uses no automatic carousel behavior", () => {
+  assert.deepEqual(Object.keys(packageJson.dependencies), ["@supabase/supabase-js"]);
+  assert.deepEqual(Object.keys(packageJson.devDependencies), ["esbuild", "supabase"]);
+  assert.doesNotMatch(itemSource, /@supabase|\bimport\b|\brequire\s*\(/i);
   assert.doesNotMatch(itemSource, /setInterval|autoplay|carousel/i);
   assert.match(itemSource, /find\.photos\.forEach\(addPhoto\)/);
 });

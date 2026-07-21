@@ -68,14 +68,15 @@ const migrationDirectory = resolve(repositoryRoot, "supabase/migrations");
 const migrationFiles = existsSync(migrationDirectory)
   ? readdirSync(migrationDirectory).filter((file) => file.endsWith(".sql")).sort()
   : [];
+const foundationMigrationFile = "20260720120000_m07b1_catalog_foundation.sql";
 requireCheck(
-  migrationFiles.length === 1
-    && /^\d{14}_m07b1_catalog_foundation\.sql$/.test(migrationFiles[0]),
-  "Exactly one ordered M07B-1 foundation migration is required."
+  migrationFiles.includes(foundationMigrationFile)
+    && migrationFiles[0] === foundationMigrationFile,
+  "The ordered M07B-1 foundation migration must remain first and unchanged."
 );
 
-const migration = migrationFiles.length === 1
-  ? read(`supabase/migrations/${migrationFiles[0]}`)
+const migration = migrationFiles.includes(foundationMigrationFile)
+  ? read(`supabase/migrations/${foundationMigrationFile}`)
   : "";
 const config = existsSync(resolve(repositoryRoot, "supabase/config.toml"))
   ? read("supabase/config.toml")
@@ -166,12 +167,16 @@ for (const script of [
 }
 requireCheck(packageJson.private === true, "package.json must be private.");
 requireCheck(
-  Object.keys(packageJson.devDependencies || {}).length === 1
+  Object.keys(packageJson.devDependencies || {}).length === 2
+    && /^\d+\.\d+\.\d+$/.test(packageJson.devDependencies?.esbuild || "")
     && /^\d+\.\d+\.\d+$/.test(packageJson.devDependencies?.supabase || ""),
-  "Supabase CLI must be the only pinned stable development dependency."
+  "Supabase CLI and esbuild must be the only pinned stable development dependencies."
 );
-requireCheck(!packageJson.dependencies, "M07B-1 must have no runtime dependencies.");
-requireCheck(!JSON.stringify(packageJson).includes("@supabase/supabase-js"), "Browser SDK is out of scope.");
+requireCheck(
+  Object.keys(packageJson.dependencies || {}).length === 1
+    && /^\d+\.\d+\.\d+$/.test(packageJson.dependencies?.["@supabase/supabase-js"] || ""),
+  "The pinned Supabase browser SDK must be the only runtime dependency."
+);
 
 const environmentExample = existsSync(resolve(repositoryRoot, ".env.example"))
   ? read(".env.example")

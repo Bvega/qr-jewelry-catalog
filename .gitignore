@@ -6,6 +6,7 @@
 .env.*
 !.env.example
 .env.local
+admin/config.js
 
 # Dependencies
 node_modules/

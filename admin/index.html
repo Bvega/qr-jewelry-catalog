@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob: https://*.supabase.co; font-src 'self';">
+    <title>Seller Catalog Manager | Between Us</title>
+    <link rel="icon" href="../assets/brand/between-us-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="./config.js" defer></script>
+    <script src="./assets/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to manager</a>
+    <header class="site-header">
+      <a class="brand" href="../index.html" aria-label="Between Us home">
+        <img src="../assets/brand/between-us-mark.svg" width="48" height="48" alt="">
+        <span>Between Us</span>
+      </a>
+      <div>
+        <p class="eyebrow">Private workspace</p>
+        <h1>Seller Catalog Manager</h1>
+      </div>
+    </header>
+
+    <main id="main-content" class="page-shell">
+      <div id="globalStatus" class="status" role="status" aria-live="polite" aria-atomic="true">Loading manager…</div>
+
+      <section id="signInSection" class="panel auth-panel" aria-labelledby="signInTitle" hidden>
+        <p class="eyebrow">Allowlisted access only</p>
+        <h2 id="signInTitle">Sign in</h2>
+        <p>Use the email and password assigned to your approved seller account.</p>
+        <form id="signInForm" novalidate>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="username" inputmode="email" required>
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+          <button id="signInButton" class="button button-primary" type="submit">Sign in</button>
+        </form>
+      </section>
+
+      <section id="deniedSection" class="panel denied-panel" aria-labelledby="deniedTitle" hidden>
+        <p class="eyebrow">Access denied</p>
+        <h2 id="deniedTitle">Seller access is not available</h2>
+        <p>This account does not have Seller Catalog Manager access.</p>
+        <button id="returnToSignInButton" class="button" type="button">Return to sign in</button>
+      </section>
+
+      <section id="managerSection" hidden>
+        <div class="session-bar panel">
+          <div>
+            <p class="eyebrow">Session</p>
+            <p id="sessionStatus">Access verified.</p>
+          </div>
+          <button id="logoutButton" class="button button-secondary" type="button">Sign out</button>
+        </div>
+
+        <div class="manager-layout">
+          <section class="panel catalog-panel" aria-labelledby="catalogTitle">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Inventory</p>
+                <h2 id="catalogTitle">All Finds</h2>
+              </div>
+              <button id="newFindButton" class="button button-primary" type="button">New Find</button>
+            </div>
+            <label for="catalogFilter">Filter Finds</label>
+            <select id="catalogFilter" name="catalogFilter">
+              <option value="all">All</option>
+              <option value="available">Available</option>
+              <option value="reserved">Reserved</option>
+              <option value="sold">Sold</option>
+              <option value="published">Published</option>
+              <option value="hidden">Hidden</option>
+              <option value="archived">Archived</option>
+            </select>
+            <p id="catalogSummary" class="summary" aria-live="polite"></p>
+            <div id="catalogLoading" class="loading-state" hidden>Loading catalog…</div>
+            <div id="catalogEmpty" class="empty-state" hidden>No Finds match this view.</div>
+            <ul id="catalogList" class="catalog-list" aria-label="Seller catalog"></ul>
+          </section>
+
+          <section id="editorSection" class="panel editor-panel" aria-labelledby="editorTitle" hidden>
+            <div class="section-heading">
+              <div>
+                <p id="editorEyebrow" class="eyebrow">Create</p>
+                <h2 id="editorTitle" tabindex="-1">New Find</h2>
+              </div>
+              <button id="cancelEditButton" class="button button-quiet" type="button">Cancel edit</button>
+            </div>
+
+            <form id="findForm" novalidate>
+              <div class="field">
+                <label for="title">Title <span aria-hidden="true">*</span></label>
+                <input id="title" name="title" type="text" maxlength="200" required aria-describedby="titleError">
+                <span id="titleError" class="field-error"></span>
+              </div>
+              <div class="field">
+                <label for="collectionId">Collection <span aria-hidden="true">*</span></label>
+                <select id="collectionId" name="collection_id" required aria-describedby="collectionIdError">
+                  <option value="">Choose a Collection</option>
+                </select>
+                <span id="collectionIdError" class="field-error"></span>
+              </div>
+              <div class="field-row">
+                <div class="field">
+                  <label for="priceAmount">Price (USD) <span aria-hidden="true">*</span></label>
+                  <input id="priceAmount" name="price_amount" type="text" inputmode="decimal" placeholder="0.00" required aria-describedby="priceAmountError">
+                  <span id="priceAmountError" class="field-error"></span>
+                </div>
+                <div class="field">
+                  <label for="availability">Availability <span aria-hidden="true">*</span></label>
+                  <select id="availability" name="availability" required aria-describedby="availabilityError">
+                    <option value="available">Available</option>
+                    <option value="reserved">Reserved</option>
+                    <option value="sold">Sold</option>
+                  </select>
+                  <span id="availabilityError" class="field-error"></span>
+                </div>
+              </div>
+              <div class="field">
+                <label for="description">Description <span aria-hidden="true">*</span></label>
+                <textarea id="description" name="description" rows="7" maxlength="5000" required aria-describedby="descriptionError"></textarea>
+                <span id="descriptionError" class="field-error"></span>
+              </div>
+              <div class="field">
+                <label for="condition">Condition</label>
+                <textarea id="condition" name="condition" rows="3" maxlength="500" aria-describedby="conditionError"></textarea>
+                <span id="conditionError" class="field-error"></span>
+              </div>
+
+              <fieldset class="image-fieldset">
+                <legend>Primary image</legend>
+                <p>One JPEG, PNG, or WebP image, up to 10 MiB.</p>
+                <div id="imagePreviewFrame" class="image-preview">
+                  <img id="imagePreview" alt="Selected primary image preview" hidden>
+                  <span id="imagePlaceholder">No primary image selected</span>
+                </div>
+                <div class="field">
+                  <label for="primaryImage">Upload or replace image</label>
+                  <input id="primaryImage" name="primary_image" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="primaryImageError">
+                  <span id="primaryImageError" class="field-error"></span>
+                </div>
+                <div class="field">
+                  <label for="altText">Image alternative text</label>
+                  <textarea id="altText" name="alt_text" rows="3" maxlength="500" aria-describedby="altTextHelp altTextError"></textarea>
+                  <small id="altTextHelp">Required when uploading or replacing an image.</small>
+                  <span id="altTextError" class="field-error"></span>
+                </div>
+              </fieldset>
+
+              <div class="form-actions">
+                <button class="button button-secondary" type="submit" name="saveAction" value="draft">Save draft</button>
+                <button class="button button-primary" type="submit" name="saveAction" value="publish">Save and publish</button>
+                <button id="hideFindButton" class="button" type="button" hidden>Hide</button>
+                <button id="archiveFindButton" class="button button-danger" type="button" hidden>Archive</button>
+                <button id="restoreFindButton" class="button" type="button" hidden>Restore</button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
