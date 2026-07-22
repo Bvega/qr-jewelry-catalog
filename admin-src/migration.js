@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { createMigrationAuthManager } from "./migration-auth.js";
-import { CONFIRMATION_PHRASE, createExecutionGate, executeCatalogMigration, performDryRun } from "./migration-executor.js";
+import { CONFIRMATION_PHRASE, createExecutionGate, executeCatalogMigration, prepareFreshDryRun } from "./migration-executor.js";
 import { loadAndVerifyMigrationSources } from "./migration-plan.js";
 import { createMigrationUI } from "./migration-ui.js";
 
@@ -43,16 +43,22 @@ if (!configurationIsUsable(configuration)) {
   const gate = createExecutionGate();
   let verified = null;
   let currentDryRun = null;
-  let sourceLoad = null;
 
-  async function loadSourcesOnce() {
-    sourceLoad ||= loadAndVerifyMigrationSources();
+  async function loadFreshVerifiedSources() {
+    const sessionResult = await client.auth.getSession();
+    const accessToken = sessionResult.data?.session?.access_token;
+    if (sessionResult.error || typeof accessToken !== "string" || accessToken === "") {
+      throw new Error("Owner-authenticated source delivery is unavailable.");
+    }
+    return loadAndVerifyMigrationSources({ accessToken });
+  }
+
+  async function loadInitialSources() {
     try {
-      verified = await sourceLoad;
+      verified = await loadFreshVerifiedSources();
       ui.renderPlan(verified.plan);
       ui.setWorkflowState("blocked", "Local sources verified. Run the mandatory dry-run before execution.");
     } catch (error) {
-      sourceLoad = null;
       verified = null;
       ui.setWorkflowState("blocked", error.message || "Local source verification failed.");
     }
@@ -67,7 +73,7 @@ if (!configurationIsUsable(configuration)) {
     if (state.state === "denied" || state.state === "error") ui.setWorkflowState("blocked", state.message || "Owner access could not be verified.");
     if (state.state === "authorized") {
       ui.setStatus("Owner role verified. Verifying local sources…");
-      await loadSourcesOnce();
+      await loadInitialSources();
     }
   });
 
@@ -81,7 +87,6 @@ if (!configurationIsUsable(configuration)) {
   ui.refs.logoutButton.addEventListener("click", async () => {
     verified = null;
     currentDryRun = null;
-    sourceLoad = null;
     gate.clear();
     await auth.signOut();
   });
@@ -92,13 +97,16 @@ if (!configurationIsUsable(configuration)) {
   });
 
   ui.refs.dryRunButton.addEventListener("click", async () => {
-    if (!verified) return;
     gate.clear();
     currentDryRun = null;
+    verified = null;
     ui.setRunning(true);
-    ui.setWorkflowState("running", "Running no-write database and Storage preflight…");
+    ui.setWorkflowState("running", "Reloading all local sources before the no-write preflight…");
     try {
-      const dryRun = await performDryRun({ client, verified });
+      const fresh = await prepareFreshDryRun({ client, loadSources: loadFreshVerifiedSources });
+      verified = fresh.verified;
+      const dryRun = fresh.dryRun;
+      ui.renderPlan(verified.plan);
       currentDryRun = dryRun;
       gate.setDryRun(dryRun);
       ui.renderPreflight(dryRun);
@@ -133,7 +141,7 @@ if (!configurationIsUsable(configuration)) {
       const result = await executeCatalogMigration({
         client, verified, dryRun: currentDryRun, checked: ui.refs.confirmationCheck.checked,
         phrase: ui.refs.confirmationPhrase.value,
-        revalidateSources: () => loadAndVerifyMigrationSources(),
+        revalidateSources: loadFreshVerifiedSources,
         onProgress: ({ public_id, state }) => ui.setRecordProgress(public_id, state)
       });
       currentDryRun = result.dryRun;

@@ -125,7 +125,7 @@ test("upload failure rolls back only the newly inserted Find", async () => {
   assert.deepEqual(client.state.finds.map((find) => find.public_id), ["BU-7000"]);
   assert.equal(client.state.find_photos.length, 0);
   assert.equal(client.objects.size, 0);
-  assert.equal(client.calls.removes, 1);
+  assert.equal(client.calls.removes, 0);
 });
 
 test("metadata failure removes the new object and the new Find", async () => {
@@ -146,11 +146,129 @@ test("rollback failure stops remaining records and reports recovery state", asyn
   const initial = await dryRun(client);
   await assert.rejects(
     () => executeCatalogMigration({ client, verified, dryRun: initial, ...confirmation, clock: () => 100 }),
-    (error) => error.rollbackFailed === true && /rollback did not complete/i.test(error.message)
+    (error) => error.partial === true && error.rollbackFailed === true && /rollback could not be verified/i.test(error.message)
   );
   assert.equal(client.state.finds.length, 0);
   assert.equal(client.state.find_photos.length, 0);
   assert.equal(client.objects.size, 1);
+  assert.equal(client.calls.uploads, 1);
+});
+
+test("a thrown post-write verification rolls back the current attempt", async () => {
+  const client = createMockClient({ collections: verified.plan.collections });
+  const initial = await dryRun(client);
+  let verificationCount = 0;
+  const dryRunImpl = async (options) => {
+    verificationCount += 1;
+    if (verificationCount === 2) throw new Error("fictional verification outage");
+    return performDryRun(options);
+  };
+  await assert.rejects(
+    () => executeCatalogMigration({
+      client,
+      verified,
+      dryRun: initial,
+      ...confirmation,
+      clock: () => 100,
+      dryRunImpl
+    }),
+    (error) => error.partial === true && error.rollbackFailed === false && /absence was verified/i.test(error.message)
+  );
+  assert.equal(client.state.finds.length, 0);
+  assert.equal(client.state.find_photos.length, 0);
+  assert.equal(client.objects.size, 0);
+  assert.equal(client.calls.uploads, 1);
+});
+
+test("a thrown final verification rolls back every attempt created by the execution", async () => {
+  const client = createMockClient({ collections: verified.plan.collections });
+  const initial = await dryRun(client);
+  let verificationCount = 0;
+  const dryRunImpl = async (options) => {
+    verificationCount += 1;
+    if (verificationCount === 6) throw new Error("fictional final verification outage");
+    return performDryRun(options);
+  };
+  await assert.rejects(
+    () => executeCatalogMigration({
+      client,
+      verified,
+      dryRun: initial,
+      ...confirmation,
+      clock: () => 100,
+      dryRunImpl
+    }),
+    (error) => error.partial === true && error.rollbackFailed === false && /final verification threw/i.test(error.message)
+  );
+  assert.equal(client.state.finds.length, 0);
+  assert.equal(client.state.find_photos.length, 0);
+  assert.equal(client.objects.size, 0);
+  assert.equal(client.calls.uploads, 4);
+});
+
+test("an ambiguous upload on a resumable Find is inspected and never deleted", async () => {
+  const planned = verified.plan.finds[0];
+  const find = databaseFind(planned);
+  const expectedPath = `finds/${find.id}/${planned.photo.filename}`;
+  const client = createMockClient({
+    collections: verified.plan.collections,
+    finds: [find],
+    fail: { uploadAfterWriteError: true }
+  });
+  const initial = await dryRun(client);
+  await assert.rejects(
+    () => executeCatalogMigration({ client, verified, dryRun: initial, ...confirmation, clock: () => 100 }),
+    (error) => error.partial === true && error.manualReview === true && /no unconfirmed artifact was deleted/i.test(error.message)
+  );
+  assert.equal(client.state.finds.length, 1);
+  assert.equal(client.state.find_photos.length, 0);
+  assert.equal(client.objects.has(expectedPath), true);
+  assert.equal(client.calls.removes, 0);
+  assert.equal(client.calls.uploads, 1);
+});
+
+test("an ambiguous metadata insert is re-read and reconciled before verified rollback", async () => {
+  const client = createMockClient({
+    collections: verified.plan.collections,
+    fail: { metadataAfterWriteError: true, photoDeleteAfterWriteError: true }
+  });
+  const initial = await dryRun(client);
+  await assert.rejects(
+    () => executeCatalogMigration({ client, verified, dryRun: initial, ...confirmation, clock: () => 100 }),
+    (error) => error.partial === true && error.rollbackFailed === false && /metadata response was ambiguous/i.test(error.message)
+  );
+  assert.equal(client.state.finds.length, 0);
+  assert.equal(client.state.find_photos.length, 0);
+  assert.equal(client.objects.size, 0);
+  assert.equal(client.calls.removes, 1);
+});
+
+test("ambiguous cleanup responses are reconciled by final absence reads", async () => {
+  const client = createMockClient({
+    collections: verified.plan.collections,
+    fail: { metadata: true, removeAfterWriteError: true, findDeleteAfterWriteError: true }
+  });
+  const initial = await dryRun(client);
+  await assert.rejects(
+    () => executeCatalogMigration({ client, verified, dryRun: initial, ...confirmation, clock: () => 100 }),
+    (error) => error.partial === true && error.rollbackFailed === false && /absence was verified/i.test(error.message)
+  );
+  assert.equal(client.state.finds.length, 0);
+  assert.equal(client.objects.size, 0);
+});
+
+test("rollback success is verified rather than inferred from a successful no-op response", async () => {
+  const client = createMockClient({
+    collections: verified.plan.collections,
+    fail: { metadata: true, removeNoop: true }
+  });
+  const initial = await dryRun(client);
+  await assert.rejects(
+    () => executeCatalogMigration({ client, verified, dryRun: initial, ...confirmation, clock: () => 100 }),
+    (error) => error.partial === true && error.rollbackFailed === true && /remaining Finds were stopped/i.test(error.message)
+  );
+  assert.equal(client.objects.size, 1);
+  assert.equal(client.state.finds.length, 0);
   assert.equal(client.calls.uploads, 1);
 });
 

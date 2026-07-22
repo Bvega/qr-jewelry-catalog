@@ -295,7 +295,7 @@ test("activation shell is branded, accessible, private, and script-restricted", 
   assert.doesNotMatch(activationHtml, /<script(?![^>]*\bsrc=)[^>]*>/i);
   const scriptSources = [...activationHtml.matchAll(/<script[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g)]
     .map((match) => match[1]);
-  assert.deepEqual(scriptSources, ["./config.js", "./assets/activate.js"]);
+  assert.deepEqual(scriptSources, ["./runtime-config.js", "./assets/activate.js"]);
 });
 
 test("missing invitation session fails closed without probing role or scrubbing URL", async () => {

@@ -1,12 +1,13 @@
-export const MIGRATION_PLAN_URL = "/migration/m07b3-catalog-plan.json";
+export const MAINTENANCE_SOURCE_PREFIX = "/__maintenance/m07b3";
+export const MIGRATION_PLAN_URL = `${MAINTENANCE_SOURCE_PREFIX}/plan`;
 export const EXPECTED_PUBLIC_IDS = Object.freeze(["BU-0006", "BU-0007", "BU-0008", "BU-0009"]);
 export const PRESERVED_PUBLIC_IDS = Object.freeze(["BU-0001", "BU-0002", "BU-0003", "BU-0004", "BU-0005"]);
 
-const SOURCE_URLS = Object.freeze({
-  "content-intake/finds.csv": "/content-intake/finds.csv",
-  "content-intake/photo-manifest.csv": "/content-intake/photo-manifest.csv",
-  "data/collections.js": "/data/collections.js",
-  "docs/IDENTIFIER_REGISTRY.md": "/docs/IDENTIFIER_REGISTRY.md"
+export const MAINTENANCE_SOURCE_URLS = Object.freeze({
+  "content-intake/finds.csv": `${MAINTENANCE_SOURCE_PREFIX}/finds.csv`,
+  "content-intake/photo-manifest.csv": `${MAINTENANCE_SOURCE_PREFIX}/photo-manifest.csv`,
+  "data/collections.js": `${MAINTENANCE_SOURCE_PREFIX}/collections.js`,
+  "docs/IDENTIFIER_REGISTRY.md": `${MAINTENANCE_SOURCE_PREFIX}/identifier-registry.md`
 });
 
 const TOP_LEVEL_KEYS = ["plan_version", "sources", "collections", "finds"];
@@ -148,7 +149,7 @@ function validatePlanShape(plan) {
   if (!exactKeys(plan, TOP_LEVEL_KEYS) || plan.plan_version !== 1 || hasDisallowedKey(plan)) {
     throw new SourceVerificationError("The tracked plan has an unexpected structure.");
   }
-  if (!exactKeys(plan.sources, Object.keys(SOURCE_URLS))) {
+  if (!exactKeys(plan.sources, Object.keys(MAINTENANCE_SOURCE_URLS))) {
     throw new SourceVerificationError("The tracked plan source contract is not exact.");
   }
   if (!Array.isArray(plan.collections) || plan.collections.length !== 6 || plan.collections.some((item) => !exactKeys(item, COLLECTION_KEYS))) {
@@ -236,8 +237,14 @@ function verifyCsvDerivation(plan, findsSource, manifestSource) {
   }
 }
 
-async function fetchBytes(url, fetchImpl) {
-  const response = await fetchImpl(url, { cache: "no-store", credentials: "same-origin" });
+async function fetchBytes(url, fetchImpl, accessToken) {
+  const response = await fetchImpl(url, {
+    method: "GET",
+    cache: "no-store",
+    credentials: "same-origin",
+    redirect: "error",
+    headers: { authorization: `Bearer ${accessToken}` }
+  });
   if (!response.ok) throw new SourceVerificationError("A required local migration source is unavailable.");
   return new Uint8Array(await response.arrayBuffer());
 }
@@ -257,8 +264,14 @@ export async function verifyPhotoBlob(blob, expected) {
   return true;
 }
 
-export async function loadAndVerifyMigrationSources(fetchImpl = globalThis.fetch.bind(globalThis)) {
-  const planBytes = await fetchBytes(MIGRATION_PLAN_URL, fetchImpl);
+export async function loadAndVerifyMigrationSources({
+  fetchImpl = globalThis.fetch.bind(globalThis),
+  accessToken
+} = {}) {
+  if (typeof accessToken !== "string" || accessToken === "" || /\s/.test(accessToken)) {
+    throw new SourceVerificationError("Owner-authenticated source delivery is required.");
+  }
+  const planBytes = await fetchBytes(MIGRATION_PLAN_URL, fetchImpl, accessToken);
   let plan;
   try {
     plan = JSON.parse(new TextDecoder().decode(planBytes));
@@ -267,8 +280,8 @@ export async function loadAndVerifyMigrationSources(fetchImpl = globalThis.fetch
   }
   validatePlanShape(plan);
 
-  const sourceEntries = await Promise.all(Object.entries(SOURCE_URLS).map(async ([path, url]) => {
-    const bytes = await fetchBytes(url, fetchImpl);
+  const sourceEntries = await Promise.all(Object.entries(MAINTENANCE_SOURCE_URLS).map(async ([path, url]) => {
+    const bytes = await fetchBytes(url, fetchImpl, accessToken);
     if (await sha256Hex(bytes) !== plan.sources[path]) {
       throw new SourceVerificationError(`Local source drift blocks migration: ${path}.`);
     }
@@ -296,7 +309,11 @@ export async function loadAndVerifyMigrationSources(fetchImpl = globalThis.fetch
 
   const photos = new Map();
   await Promise.all(plan.finds.map(async (find) => {
-    const bytes = await fetchBytes(`/content-intake/photos/${encodeURIComponent(find.photo.filename)}`, fetchImpl);
+    const bytes = await fetchBytes(
+      `${MAINTENANCE_SOURCE_PREFIX}/photos/${encodeURIComponent(find.photo.filename)}`,
+      fetchImpl,
+      accessToken
+    );
     const blob = new Blob([bytes], { type: find.photo.mime_type });
     try {
       await verifyPhotoBlob(blob, find.photo);

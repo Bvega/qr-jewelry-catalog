@@ -40,11 +40,11 @@ test("shell has no signup flow and uses a strict local-asset CSP", () => {
   assert.match(html, /connect-src 'self' http:\/\/127\.0\.0\.1:54321 ws:\/\/127\.0\.0\.1:54321 https:\/\/\*\.supabase\.co wss:\/\/\*\.supabase\.co/);
   assert.match(html, /img-src 'self' data: blob: http:\/\/127\.0\.0\.1:54321 https:\/\/\*\.supabase\.co/);
   assert.doesNotMatch(html, /unsafe-eval|unsafe-inline/);
-  assert.match(html, /src="\.\/config\.js"/);
+  assert.match(html, /src="\.\/runtime-config\.js"/);
   assert.match(html, /src="\.\/assets\/app\.js"/);
 });
 
-test("local server binds to loopback, maps /admin/, blocks secrets, and has no write API", () => {
+test("local server binds to loopback, maps /admin/, blocks secrets, and has no write API", async () => {
   assert.equal(HOST, "127.0.0.1");
   assert.equal(resolveStaticRequest("/admin/", root), resolve(root, "admin/index.html"));
   assert.equal(resolveStaticRequest("/admin/activate.html", root), resolve(root, "admin/activate.html"));
@@ -66,10 +66,10 @@ test("local server binds to loopback, maps /admin/, blocks secrets, and has no w
       this.body = body;
     }
   };
-  handler({ method: "POST", url: "/admin/" }, response);
+  await handler({ method: "POST", url: "/admin/", headers: {} }, response);
   assert.equal(response.status, 405);
   assert.equal(response.headers.Allow, "GET, HEAD");
-  assert.equal(response.body, "Method not allowed");
+  assert.equal(response.body.toString("utf8"), "Method not allowed");
   server.close();
 });
 

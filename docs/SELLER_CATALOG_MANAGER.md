@@ -4,7 +4,7 @@
 
 The private Seller Catalog Manager is a framework-free browser application at `/admin/`. `admin/index.html` is the semantic shell, `admin-src/` contains modular vanilla JavaScript and mobile-first CSS, and `scripts/build-admin.mjs` produces the committed browser assets with esbuild. The existing public catalog remains static and does not read from Supabase in M07B-2.
 
-Browser configuration is deliberately separate from the bundle. `admin/config.js` is generated locally, ignored by Git, and loaded before `admin/assets/app.js`. The browser receives only the project URL, publishable key, and project reference.
+Browser configuration is deliberately separate from the bundle. `admin/config.js` is generated locally and ignored by Git, while the loopback server validates it and exposes only the browser-safe fields at `/admin/runtime-config.js` before `admin/assets/app.js`. Direct requests to `admin/config.js` are denied. The browser receives only the project URL, publishable key, and project reference.
 
 ## Authentication boundary and role gate
 

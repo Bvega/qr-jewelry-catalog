@@ -49,7 +49,7 @@ publishableKey
 projectRef
 ```
 
-It prints one neutral success message and no configuration value. `admin/config.js` is local-only and must never be committed.
+It prints one neutral success message and no configuration value. `admin/config.js` is local-only and must never be committed or fetched directly. The loopback server validates this file and emits only its browser-safe fields at `/admin/runtime-config.js`; requests to `/admin/config.js` return 404.
 
 ## Serve and smoke test
 
@@ -57,7 +57,7 @@ It prints one neutral success message and no configuration value. `admin/config.
 npm run admin:serve
 ```
 
-Open `http://127.0.0.1:3000/admin/`. The repository-local server binds only to `127.0.0.1`, serves read-only static files, rejects non-GET/HEAD methods, blocks dotfiles and traversal, and does not expose a write API.
+Open `http://127.0.0.1:3000/admin/`. The repository-local server binds only to `127.0.0.1`, serves read-only files, rejects non-GET/HEAD methods, blocks dotfiles and traversal, and does not expose a write API.
 
 The separate seller invitation-completion route is:
 
@@ -73,7 +73,7 @@ The temporary M07B-3 owner-only intake route is intentionally unlinked:
 http://127.0.0.1:3000/admin/migrate-intake.html
 ```
 
-It loads the tracked plan and local sources only after exact owner authorization. Editor and non-admin accounts are signed out. Dry-run performs no writes; execution additionally requires a current successful dry-run, a review checkbox, the exact confirmation phrase, and a separate final action. During Stage A use only fictional local Auth users. After local Supabase starts, `npm run admin:config -- --local` writes an ignored loopback configuration without printing its browser-safe value. An isolated validation copy may add `--workdir /path/to/unlinked-project`. Do not use the local option for the post-acceptance remote runbook.
+It loads migration sources through the exact `/__maintenance/m07b3/` allowlist only after the server validates the current bearer session and exact owner role. The access token stays in the Authorization header and is never placed in a URL, page source, response, or log. Direct static access to the plan, accepted CSVs, manifest, source photos, and identifier registry is blocked. Editor and non-admin accounts are signed out. Every dry-run freshly reloads and verifies all plan, registry, CSV, and photo bytes and performs no writes; execution additionally requires a current successful dry-run, a review checkbox, the exact confirmation phrase, and a separate final action. During Stage A use only fictional local Auth users. After local Supabase starts, `npm run admin:config -- --local` writes an ignored loopback configuration without printing its browser-safe value. An isolated validation copy may add `--workdir /path/to/unlinked-project`. Do not use the local option for the post-acceptance remote runbook.
 
 Verify:
 
@@ -84,7 +84,7 @@ Verify:
 5. an allowlisted local test admin can load the empty local catalog; and
 6. page source and the console contain no secret value or session/token log.
 
-For the M07B-3 route, also verify the plan is absent before authorization, the owner dry-run reports four target IDs and zero writes, editors are denied, source photos verify, and refresh never starts execution.
+For the M07B-3 route, also verify direct and protected unauthenticated requests reveal no migration source, authenticated editors are denied, an authenticated owner can fetch only the exact maintenance allowlist, each owner dry-run reloads all sources and reports four target IDs with zero writes, source photos verify, and refresh never starts execution.
 
 Do not use a real remote owner account for automated testing. Remote owner smoke testing waits for MASTER approval.
 
@@ -103,7 +103,7 @@ Do not use a real invitation or write to remote Auth during implementation. Afte
 
 ## Troubleshooting
 
-**Configuration is missing or invalid:** Check only that the three required names are present and non-empty. Confirm the URL uses HTTPS, the hostname matches the project reference, and the key is publishable. Regenerate `admin/config.js`; do not inspect or paste credentials into issue reports.
+**Configuration is missing or invalid:** Check only that the three required names are present and non-empty. Confirm the URL uses HTTPS, the hostname matches the project reference, and the key is publishable. Regenerate `admin/config.js`; do not inspect it through HTTP or paste credentials into issue reports. The browser loads the validated `/admin/runtime-config.js` response.
 
 **Access is denied after valid authentication:** Authentication and authorization are separate. Confirm the test user is allowlisted locally in `private.catalog_admins`. Do not expose or query the private allowlist from browser code.
 

@@ -30,11 +30,13 @@ Each Find uses exactly one primary image at `finds/{find-id}/{approved-filename}
 
 The temporary, unlinked loopback route is `/admin/migrate-intake.html`. It uses the same ignored browser-safe configuration as the Seller Catalog Manager and supports email/password sign-in or restoration of an existing manager session. After authentication it calls the self-only role probe. Only exact role `owner` proceeds; editor and non-admin accounts are signed out and denied.
 
-The plan and local source files are not fetched until the owner gate succeeds. The page has no signup or password-reset request flow and never renders internal identifiers, authentication state, configuration values, or internal intake annotations.
+The loopback server rejects direct static access to `migration/`, the accepted `content-intake/` files and photos, the identifier registry, `.env.local`, and `admin/config.js`. Migration reads use an exact allowlist under `/__maintenance/m07b3/`. Every allowlisted request carries the current Supabase access token only in the `Authorization: Bearer` header. The server validates the user with Supabase Auth and then requires the exact `owner` result from `current_catalog_admin_role` before returning bytes. It uses only the browser-safe publishable key, exposes no write API, accepts only GET/HEAD, and returns neutral 401/403/404 responses. The token is never put in a URL, page source, response, or log.
+
+The browser configuration is delivered at `/admin/runtime-config.js` from the ignored file after the server validates that it contains only the project URL, publishable key, and project reference. The ignored `admin/config.js` path itself remains inaccessible. The public `data/collections.js` asset remains unchanged and public because the accepted static catalog requires it; migration reads receive the same tracked bytes only through the authenticated maintenance allowlist. The page has no signup or password-reset request flow and never renders internal identifiers, authentication material, configuration values, or internal intake annotations.
 
 ## Mandatory dry-run
 
-Dry-run writes nothing. It rechecks the local plan and images, owner authorization, six Collections, absence of `BU-0001` through `BU-0005`, target IDs and slugs, exact hidden state, photo rows, authenticated Storage contents, and absence of relations. Each target becomes one of:
+Dry-run writes nothing. Every click discards prior source verification, reloads the tracked plan, both CSVs, the Collection registry, the identifier registry, and all four photos through the protected owner-only channel, then rechecks source hashes plus every photo's SHA-256, byte size, detected MIME type, width, and height. It also rechecks owner authorization, six Collections, absence of `BU-0001` through `BU-0005`, target IDs and slugs, exact hidden state, photo rows, authenticated Storage contents, and absence of relations. Each target becomes one of:
 
 - `absent` — safe to create;
 - `resumable` — exact Find with an incomplete, non-conflicting primary-photo step;
@@ -47,7 +49,9 @@ Execution requires that current successful dry-run, a checked review control, th
 
 Exact complete records are skipped. Resumable records receive only their missing exact photo step. Existing mismatches are never overwritten, and pre-existing rows or objects are never hard-deleted.
 
-For a newly inserted Find, upload or photo-metadata failure triggers removal of only the newly uploaded object and newly inserted Find. For a resume, cleanup is limited to photo artifacts created by that attempt. A cleanup failure stops all remaining records and reports the affected public ID without exposing an internal identifier. A second dry-run after a complete import reports all four already complete and offers no execution action.
+Every post-write and final verification is exception-safe. A database, Storage, network, parsing, or verification exception starts rollback for the current attempt; a final batch verification exception rolls back every artifact proven to belong to that execution. Rollback deletes only a positively confirmed attempt-created photo row, object, or new Find and then independently re-reads the database and Storage to verify absence. A successful-looking delete response is not treated as proof.
+
+Upload success is recorded only after the response confirms the exact path. A collision, timeout, or ambiguous upload response triggers fresh Storage inspection. On a resumable pre-existing Find, an object is never deleted unless this execution positively proved it created the object; unresolved ownership stops for manual review. Ambiguous metadata insert/delete responses are likewise reconciled by exact reads. A newly inserted Find and UUID-scoped path may be cleaned up only while their ownership by the attempt is proven. Rollback failure stops all remaining Finds and reports `partial-failure`; it never falls back to a generic no-write blocked state. A second dry-run after a complete import reports all four already complete and offers no execution action.
 
 ## Local validation
 

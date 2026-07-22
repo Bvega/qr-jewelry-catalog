@@ -30,7 +30,7 @@ After the Supabase client establishes the session, residual invitation query or 
 
 ## Configuration and security boundary
 
-The page loads the ignored `admin/config.js` followed by the committed activation bundle. Browser configuration contains only the Supabase URL, publishable key, and project reference. Activation requires no secret key, service-role key, server-side credential, application server, or database change.
+The page loads the server-validated `/admin/runtime-config.js` response followed by the committed activation bundle. The ignored `admin/config.js` source path is not served. Browser configuration contains only the Supabase URL, publishable key, and project reference. Activation requires no secret key, service-role key, server-side credential, application server, or database change.
 
 ## Expired or invalid invitation recovery
 

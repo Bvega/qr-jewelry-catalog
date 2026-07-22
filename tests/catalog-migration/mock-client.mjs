@@ -89,17 +89,24 @@ class Builder {
         rows.push(row);
         inserted.push({ ...row });
       }
+      if (this.table === "find_photos" && this.owner.fail.metadataAfterWriteError) {
+        return { data: null, error: new Error("ambiguous metadata insert") };
+      }
       return { data: inserted, error: null };
     }
     if (this.action === "delete") {
       this.owner.calls.writes += 1;
       if (this.table === "finds" && this.owner.fail.findDelete) return { data: null, error: new Error("delete") };
       if (this.table === "find_photos" && this.owner.fail.photoDelete) return { data: null, error: new Error("delete") };
+      if (this.table === "finds" && this.owner.fail.findDeleteNoop) return { data: [], error: null };
+      if (this.table === "find_photos" && this.owner.fail.photoDeleteNoop) return { data: [], error: null };
       const removedIds = new Set(rows.filter((row) => matches(row, this.filters)).map((row) => row.id));
       this.owner.state[this.table] = rows.filter((row) => !matches(row, this.filters));
       if (this.table === "finds") {
         this.owner.state.find_photos = this.owner.state.find_photos.filter((photo) => !removedIds.has(photo.find_id));
       }
+      if (this.table === "finds" && this.owner.fail.findDeleteAfterWriteError) return { data: null, error: new Error("ambiguous delete") };
+      if (this.table === "find_photos" && this.owner.fail.photoDeleteAfterWriteError) return { data: null, error: new Error("ambiguous delete") };
       return { data: [], error: null };
     }
     return { data: null, error: new Error("unsupported") };
@@ -145,13 +152,16 @@ export function createMockClient({ role = "owner", collections = [], finds = [],
           owner.calls.uploads += 1;
           if (fail.upload || owner.objects.has(path)) return { data: null, error: new Error("upload") };
           owner.objects.set(path, blob);
+          if (fail.uploadAfterWriteError) return { data: null, error: new Error("ambiguous upload") };
           return { data: { path }, error: null };
         },
         remove: async (paths) => {
           owner.calls.writes += 1;
           owner.calls.removes += 1;
           if (fail.remove) return { data: null, error: new Error("remove") };
+          if (fail.removeNoop) return { data: [], error: null };
           for (const path of paths) owner.objects.delete(path);
+          if (fail.removeAfterWriteError) return { data: null, error: new Error("ambiguous remove") };
           return { data: [], error: null };
         }
       })

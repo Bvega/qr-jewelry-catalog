@@ -12,11 +12,12 @@ const FIND_COLUMNS = [
 const PHOTO_COLUMNS = "id,find_id,storage_path,role,sequence,alt_text,width,height";
 
 export class MigrationWorkflowError extends Error {
-  constructor(message, { partial = false, rollbackFailed = false } = {}) {
+  constructor(message, { partial = false, rollbackFailed = false, manualReview = false } = {}) {
     super(message);
     this.name = "MigrationWorkflowError";
     this.partial = partial;
     this.rollbackFailed = rollbackFailed;
+    this.manualReview = manualReview;
   }
 }
 
@@ -259,6 +260,15 @@ export async function performDryRun({ client, verified, clock = Date.now }) {
   return preflight;
 }
 
+export async function prepareFreshDryRun({ client, loadSources, clock = Date.now }) {
+  if (typeof loadSources !== "function") {
+    throw new MigrationWorkflowError("Fresh local source verification is required for every dry-run.");
+  }
+  const verified = await loadSources();
+  const dryRun = await performDryRun({ client, verified, clock });
+  return { verified, dryRun };
+}
+
 export function createExecutionGate({ clock = Date.now, maxAgeMs = DRY_RUN_MAX_AGE_MS } = {}) {
   let dryRun = null;
   return {
@@ -290,78 +300,254 @@ async function ensureCollections(client, plan, states) {
   for (const state of states) {
     if (state.state === "exact") continue;
     const collection = plan.collections.find((entry) => entry.id === state.id);
-    const inserted = await client.from("collections").insert(collection);
-    if (!inserted.error) continue;
-    const reload = await client.from("collections").select("id,label,status,sort_order,description").eq("id", collection.id).maybeSingle();
+    try {
+      await client.from("collections").insert(collection);
+    } catch {
+      // The exact post-state below is authoritative for ambiguous responses.
+    }
+    let reload;
+    try {
+      reload = await client.from("collections")
+        .select("id,label,status,sort_order,description")
+        .eq("id", collection.id)
+        .maybeSingle();
+    } catch {
+      throw new MigrationWorkflowError(
+        `Collection ${collection.id} create response was ambiguous and its exact state could not be inspected.`,
+        { partial: true, rollbackFailed: true, manualReview: true }
+      );
+    }
     if (reload.error || !reload.data || !collectionMatches(reload.data, collection)) {
-      throw new MigrationWorkflowError(`Collection ${collection.id} could not be created exactly.`);
+      throw new MigrationWorkflowError(
+        `Collection ${collection.id} could not be verified after its create attempt.`,
+        { partial: true }
+      );
     }
   }
 }
 
+async function inspectFindByPublicId(client, planned) {
+  const result = await client.from("finds").select(FIND_COLUMNS).eq("public_id", planned.public_id);
+  if (result.error) throw new MigrationWorkflowError(`${planned.public_id} post-write state could not be inspected.`, { partial: true });
+  const rows = result.data || [];
+  if (rows.length === 0) return { state: "absent", row: null };
+  if (rows.length === 1 && findMatches(rows[0], planned)) return { state: "exact", row: rows[0] };
+  return { state: "mismatch", row: rows[0] || null };
+}
+
 async function insertFind(client, planned) {
-  const result = await client.from("finds").insert(plannedFindPayload(planned)).select(FIND_COLUMNS).single();
-  if (result.error || !result.data) throw new MigrationWorkflowError(`${planned.public_id} could not be inserted.`);
-  if (!findMatches(result.data, planned)) {
-    const recovered = await removeFind(client, result.data.id);
+  let result;
+  try {
+    result = await client.from("finds").insert(plannedFindPayload(planned)).select(FIND_COLUMNS).single();
+  } catch {
+    result = { data: null, error: true };
+  }
+  if (!result.error && result.data?.id) {
+    if (findMatches(result.data, planned)) return result.data;
+    const recovered = await removeFindVerified(client, result.data.id);
     throw new MigrationWorkflowError(
       recovered
-        ? `${planned.public_id} insert verification failed and the new Find was rolled back.`
-        : `${planned.public_id} insert verification failed and rollback did not complete.`,
+        ? `${planned.public_id} insert verification failed and the confirmed new Find was rolled back.`
+        : `${planned.public_id} insert verification failed and rollback could not be verified.`,
       { partial: true, rollbackFailed: !recovered }
     );
   }
-  return result.data;
-}
 
-async function removeObject(client, path) {
-  const result = await client.storage.from(IMAGE_BUCKET).remove([path]);
-  return !result.error;
-}
-
-async function removeFind(client, findId) {
-  const result = await client.from("finds").delete().eq("id", findId);
-  return !result.error;
-}
-
-async function removePhoto(client, photoId) {
-  const result = await client.from("find_photos").delete().eq("id", photoId);
-  return !result.error;
-}
-
-async function recoverFailure({ client, record, find, objectCreated, photoCreated, newFind }) {
-  let ok = true;
-  if (newFind) {
-    if (objectCreated) ok = await removeObject(client, record.storagePath) && ok;
-    ok = await removeFind(client, find.id) && ok;
-    return ok;
+  let state;
+  try {
+    state = await inspectFindByPublicId(client, planned);
+  } catch {
+    throw new MigrationWorkflowError(
+      `${planned.public_id} insert response was ambiguous and requires manual review.`,
+      { partial: true, rollbackFailed: true, manualReview: true }
+    );
   }
-  if (photoCreated) ok = await removePhoto(client, photoCreated.id) && ok;
-  if (objectCreated) ok = await removeObject(client, record.storagePath) && ok;
-  return ok;
+  if (state.state === "absent") {
+    throw new MigrationWorkflowError(
+      `${planned.public_id} insert failed; a fresh inspection confirmed that no target Find exists.`,
+      { partial: true }
+    );
+  }
+  throw new MigrationWorkflowError(
+    `${planned.public_id} insert response was ambiguous; the observed Find was not deleted because this attempt cannot prove ownership.`,
+    { partial: true, rollbackFailed: true, manualReview: true }
+  );
+}
+
+async function inspectPhotoMetadata(client, databaseFind, planned, storagePath) {
+  const result = await client.from("find_photos").select(PHOTO_COLUMNS);
+  if (result.error) throw new MigrationWorkflowError(`${planned.public_id} photo metadata state could not be inspected.`, { partial: true });
+  const rows = result.data || [];
+  const associated = rows.filter((photo) => photo.find_id === databaseFind.id);
+  const pathConflict = rows.some((photo) => photo.storage_path === storagePath && photo.find_id !== databaseFind.id);
+  if (associated.length === 0 && !pathConflict) return { state: "absent", row: null };
+  if (associated.length === 1 && !pathConflict && photoMatches(associated[0], planned, storagePath)) {
+    return { state: "exact", row: associated[0] };
+  }
+  return { state: "mismatch", row: associated[0] || null };
+}
+
+async function verifyFindAbsent(client, findId) {
+  try {
+    const result = await client.from("finds").select("id").eq("id", findId);
+    return !result.error && (result.data || []).length === 0;
+  } catch {
+    return false;
+  }
+}
+
+async function verifyPhotoAbsent(client, photoId) {
+  try {
+    const result = await client.from("find_photos").select("id").eq("id", photoId);
+    return !result.error && (result.data || []).length === 0;
+  } catch {
+    return false;
+  }
+}
+
+async function verifyObjectAbsent(client, find, planned) {
+  try {
+    const state = await inspectStorage(client, find, planned);
+    return state.exact && !state.exists;
+  } catch {
+    return false;
+  }
+}
+
+async function removeObjectVerified(client, find, planned, storagePath) {
+  try {
+    await client.storage.from(IMAGE_BUCKET).remove([storagePath]);
+  } catch {
+    // A fresh read below reconciles ambiguous delete responses.
+  }
+  return verifyObjectAbsent(client, find, planned);
+}
+
+async function removeFindVerified(client, findId) {
+  try {
+    await client.from("finds").delete().eq("id", findId);
+  } catch {
+    // A fresh read below reconciles ambiguous delete responses.
+  }
+  return verifyFindAbsent(client, findId);
+}
+
+async function removePhotoVerified(client, photoId) {
+  try {
+    await client.from("find_photos").delete().eq("id", photoId);
+  } catch {
+    // A fresh read below reconciles ambiguous delete responses.
+  }
+  return verifyPhotoAbsent(client, photoId);
+}
+
+async function recoverFailure({ client, attempt }) {
+  if (attempt.photoCreated?.id) {
+    await removePhotoVerified(client, attempt.photoCreated.id);
+  }
+  if (attempt.objectCreated) {
+    await removeObjectVerified(client, attempt.find, attempt.planned, attempt.storagePath);
+  }
+  if (attempt.newFind) {
+    await removeFindVerified(client, attempt.find.id);
+  }
+
+  const checks = [];
+  if (attempt.photoCreated?.id) checks.push(await verifyPhotoAbsent(client, attempt.photoCreated.id));
+  if (attempt.objectCreated) checks.push(await verifyObjectAbsent(client, attempt.find, attempt.planned));
+  if (attempt.newFind) checks.push(await verifyFindAbsent(client, attempt.find.id));
+  return checks.every(Boolean);
+}
+
+async function rollbackAttempts(client, attempts) {
+  let recovered = true;
+  for (const attempt of [...attempts].reverse()) {
+    recovered = await recoverFailure({ client, attempt }) && recovered;
+  }
+  return recovered;
+}
+
+async function failAfterRollback(client, attempts, publicId, reason) {
+  const recovered = await rollbackAttempts(client, attempts);
+  throw new MigrationWorkflowError(
+    recovered
+      ? `${publicId} ${reason}; attempt-created artifacts were rolled back and their absence was verified.`
+      : `${publicId} ${reason}; rollback could not be verified and remaining Finds were stopped.`,
+    { partial: true, rollbackFailed: !recovered }
+  );
+}
+
+function manualReviewError(publicId, reason) {
+  return new MigrationWorkflowError(
+    `${publicId} ${reason}; ownership could not be proved, so no unconfirmed artifact was deleted. Manual review is required.`,
+    { partial: true, rollbackFailed: true, manualReview: true }
+  );
+}
+
+function emitProgress(onProgress, value) {
+  try {
+    onProgress(value);
+  } catch {
+    // Progress rendering cannot alter or obscure migration safety state.
+  }
 }
 
 async function finishPhoto({ client, verified, planned, record, databaseFind, newFind }) {
   const storagePath = record.storagePath || `finds/${databaseFind.id}/${planned.photo.filename}`;
-  const workingRecord = { ...record, storagePath };
-  let objectCreated = false;
-  let photoCreated = null;
+  const attempt = {
+    planned,
+    record: { ...record, storagePath },
+    find: databaseFind,
+    storagePath,
+    newFind,
+    objectCreated: false,
+    photoCreated: null
+  };
+
+  let blob;
   try {
-    if (record.storage_object !== "exact") {
-      const blob = verified.photos.get(planned.public_id);
-      await verifyPhotoBlob(blob, planned.photo);
-      // Preflight proved this exact path absent. Treat an upload error as
-      // potentially ambiguous and remove only that attempt-scoped path.
-      objectCreated = true;
-      const upload = await client.storage.from(IMAGE_BUCKET).upload(storagePath, blob, {
+    blob = verified.photos.get(planned.public_id);
+    await verifyPhotoBlob(blob, planned.photo);
+  } catch {
+    return failAfterRollback(client, [attempt], planned.public_id, "photo verification failed after the Find create step");
+  }
+
+  if (record.storage_object !== "exact") {
+    let upload;
+    try {
+      upload = await client.storage.from(IMAGE_BUCKET).upload(storagePath, blob, {
         cacheControl: "3600",
         contentType: planned.photo.mime_type,
         upsert: false
       });
-      if (upload.error) throw new MigrationWorkflowError(`${planned.public_id} image upload failed.`, { partial: true });
+    } catch {
+      upload = { data: null, error: true };
     }
-    if (record.photo_metadata !== "exact") {
-      const metadata = await client.from("find_photos").insert({
+
+    if (!upload.error && upload.data?.path === storagePath) {
+      attempt.objectCreated = true;
+    } else {
+      let observed;
+      try {
+        observed = await inspectStorage(client, databaseFind, planned);
+      } catch {
+        throw manualReviewError(planned.public_id, "image upload response and fresh Storage inspection were ambiguous");
+      }
+      if (observed.exact && !observed.exists) {
+        return failAfterRollback(client, [attempt], planned.public_id, "image upload failed and fresh inspection confirmed no object");
+      }
+      if (observed.exact && observed.exists && newFind) {
+        attempt.objectCreated = true;
+        return failAfterRollback(client, [attempt], planned.public_id, "image upload response was ambiguous on the confirmed new Find path");
+      }
+      throw manualReviewError(planned.public_id, "image upload response was ambiguous and the observed object may be pre-existing or concurrent");
+    }
+  }
+
+  if (record.photo_metadata !== "exact") {
+    let metadata;
+    try {
+      metadata = await client.from("find_photos").insert({
         find_id: databaseFind.id,
         storage_path: storagePath,
         role: "primary",
@@ -370,28 +556,37 @@ async function finishPhoto({ client, verified, planned, record, databaseFind, ne
         width: planned.photo.width,
         height: planned.photo.height
       }).select(PHOTO_COLUMNS).single();
-      if (metadata.error || !metadata.data) {
-        throw new MigrationWorkflowError(`${planned.public_id} photo metadata insert failed.`, { partial: true });
-      }
-      photoCreated = metadata.data;
+    } catch {
+      metadata = { data: null, error: true };
     }
-    return { objectCreated, photoCreated, storagePath };
-  } catch (error) {
-    const recovered = await recoverFailure({
-      client,
-      record: workingRecord,
-      find: databaseFind,
-      objectCreated,
-      photoCreated,
-      newFind
-    });
-    throw new MigrationWorkflowError(
-      recovered
-        ? `${planned.public_id} failed and newly created artifacts were rolled back.`
-        : `${planned.public_id} failed and rollback did not complete; stop and recover this Find.`,
-      { partial: true, rollbackFailed: !recovered }
-    );
+
+    const responseConfirmsCreation = !metadata.error
+      && metadata.data?.id
+      && metadata.data.find_id === databaseFind.id;
+    if (responseConfirmsCreation) {
+      attempt.photoCreated = metadata.data;
+      if (!photoMatches(metadata.data, planned, storagePath)) {
+        return failAfterRollback(client, [attempt], planned.public_id, "photo metadata response did not match the approved row");
+      }
+    } else {
+      let observed;
+      try {
+        observed = await inspectPhotoMetadata(client, databaseFind, planned, storagePath);
+      } catch {
+        throw manualReviewError(planned.public_id, "photo metadata response and fresh database inspection were ambiguous");
+      }
+      if (observed.state === "absent") {
+        return failAfterRollback(client, [attempt], planned.public_id, "photo metadata insert failed and fresh inspection confirmed no row");
+      }
+      if (observed.state === "exact" && newFind) {
+        attempt.photoCreated = observed.row;
+        return failAfterRollback(client, [attempt], planned.public_id, "photo metadata response was ambiguous on the confirmed new Find");
+      }
+      throw manualReviewError(planned.public_id, "photo metadata response was ambiguous and the observed row may be pre-existing or concurrent");
+    }
   }
+
+  return attempt;
 }
 
 export async function executeCatalogMigration({
@@ -403,6 +598,7 @@ export async function executeCatalogMigration({
   clock = Date.now,
   maxAgeMs = DRY_RUN_MAX_AGE_MS,
   revalidateSources = async () => verified,
+  dryRunImpl = performDryRun,
   onProgress = () => {}
 }) {
   if (
@@ -419,19 +615,20 @@ export async function executeCatalogMigration({
   if (JSON.stringify(currentVerified?.plan) !== JSON.stringify(verified.plan)) {
     throw new MigrationWorkflowError("The local migration sources changed. Run a new dry-run.");
   }
-  const current = await performDryRun({ client, verified: currentVerified, clock });
+  const current = await dryRunImpl({ client, verified: currentVerified, clock });
   if (!current.ready || current.fingerprint !== dryRun.fingerprint) {
     throw new MigrationWorkflowError("The dry-run is stale. Run it again before execution.");
   }
   await ensureCollections(client, currentVerified.plan, current.collections);
 
   const results = [];
+  const completedAttempts = [];
   for (const planned of currentVerified.plan.finds) {
     const record = current.records.find((entry) => entry.public_id === planned.public_id);
-    onProgress({ public_id: planned.public_id, state: "running" });
+    emitProgress(onProgress, { public_id: planned.public_id, state: "running" });
     if (record.state === "complete") {
       results.push({ public_id: planned.public_id, state: "skipped" });
-      onProgress({ public_id: planned.public_id, state: "skipped" });
+      emitProgress(onProgress, { public_id: planned.public_id, state: "skipped" });
       continue;
     }
 
@@ -440,33 +637,34 @@ export async function executeCatalogMigration({
     const executionRecord = newFind
       ? { ...record, state: "resumable", photo_metadata: "absent", storage_object: "absent", storagePath: `finds/${databaseFind.id}/${planned.photo.filename}` }
       : record;
-    const created = await finishPhoto({ client, verified: currentVerified, planned, record: executionRecord, databaseFind, newFind });
+    const attempt = await finishPhoto({ client, verified: currentVerified, planned, record: executionRecord, databaseFind, newFind });
 
-    const verification = await performDryRun({ client, verified: currentVerified, clock });
-    const verifiedRecord = verification.records.find((entry) => entry.public_id === planned.public_id);
-    if (!verification.ready || verifiedRecord?.state !== "complete") {
-      const recovered = await recoverFailure({
-        client,
-        record: { ...executionRecord, storagePath: created.storagePath },
-        find: databaseFind,
-        objectCreated: created.objectCreated,
-        photoCreated: created.photoCreated,
-        newFind
-      });
-      throw new MigrationWorkflowError(
-        recovered
-          ? `${planned.public_id} final verification failed and newly created artifacts were rolled back.`
-          : `${planned.public_id} final verification failed and rollback did not complete.`,
-        { partial: true, rollbackFailed: !recovered }
-      );
+    let exactPostWriteState = false;
+    try {
+      const verification = await dryRunImpl({ client, verified: currentVerified, clock });
+      const verifiedRecord = verification.records.find((entry) => entry.public_id === planned.public_id);
+      exactPostWriteState = verification.ready && verifiedRecord?.state === "complete";
+    } catch {
+      return failAfterRollback(client, [attempt], planned.public_id, "post-write verification threw an exception");
     }
+    if (!exactPostWriteState) {
+      return failAfterRollback(client, [attempt], planned.public_id, "post-write verification did not reach the exact complete state");
+    }
+    completedAttempts.push(attempt);
     results.push({ public_id: planned.public_id, state: newFind ? "imported" : "resumed" });
-    onProgress({ public_id: planned.public_id, state: newFind ? "imported" : "resumed" });
+    emitProgress(onProgress, { public_id: planned.public_id, state: newFind ? "imported" : "resumed" });
   }
 
-  const finalDryRun = await performDryRun({ client, verified: currentVerified, clock });
-  if (!finalDryRun.ready || !finalDryRun.all_complete) {
-    throw new MigrationWorkflowError("Final migration verification did not reach four complete Finds.", { partial: true });
+  let finalDryRun;
+  let exactFinalState = false;
+  try {
+    finalDryRun = await dryRunImpl({ client, verified: currentVerified, clock });
+    exactFinalState = finalDryRun.ready && finalDryRun.all_complete;
+  } catch {
+    return failAfterRollback(client, completedAttempts, "Migration", "final verification threw an exception");
+  }
+  if (!exactFinalState) {
+    return failAfterRollback(client, completedAttempts, "Migration", "final verification did not reach four complete Finds");
   }
   return { state: "complete", results, dryRun: finalDryRun };
 }
