@@ -1,69 +1,68 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Monday, July 20, 2026
+Updated: Wednesday, July 22, 2026
 Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
 - M00 through M07A are complete.
 - M07B-1 Supabase Foundation is complete and accepted.
 - M07B-2 Seller Catalog Manager is complete and accepted.
-- M07B-2 implementation commit:
-  8e202f1d1e9792d808efa2b592476dbcfc01d702
-- M07B-2 is merged into main and pushed to GitHub.
-- Remote migrations are synchronized:
-  20260720120000
-  20260720130000
-- Seller Manager local page loads at:
-  http://127.0.0.1:3000/admin/
-- Owner Auth user exists and remains allowlisted with role owner.
-- Controlled remote owner smoke is BLOCKED:
-  owner is Waiting for verification / Unconfirmed.
-- Root cause:
-  invitation redirected to http://localhost:3000, which opens Open WebUI;
-  M07B-2 has no invitation/password-setup page.
-- Existing owner UUID and allowlist row must be preserved.
+- M07B-2R1 Seller Invitation and Password Setup is complete and accepted.
+- Accepted implementation commit on main:
+  fa74ad96fd6cbf21a690c0ec4d592a4127bc6912
+- Remote owner activation smoke passed:
+  account activated;
+  first password established;
+  fresh sign-in succeeded;
+  role owner verified;
+  remote catalog loaded.
+- Remote catalog currently contains 0 Finds.
+- Remote migrations 20260720120000 and 20260720130000 are synchronized.
 - Browser-safe remote configuration remains only in ignored .env.local.
-- admin/config.js is generated locally and ignored by Git.
-- Intake remains 4 ready and 0 blocked.
+- admin/config.js remains generated locally and ignored.
+- Intake remains 4 proposed, 4 ready, 0 blocked.
+- Existing permanent IDs BU-0001 through BU-0005 remain assigned.
+- The next four IDs must be BU-0006 through BU-0009.
 - main is synchronized and clean.
 
 M07B PLAN
 - M07B-1 Supabase Foundation — COMPLETE
 - Remote Supabase bootstrap — COMPLETE
 - M07B-2 Seller Catalog Manager — COMPLETE
-- M07B-2R1 Seller Invitation and Password Setup — NEXT
-- Controlled remote owner activation smoke — AFTER M07B-2R1 ACCEPTANCE
-- M07B-3 Catalog Data Migration — BLOCKED UNTIL OWNER SMOKE PASSES
+- M07B-2R1 Seller Invitation and Password Setup — COMPLETE
+- Controlled remote owner activation smoke — COMPLETE
+- M07B-3 Controlled Catalog Data Migration — NEXT
 - M07B-4 Deployment and Acceptance
 
 TOP TASK
-Install, commit, and push the M07B-2R1 planning package on main, then execute M07B-2R1 in Codex.
+Install, commit, and push the M07B-3 planning package on main, then execute M07B-3 Stage A in Codex.
 
 NEXT ACTIONS
 1. Install:
-   docs/MILESTONES/M07B2R1.md
-   docs/REPORTS/M07B2_REMOTE_SMOKE_BLOCKER.md
+   docs/MILESTONES/M07B3.md
+   docs/REPORTS/M07B2_REMOTE_OWNER_ACCEPTANCE.md
    chatGPT_Todo.txt
 2. Commit and push the planning package to main.
 3. Confirm main is synchronized and clean.
-4. Open Codex project:
-   qr-jewelry-catalog
-5. Confirm:
-   Local
-   main
-   GPT-5.6 Sol
-   Extra High
-6. Send:
-   Read docs/MILESTONES/M07B2R1.md and execute the complete repair milestone exactly as written. Do not push or merge. Return the required final report.
-7. Return the report to the MASTER chat.
-8. Do not change Supabase Auth URL Configuration yet.
-9. Do not resend the invitation yet.
-10. Do not begin M07B-3.
+4. Keep the four approved source photos in content-intake/photos/.
+5. Start Docker Desktop before Codex validation.
+6. Open Codex project qr-jewelry-catalog.
+7. Confirm Local, main, GPT-5.6 Sol, Extra High.
+8. Send:
+   Read docs/MILESTONES/M07B3.md and execute Stage A of the complete milestone exactly as written. Do not perform remote writes. Do not push or merge. Return the required final report.
+9. Return the report to MASTER.
+10. Do not execute remote import until MASTER accepts implementation.
+11. Do not begin M07B-4.
 
 IMPORTANT
-- Codex creates the repair branch.
-- Preserve the existing owner Auth user, UUID, and allowlist row.
-- Do not use localhost for the later smoke; use exact 127.0.0.1 URLs.
-- Do not expose invitation links, owner email, password, UUID, tokens, or keys.
-- Do not commit .env.local or admin/config.js.
-- No database migration is expected.
-- Do not push or merge the Codex repair branch.
+- Codex creates the implementation branch.
+- Preserve BU-0001 through BU-0005.
+- Four intake Finds receive BU-0006 through BU-0009.
+- Next generated ID must be BU-0010.
+- Imported records remain hidden and unfeatured.
+- Owner notes never enter plan, UI, logs, reports, or database.
+- Source photos are hashed and uploaded without recompression.
+- Codex uses fictional local Auth and local Supabase data only.
+- No remote catalog or Storage write during implementation.
+- Public catalog data source remains unchanged.
+- Do not commit local config, source photos, credentials, owner identifiers, or tokens.
+- Do not push or merge implementation branch.
