@@ -48,7 +48,8 @@ test("project structure and repository-local CLI scripts are complete", () => {
 test("the ordered M07B-1 foundation remains the schema source of truth beneath later migrations", () => {
   assert.deepEqual(migrations, [
     "20260720120000_m07b1_catalog_foundation.sql",
-    "20260720130000_m07b2_catalog_admin_role_probe.sql"
+    "20260720130000_m07b2_catalog_admin_role_probe.sql",
+    "20260722120000_m07b3_public_id_reservations.sql"
   ]);
   assert.match(migration, /create schema if not exists private/i);
   assert.doesNotMatch(config, /schemas\s*=\s*\[[^\]]*"private"/);
@@ -173,7 +174,7 @@ test("protected live catalog and accepted intake files remain unchanged", () => 
     "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
     "data/reservation.js", "data/permalinks.js", "assets/images", "assets/brand",
     "content-intake/finds.csv", "content-intake/photo-manifest.csv", "content-intake/photos",
-    "tests/fixtures/legacy-items.snapshot.json", "docs/IDENTIFIER_REGISTRY.md",
+    "tests/fixtures/legacy-items.snapshot.json",
     ".github/workflows/baseline-validation.yml"
   ];
   const result = spawnSync("git", ["diff", "--name-only", foundationBase, "--", ...protectedPaths], {

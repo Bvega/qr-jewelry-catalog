@@ -2,6 +2,7 @@
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
@@ -66,7 +67,7 @@ export function validateBrowserConfiguration(values) {
   }
 
   const projectRef = values.SUPABASE_PROJECT_REF.trim();
-  if (!/^[a-z0-9]{8,40}$/.test(projectRef)) {
+  if (!/^[a-z0-9-]{8,40}$/.test(projectRef)) {
     throw new Error("SUPABASE_PROJECT_REF is not a valid project reference.");
   }
 
@@ -76,16 +77,21 @@ export function validateBrowserConfiguration(values) {
   } catch {
     throw new Error("SUPABASE_URL is not a valid URL.");
   }
+  const local = projectUrl.protocol === "http:"
+    && projectUrl.hostname === "127.0.0.1"
+    && projectUrl.port === "54321"
+    && projectRef === "local-m07b3";
+  const remote = projectUrl.protocol === "https:"
+    && projectUrl.hostname === `${projectRef}.supabase.co`;
   if (
-    projectUrl.protocol !== "https:"
+    (!local && !remote)
     || projectUrl.username
     || projectUrl.password
     || projectUrl.pathname !== "/"
     || projectUrl.search
     || projectUrl.hash
-    || projectUrl.hostname !== `${projectRef}.supabase.co`
   ) {
-    throw new Error("SUPABASE_URL must be the HTTPS URL for SUPABASE_PROJECT_REF.");
+    throw new Error("SUPABASE_URL must be the matching remote HTTPS URL or exact M07B-3 loopback URL.");
   }
 
   const publishableKey = values.SUPABASE_PUBLISHABLE_KEY.trim();
@@ -127,9 +133,43 @@ export function generateAdminConfig({
   writeFileSync(outputPath, serializeBrowserConfiguration(configuration), { encoding: "utf8", mode: 0o600 });
 }
 
+function parseLocalStatus(source) {
+  const values = {};
+  for (const line of source.split(/\r?\n/)) {
+    const match = line.match(/^(API_URL|ANON_KEY|PUBLISHABLE_KEY)=(.*)$/);
+    if (!match) continue;
+    values[match[1]] = match[2].trim().replace(/^['"]|['"]$/g, "");
+  }
+  return values;
+}
+
+export function generateLocalAdminConfig({
+  outputPath = resolve(repositoryRoot, "admin/config.js"),
+  workdir = repositoryRoot
+} = {}) {
+  const status = spawnSync("supabase", ["status", "-o", "env", "--workdir", workdir, "--agent", "no"], {
+    cwd: repositoryRoot,
+    encoding: "utf8"
+  });
+  if (status.error || status.status !== 0) throw new Error("Local Supabase status is unavailable.");
+  const local = parseLocalStatus(status.stdout);
+  const configuration = validateBrowserConfiguration({
+    SUPABASE_URL: local.API_URL,
+    SUPABASE_PUBLISHABLE_KEY: local.PUBLISHABLE_KEY || local.ANON_KEY,
+    SUPABASE_PROJECT_REF: "local-m07b3"
+  });
+  writeFileSync(outputPath, serializeBrowserConfiguration(configuration), { encoding: "utf8", mode: 0o600 });
+}
+
 async function main() {
   try {
-    generateAdminConfig();
+    if (process.argv.includes("--local")) {
+      const workdirIndex = process.argv.indexOf("--workdir");
+      const workdir = workdirIndex >= 0 ? process.argv[workdirIndex + 1] : repositoryRoot;
+      if (!workdir) throw new Error("--workdir requires a local project directory.");
+      generateLocalAdminConfig({ workdir });
+    }
+    else generateAdminConfig();
     console.log("Seller Manager browser configuration generated.");
   } catch (error) {
     console.error(`Seller Manager browser configuration failed: ${error.message}`);

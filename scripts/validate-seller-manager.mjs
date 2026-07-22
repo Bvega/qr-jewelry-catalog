@@ -6,19 +6,26 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const acceptedBase = "852c8a0616c84ef197cc0fc20cd22c1ffb165739";
+const acceptedBase = "915b7fef50ac40ac255b2c8d522d58e0a69ae704";
 const failures = [];
 
 const requiredPaths = [
   "admin/index.html",
   "admin/activate.html",
+  "admin/migrate-intake.html",
   "admin/config.example.js",
   "admin/assets/activate.js",
   "admin/assets/app.js",
+  "admin/assets/migrate-intake.js",
   "admin/assets/styles.css",
   "admin-src/activation.js",
   "admin-src/app.js",
   "admin-src/auth.js",
+  "admin-src/migration.js",
+  "admin-src/migration-auth.js",
+  "admin-src/migration-executor.js",
+  "admin-src/migration-plan.js",
+  "admin-src/migration-ui.js",
   "admin-src/catalog.js",
   "admin-src/photos.js",
   "admin-src/password.js",
@@ -64,8 +71,7 @@ const protectedPaths = [
   "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
   "data/reservation.js", "data/permalinks.js", "assets/images",
   "content-intake/finds.csv", "content-intake/photo-manifest.csv", "content-intake/photos",
-  "tests/fixtures/legacy-items.snapshot.json", "docs/IDENTIFIER_REGISTRY.md",
-  "supabase/migrations", "supabase/tests/database"
+  "tests/fixtures/legacy-items.snapshot.json"
 ];
 const protectedDiff = spawnSync("git", ["diff", "--name-only", acceptedBase, "--", ...protectedPaths], {
   cwd: repositoryRoot,

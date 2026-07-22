@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self'; style-src 'self'; connect-src 'self' http://127.0.0.1:54321 ws://127.0.0.1:54321 https://*.supabase.co wss://*.supabase.co; img-src 'self' data: blob: http://127.0.0.1:54321 https://*.supabase.co; font-src 'self';">
+    <title>Catalog Intake Migration | Between Us</title>
+    <link rel="icon" href="../assets/brand/between-us-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="./config.js" defer></script>
+    <script src="./assets/migrate-intake.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to migration workspace</a>
+    <header class="site-header">
+      <span class="brand" aria-label="Between Us">
+        <img src="../assets/brand/between-us-mark.svg" width="48" height="48" alt="">
+        <span>Between Us</span>
+      </span>
+      <div>
+        <p class="eyebrow">Private workspace</p>
+        <h1>Catalog Intake Migration</h1>
+      </div>
+    </header>
+
+    <main id="main-content" class="page-shell migration-shell">
+      <div id="migrationStatus" class="status" role="status" aria-live="polite" aria-atomic="true">Loading migration workspace…</div>
+
+      <section id="migrationSignInSection" class="panel auth-panel" aria-labelledby="migrationSignInTitle" hidden>
+        <p class="eyebrow">Owner access only</p>
+        <h2 id="migrationSignInTitle">Sign in</h2>
+        <p>Use the approved owner account. Authentication alone does not unlock this workflow.</p>
+        <form id="migrationSignInForm" novalidate>
+          <label for="migrationEmail">Email</label>
+          <input id="migrationEmail" name="email" type="email" autocomplete="username" inputmode="email" required>
+          <label for="migrationPassword">Password</label>
+          <input id="migrationPassword" name="password" type="password" autocomplete="current-password" required>
+          <button id="migrationSignInButton" class="button button-primary" type="submit">Sign in</button>
+        </form>
+      </section>
+
+      <section id="migrationDeniedSection" class="panel denied-panel" aria-labelledby="migrationDeniedTitle" hidden>
+        <p class="eyebrow">Access denied</p>
+        <h2 id="migrationDeniedTitle">Owner access is required</h2>
+        <p>Editor and non-admin accounts cannot use the intake migration workflow.</p>
+        <button id="migrationReturnButton" class="button" type="button">Return to sign in</button>
+      </section>
+
+      <section id="migrationWorkspace" hidden>
+        <div class="session-bar panel">
+          <div>
+            <p class="eyebrow">Authorization</p>
+            <p>Owner role verified.</p>
+          </div>
+          <button id="migrationLogoutButton" class="button button-secondary" type="button">Sign out</button>
+        </div>
+
+        <section id="migrationPlanSection" class="panel" aria-labelledby="migrationPlanTitle" hidden>
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Tracked local sources</p>
+              <h2 id="migrationPlanTitle">Exact four-Find plan</h2>
+            </div>
+            <span id="sourceVerificationBadge" class="badge">Verifying</span>
+          </div>
+          <p>The tracked plan, accepted CSVs, Collection registry, identifier registry, and original photo bytes must all agree.</p>
+          <div class="table-scroll" tabindex="0">
+            <table class="migration-table">
+              <thead>
+                <tr>
+                  <th scope="col">Public ID / Find</th>
+                  <th scope="col">Collection</th>
+                  <th scope="col">Price / availability</th>
+                  <th scope="col">State</th>
+                  <th scope="col">Primary image</th>
+                </tr>
+              </thead>
+              <tbody id="migrationPlanBody"></tbody>
+            </table>
+          </div>
+          <button id="dryRunButton" class="button button-primary" type="button" disabled>Run dry-run</button>
+        </section>
+
+        <section id="databasePreflightSection" class="panel" aria-labelledby="databasePreflightTitle" hidden>
+          <p class="eyebrow">No-write database check</p>
+          <h2 id="databasePreflightTitle">Database preflight</h2>
+          <p id="databasePreflightSummary"></p>
+          <ul id="collectionPreflightList" class="preflight-list"></ul>
+          <ul id="findPreflightList" class="preflight-list"></ul>
+          <ul id="preflightErrors" class="error-list" aria-live="polite"></ul>
+        </section>
+
+        <section id="migrationConfirmationSection" class="panel confirmation-panel" aria-labelledby="migrationConfirmationTitle" hidden>
+          <p class="eyebrow">Explicit execution control</p>
+          <h2 id="migrationConfirmationTitle">Confirm controlled import</h2>
+          <label class="check-field" for="migrationConfirmationCheck">
+            <input id="migrationConfirmationCheck" type="checkbox">
+            <span>I reviewed the current dry-run and approve four hidden, unfeatured Finds.</span>
+          </label>
+          <label for="migrationConfirmationPhrase">Type <strong>IMPORT 4 FINDS</strong></label>
+          <input id="migrationConfirmationPhrase" type="text" autocomplete="off" spellcheck="false">
+          <button id="executeMigrationButton" class="button button-danger" type="button" disabled>Execute four-record import</button>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

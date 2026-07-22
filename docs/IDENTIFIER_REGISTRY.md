@@ -9,12 +9,16 @@ This registry is the authority for permanent public IDs, current legacy IDs, and
 | `BU-0003` | 3 | `pearl-drop-earrings` | Pearl Drop Earrings |
 | `BU-0004` | 4 | `layered-gold-chain-necklace` | Layered Gold Chain Necklace |
 | `BU-0005` | 5 | `crystal-stud-earrings` | Crystal Stud Earrings |
+| `BU-0006` | — | `vintage-ceramic-handbell` | Vintage Ceramic Handbell |
+| `BU-0007` | — | `burgundy-montblanc-pen` | Burgundy Montblanc Pen |
+| `BU-0008` | — | `hand-painted-decorative-shell` | Hand-Painted Decorative Shell |
+| `BU-0009` | — | `vintage-floral-teacup-saucer` | Vintage Floral Teacup and Saucer |
 
 ## Public ID rules
 
 - Public IDs are immutable, unique, and independent of title, price, collection, and availability.
 - IDs use the uppercase form `BU-NNNN`.
-- The next new public ID is `BU-0006`; future records continue the sequence monotonically.
+- The next new public ID is `BU-0010`; future records continue the sequence monotonically.
 - A public ID is never recycled, even if its Find is sold, archived, removed from discovery, or entered in error.
 - Skipped, reserved, or retired values remain unavailable forever and must be recorded here with their disposition before the next release.
 

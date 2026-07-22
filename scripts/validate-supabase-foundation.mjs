@@ -48,7 +48,6 @@ const protectedPaths = [
   "content-intake/photo-manifest.csv",
   "content-intake/photos",
   "tests/fixtures/legacy-items.snapshot.json",
-  "docs/IDENTIFIER_REGISTRY.md",
   ".github/workflows/baseline-validation.yml"
 ];
 

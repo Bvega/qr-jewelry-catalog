@@ -49,8 +49,8 @@ select is(
 );
 
 select ok(
-  (select last_value = 1 and is_called = false from public.find_public_id_seq),
-  'the fictional public-ID fixture reset its sequence state'
+  (select last_value = 9 and is_called = true from public.find_public_id_seq),
+  'the fictional public-ID fixture restored the reserved sequence floor'
 );
 
 select * from finish();

@@ -418,8 +418,8 @@ select is(
     from public.finds
     where id = '10000000-0000-4000-8000-000000000205'
   ),
-  'BU-0005',
-  'the generator skips an explicitly occupied sequence value'
+  'BU-0013',
+  'the generator advances monotonically above the reserved sequence floor'
 );
 
 select is(
@@ -630,7 +630,7 @@ select is(
   'the admin Storage write is present inside the test transaction'
 );
 
-select setval('public.find_public_id_seq', 1, false);
+select setval('public.find_public_id_seq', 9, true);
 
 select * from finish();
 rollback;

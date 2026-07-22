@@ -1,0 +1,163 @@
+{
+  "plan_version": 1,
+  "sources": {
+    "content-intake/finds.csv": "635347926a9a947fc2428869121abb65d716cc2e8ce5f756524f57532fc8c50d",
+    "content-intake/photo-manifest.csv": "ea738c4921f8c4886528d7ba09cfeec22943598c8557e95ab0dafe8445bf1af3",
+    "data/collections.js": "9195b0f82022814a233cb0363314469d0b7d79a2e0ecb631c508f1ca5caf8fa1",
+    "docs/IDENTIFIER_REGISTRY.md": "12b6178ee97c9140c6bc99eaa75c60d9334f603297f36df67af39e023df596af"
+  },
+  "collections": [
+    {
+      "id": "jewelry",
+      "label": "Jewelry",
+      "status": "active",
+      "sort_order": 1,
+      "description": "Wearable finds selected for style, detail, and everyday discovery."
+    },
+    {
+      "id": "vintage",
+      "label": "Vintage",
+      "status": "coming_soon",
+      "sort_order": 2,
+      "description": "Distinctive pieces with character, history, and lasting appeal."
+    },
+    {
+      "id": "home-decor",
+      "label": "Home & Decor",
+      "status": "coming_soon",
+      "sort_order": 3,
+      "description": "Useful and decorative finds for comfortable, personal spaces."
+    },
+    {
+      "id": "kitchen",
+      "label": "Kitchen",
+      "status": "coming_soon",
+      "sort_order": 4,
+      "description": "Practical kitchen finds chosen for everyday use."
+    },
+    {
+      "id": "collectibles",
+      "label": "Collectibles",
+      "status": "coming_soon",
+      "sort_order": 5,
+      "description": "Interesting pieces worth noticing, keeping, or sharing."
+    },
+    {
+      "id": "new-items",
+      "label": "New Items",
+      "status": "coming_soon",
+      "sort_order": 6,
+      "description": "Unused finds offered locally at honest prices."
+    }
+  ],
+  "finds": [
+    {
+      "public_id": "BU-0006",
+      "slug": "vintage-ceramic-handbell",
+      "title": "Vintage Ceramic Handbell",
+      "collection_id": "vintage",
+      "price_amount": "4.50",
+      "price_currency": "USD",
+      "availability": "available",
+      "description": "Vintage ceramic handbell, circa 1970s, with an ivory-colored body and gold-tone handle and trim.",
+      "condition": "Good vintage condition.",
+      "legacy_id": null,
+      "is_published": false,
+      "is_featured": false,
+      "sort_order": 6,
+      "archived_at": null,
+      "photo": {
+        "filename": "vintage-ceramic-handbell-01.jpeg",
+        "mime_type": "image/jpeg",
+        "byte_size": 181110,
+        "sha256": "310c173fe3d2ea48f0a8e12ddefbfd5d76b53bb0ba219f824ba4ae1eeda4fc75",
+        "width": 1122,
+        "height": 1495,
+        "alt_text": "Ivory ceramic handbell with gold-tone handle and trim.",
+        "role": "primary",
+        "sequence": 1
+      }
+    },
+    {
+      "public_id": "BU-0007",
+      "slug": "burgundy-montblanc-pen",
+      "title": "Burgundy Montblanc Pen",
+      "collection_id": "collectibles",
+      "price_amount": "450.00",
+      "price_currency": "USD",
+      "availability": "reserved",
+      "description": "Burgundy Montblanc pen with gold-tone trim, white emblem, and protective sleeve.",
+      "condition": "New.",
+      "legacy_id": null,
+      "is_published": false,
+      "is_featured": false,
+      "sort_order": 7,
+      "archived_at": null,
+      "photo": {
+        "filename": "burgundy-montblanc-pen-01.jpeg",
+        "mime_type": "image/jpeg",
+        "byte_size": 614723,
+        "sha256": "663687088e9761696096a6473ce2f471d64e6493efb20595cb6c843859eaacd9",
+        "width": 1758,
+        "height": 2048,
+        "alt_text": "Burgundy Montblanc pen with gold-tone trim resting on a black protective sleeve.",
+        "role": "primary",
+        "sequence": 1
+      }
+    },
+    {
+      "public_id": "BU-0008",
+      "slug": "hand-painted-decorative-shell",
+      "title": "Hand-Painted Decorative Shell",
+      "collection_id": "home-decor",
+      "price_amount": "25.00",
+      "price_currency": "USD",
+      "availability": "available",
+      "description": "Hand-painted decorative seashell with dotted patterns in cream, copper, black, and silver tones.",
+      "condition": "Excellent condition.",
+      "legacy_id": null,
+      "is_published": false,
+      "is_featured": false,
+      "sort_order": 8,
+      "archived_at": null,
+      "photo": {
+        "filename": "hand-painted-decorative-shell-01.png",
+        "mime_type": "image/png",
+        "byte_size": 992531,
+        "sha256": "8a1c2210abaadeac3e159a3f85f6d8923e9724733a4af7bd05af9f11672f9205",
+        "width": 1560,
+        "height": 1710,
+        "alt_text": "Hand-painted decorative seashell with cream, copper, black, and silver dotted patterns.",
+        "role": "primary",
+        "sequence": 1
+      }
+    },
+    {
+      "public_id": "BU-0009",
+      "slug": "vintage-floral-teacup-saucer",
+      "title": "Vintage Floral Teacup and Saucer",
+      "collection_id": "vintage",
+      "price_amount": "15.00",
+      "price_currency": "USD",
+      "availability": "available",
+      "description": "Porcelain teacup and saucer with multicolor floral decoration, gold-tone interior, handle, and trim.",
+      "condition": "Normal wear consistent with age and use.",
+      "legacy_id": null,
+      "is_published": false,
+      "is_featured": false,
+      "sort_order": 9,
+      "archived_at": null,
+      "photo": {
+        "filename": "vintage-floral-teacup-saucer-01.png",
+        "mime_type": "image/png",
+        "byte_size": 6517685,
+        "sha256": "93565f9dcb3e812cacd5082dc96cda3949632c05c439fd9a3c774a62153b0059",
+        "width": 2048,
+        "height": 1913,
+        "alt_text": "Floral porcelain teacup and saucer with a gold-tone interior and decorative trim.",
+        "role": "primary",
+        "sequence": 1
+      }
+    }
+  ]
+}

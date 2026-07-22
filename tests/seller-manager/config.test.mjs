@@ -48,6 +48,23 @@ test("config validation rejects missing, insecure, mismatched, and secret settin
   }), /not accepted/);
 });
 
+test("config validation accepts only the exact local M07B-3 loopback endpoint", () => {
+  assert.deepEqual(validateBrowserConfiguration({
+    SUPABASE_URL: "http://127.0.0.1:54321",
+    SUPABASE_PUBLISHABLE_KEY: publishableKey,
+    SUPABASE_PROJECT_REF: "local-m07b3"
+  }), {
+    url: "http://127.0.0.1:54321/",
+    publishableKey,
+    projectRef: "local-m07b3"
+  });
+  assert.throws(() => validateBrowserConfiguration({
+    SUPABASE_URL: "http://localhost:54321",
+    SUPABASE_PUBLISHABLE_KEY: publishableKey,
+    SUPABASE_PROJECT_REF: "local-m07b3"
+  }), /not accepted|matching remote|loopback/i);
+});
+
 test("generator writes safely serialized configuration without modifying its input", () => {
   const directory = mkdtempSync(join(tmpdir(), "between-us-admin-config-"));
   const environmentPath = join(directory, ".env.local");
@@ -69,7 +86,7 @@ test("generated config is ignored and committed bundle contains no generated val
   const root = resolve(import.meta.dirname, "../..");
   const ignored = spawnSync("git", ["check-ignore", "-q", "admin/config.js"], { cwd: root });
   assert.equal(ignored.status, 0);
-  for (const bundleName of ["app.js", "activate.js"]) {
+  for (const bundleName of ["app.js", "activate.js", "migrate-intake.js"]) {
     const bundle = readFileSync(resolve(root, `admin/assets/${bundleName}`), "utf8");
     assert.doesNotMatch(bundle, new RegExp(projectRef));
     assert.doesNotMatch(bundle, new RegExp(publishableKey));

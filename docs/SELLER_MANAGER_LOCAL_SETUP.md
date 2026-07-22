@@ -14,6 +14,9 @@ Do not add a database password, access token, owner UUID/email, secret key, or `
 npm ci
 npm run admin:build
 npm run admin:validate
+npm run migration:prepare
+npm run migration:validate
+npm run migration:test
 ```
 
 The build reads only `admin-src/` and dependencies. It does not read `.env.local`, does not embed project values, and does not modify the public catalog runtime.
@@ -64,6 +67,14 @@ http://127.0.0.1:3000/admin/activate.html
 
 It uses the same ignored browser configuration. It is not a signup or password-reset request page; it accepts an invitation-created Auth session, verifies the current seller role, sets a first password, signs out, and directs the seller back to `/admin/` for a fresh sign-in. See `docs/SELLER_ACCOUNT_ACTIVATION.md` for the complete security boundary and post-acceptance dashboard plan.
 
+The temporary M07B-3 owner-only intake route is intentionally unlinked:
+
+```text
+http://127.0.0.1:3000/admin/migrate-intake.html
+```
+
+It loads the tracked plan and local sources only after exact owner authorization. Editor and non-admin accounts are signed out. Dry-run performs no writes; execution additionally requires a current successful dry-run, a review checkbox, the exact confirmation phrase, and a separate final action. During Stage A use only fictional local Auth users. After local Supabase starts, `npm run admin:config -- --local` writes an ignored loopback configuration without printing its browser-safe value. An isolated validation copy may add `--workdir /path/to/unlinked-project`. Do not use the local option for the post-acceptance remote runbook.
+
 Verify:
 
 1. the signed-out form is visible;
@@ -72,6 +83,8 @@ Verify:
 4. an authenticated non-admin is denied and signed out;
 5. an allowlisted local test admin can load the empty local catalog; and
 6. page source and the console contain no secret value or session/token log.
+
+For the M07B-3 route, also verify the plan is absent before authorization, the owner dry-run reports four target IDs and zero writes, editors are denied, source photos verify, and refresh never starts execution.
 
 Do not use a real remote owner account for automated testing. Remote owner smoke testing waits for MASTER approval.
 

@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const appOutput = resolve(repositoryRoot, "admin/assets/app.js");
 const activationOutput = resolve(repositoryRoot, "admin/assets/activate.js");
+const migrationOutput = resolve(repositoryRoot, "admin/assets/migrate-intake.js");
 const stylesOutput = resolve(repositoryRoot, "admin/assets/styles.css");
 
 const sharedOptions = {
@@ -38,11 +39,19 @@ await build({
 
 await build({
   ...sharedOptions,
+  entryPoints: [resolve(repositoryRoot, "admin-src/migration.js")],
+  format: "iife",
+  outfile: migrationOutput,
+  platform: "browser"
+});
+
+await build({
+  ...sharedOptions,
   entryPoints: [resolve(repositoryRoot, "admin-src/styles.css")],
   outfile: stylesOutput
 });
 
-for (const outputFile of [appOutput, activationOutput, stylesOutput]) {
+for (const outputFile of [appOutput, activationOutput, migrationOutput, stylesOutput]) {
   const output = await readFile(outputFile, "utf8");
   await writeFile(outputFile, output.replace(/[\t ]+$/gm, ""), "utf8");
 }

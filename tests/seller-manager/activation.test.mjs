@@ -289,8 +289,8 @@ test("activation shell is branded, accessible, private, and script-restricted", 
 
   assert.match(activationHtml, /script-src 'self'/);
   assert.match(activationHtml, /style-src 'self'/);
-  assert.match(activationHtml, /connect-src 'self' https:\/\/\*\.supabase\.co wss:\/\/\*\.supabase\.co/);
-  assert.match(activationHtml, /img-src 'self' data: blob: https:\/\/\*\.supabase\.co/);
+  assert.match(activationHtml, /connect-src 'self' http:\/\/127\.0\.0\.1:54321 ws:\/\/127\.0\.0\.1:54321 https:\/\/\*\.supabase\.co wss:\/\/\*\.supabase\.co/);
+  assert.match(activationHtml, /img-src 'self' data: blob: http:\/\/127\.0\.0\.1:54321 https:\/\/\*\.supabase\.co/);
   assert.doesNotMatch(activationHtml, /unsafe-eval|unsafe-inline/);
   assert.doesNotMatch(activationHtml, /<script(?![^>]*\bsrc=)[^>]*>/i);
   const scriptSources = [...activationHtml.matchAll(/<script[^>]*\bsrc="([^"]+)"[^>]*><\/script>/g)]

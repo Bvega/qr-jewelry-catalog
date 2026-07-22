@@ -488,6 +488,76 @@ textarea {
   }
 }
 
+.migration-shell {
+  max-width: 74rem;
+}
+
+.table-scroll {
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.migration-table {
+  width: 100%;
+  min-width: 48rem;
+  border-collapse: collapse;
+}
+
+.migration-table th,
+.migration-table td {
+  padding: 0.85rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.badge[data-tone="success"] {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+.preflight-list,
+.error-list {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.preflight-list li::marker {
+  content: "✓  ";
+}
+
+.preflight-list li[data-state="mismatch"]::marker,
+.error-list li::marker {
+  content: "!  ";
+}
+
+.check-field {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.check-field input {
+  width: 1.25rem;
+  min-height: 1.25rem;
+  margin-top: 0.15rem;
+}
+
+.confirmation-panel {
+  border-color: var(--error);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

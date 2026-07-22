@@ -27,6 +27,7 @@ const permalinkTestFiles = findTestFiles("tests/permalinks");
 const contentIntakeTestFiles = findTestFiles("tests/content-intake");
 const supabaseFoundationTestFiles = findTestFiles("tests/supabase-foundation");
 const sellerManagerTestFiles = findTestFiles("tests/seller-manager");
+const catalogMigrationTestFiles = findTestFiles("tests/catalog-migration");
 
 const checks = [
   {
@@ -93,10 +94,18 @@ const checks = [
     "admin-src/app.js",
     "admin-src/auth.js",
     "admin-src/catalog.js",
+    "admin-src/migration.js",
+    "admin-src/migration-auth.js",
+    "admin-src/migration-executor.js",
+    "admin-src/migration-plan.js",
+    "admin-src/migration-ui.js",
     "admin-src/photos.js",
     "admin-src/validation.js",
     "admin-src/ui.js",
     "scripts/build-admin.mjs",
+    "scripts/lib/m07b3-plan.mjs",
+    "scripts/prepare-catalog-migration.mjs",
+    "scripts/validate-catalog-migration.mjs",
     "scripts/generate-admin-config.mjs",
     "scripts/serve-static.mjs",
     "scripts/validate-seller-manager.mjs"
@@ -164,12 +173,22 @@ const checks = [
     label: "Seller Catalog Manager tests",
     displayCommand: "node --test tests/seller-manager/*.test.mjs",
     arguments: ["--test", ...sellerManagerTestFiles]
+  },
+  {
+    label: "Controlled catalog migration validation",
+    displayCommand: "node scripts/validate-catalog-migration.mjs",
+    arguments: ["scripts/validate-catalog-migration.mjs"]
+  },
+  {
+    label: "Controlled catalog migration tests",
+    displayCommand: "node --test tests/catalog-migration/*.test.mjs",
+    arguments: ["--test", ...catalogMigrationTestFiles]
   }
 ];
 
 const failures = [];
 
-console.log("M07B-2 repository validation\n");
+console.log("M07B-3 repository validation\n");
 
 for (const check of checks) {
   console.log(`[RUN] ${check.displayCommand}`);
@@ -218,7 +237,7 @@ if (failures.length > 0) {
   for (const failure of failures) {
     console.error(`- ${failure}`);
   }
-  console.error(`\nM07B-2 repository validation: FAIL (${failures.length} required check(s) failed)`);
+  console.error(`\nM07B-3 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
   const relativeTests = [
@@ -230,9 +249,10 @@ if (failures.length > 0) {
     ...permalinkTestFiles,
     ...contentIntakeTestFiles,
     ...supabaseFoundationTestFiles,
-    ...sellerManagerTestFiles
+    ...sellerManagerTestFiles,
+    ...catalogMigrationTestFiles
   ]
     .map((file) => relative(repositoryRoot, file));
-  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, content-intake, Supabase foundation, and Seller Manager test files.`);
-  console.log("M07B-2 repository validation: PASS");
+  console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, content-intake, Supabase foundation, Seller Manager, and catalog migration test files.`);
+  console.log("M07B-3 repository validation: PASS");
 }
