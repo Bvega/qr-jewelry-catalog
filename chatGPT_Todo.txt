@@ -1,5 +1,5 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Wednesday, July 22, 2026
+Updated: Wednesday, July 22, 2026 at 8:56 p.m. ET
 Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
@@ -7,22 +7,23 @@ CURRENT STATUS
 - M07B-1 Supabase Foundation is complete and accepted.
 - M07B-2 Seller Catalog Manager is complete and accepted.
 - M07B-2R1 Seller Invitation and Password Setup is complete and accepted.
+- M07B-3 Stage A is complete, accepted, merged, and pushed.
 - Accepted implementation commit on main:
-  fa74ad96fd6cbf21a690c0ec4d592a4127bc6912
-- Remote owner activation smoke passed:
-  account activated;
-  first password established;
-  fresh sign-in succeeded;
-  role owner verified;
-  remote catalog loaded.
-- Remote catalog currently contains 0 Finds.
-- Remote migrations 20260720120000 and 20260720130000 are synchronized.
-- Browser-safe remote configuration remains only in ignored .env.local.
-- admin/config.js remains generated locally and ignored.
-- Intake remains 4 proposed, 4 ready, 0 blocked.
-- Existing permanent IDs BU-0001 through BU-0005 remain assigned.
-- The next four IDs must be BU-0006 through BU-0009.
-- main is synchronized and clean.
+  26508f76ac24bd79838dde1a748f5ab935048abb
+- M07B-3 controlled remote import is complete and accepted.
+- Remote migrations are synchronized:
+  20260720120000
+  20260720130000
+  20260722120000
+- Four approved Finds were imported:
+  BU-0006 through BU-0009.
+- All four imported Finds are hidden and unfeatured.
+- Four primary photo rows and four original Storage objects were verified.
+- Seller Catalog Manager displays 4 of 4 imported Finds to the owner.
+- The public static catalog remains unchanged.
+- The next generated permanent ID must be BU-0010.
+- Browser-safe remote configuration remains local and ignored.
+- The owner signed out and the loopback server was stopped.
 
 M07B PLAN
 - M07B-1 Supabase Foundation — COMPLETE
@@ -30,39 +31,25 @@ M07B PLAN
 - M07B-2 Seller Catalog Manager — COMPLETE
 - M07B-2R1 Seller Invitation and Password Setup — COMPLETE
 - Controlled remote owner activation smoke — COMPLETE
-- M07B-3 Controlled Catalog Data Migration — NEXT
-- M07B-4 Deployment and Acceptance
+- M07B-3 Controlled Catalog Data Migration — COMPLETE
+- M07B-3 Controlled Remote Import — COMPLETE AND ACCEPTED
+- M07B-4 Deployment and Acceptance — NEXT
 
 TOP TASK
-Install, commit, and push the M07B-3 planning package on main, then execute M07B-3 Stage A in Codex.
+Prepare the complete M07B-4 implementation package.
 
 NEXT ACTIONS
-1. Install:
-   docs/MILESTONES/M07B3.md
-   docs/REPORTS/M07B2_REMOTE_OWNER_ACCEPTANCE.md
-   chatGPT_Todo.txt
-2. Commit and push the planning package to main.
-3. Confirm main is synchronized and clean.
-4. Keep the four approved source photos in content-intake/photos/.
-5. Start Docker Desktop before Codex validation.
-6. Open Codex project qr-jewelry-catalog.
-7. Confirm Local, main, GPT-5.6 Sol, Extra High.
-8. Send:
-   Read docs/MILESTONES/M07B3.md and execute Stage A of the complete milestone exactly as written. Do not perform remote writes. Do not push or merge. Return the required final report.
-9. Return the report to MASTER.
-10. Do not execute remote import until MASTER accepts implementation.
-11. Do not begin M07B-4.
+1. Commit and push the M07B-3 remote acceptance record.
+2. Confirm main and origin/main are synchronized and clean.
+3. Do not modify or publish BU-0006 through BU-0009 before M07B-4 planning.
+4. MASTER must define the M07B-4 deployment and acceptance scope.
+5. Do not begin implementation until the M07B-4 package is approved.
 
 IMPORTANT
-- Codex creates the implementation branch.
-- Preserve BU-0001 through BU-0005.
-- Four intake Finds receive BU-0006 through BU-0009.
-- Next generated ID must be BU-0010.
-- Imported records remain hidden and unfeatured.
-- Owner notes never enter plan, UI, logs, reports, or database.
-- Source photos are hashed and uploaded without recompression.
-- Codex uses fictional local Auth and local Supabase data only.
-- No remote catalog or Storage write during implementation.
-- Public catalog data source remains unchanged.
-- Do not commit local config, source photos, credentials, owner identifiers, or tokens.
-- Do not push or merge implementation branch.
+- Preserve BU-0001 through BU-0009.
+- The next generated public ID must be BU-0010.
+- Imported Finds remain hidden and unfeatured until explicitly approved.
+- Do not expose credentials, owner identifiers, tokens, or sessions.
+- Do not commit .env.local or admin/config.js.
+- Do not change the public catalog data source without an accepted milestone.
+- Do not begin M07B-4 implementation yet.
