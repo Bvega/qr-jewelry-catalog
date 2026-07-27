@@ -1,0 +1,87 @@
+name: Deploy GitHub Pages
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Validate and build Pages artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out triggering revision
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Validate inherited public catalog
+        run: npm run validate:baseline
+
+      - name: Validate Seller Catalog Manager
+        run: npm run admin:validate
+
+      - name: Validate catalog migration package
+        run: npm run migration:validate
+
+      - name: Test catalog migration package
+        run: npm run migration:test
+
+      - name: Test Pages deployment contracts
+        run: npm run pages:test
+
+      - name: Build strict Pages artifact
+        run: npm run pages:build
+        env:
+          SUPABASE_URL: ${{ vars.BETWEEN_US_SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.BETWEEN_US_SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_PROJECT_REF: ${{ vars.BETWEEN_US_SUPABASE_PROJECT_REF }}
+
+      - name: Validate final Pages artifact
+        run: npm run pages:validate
+
+      - name: Upload strict Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist/pages
+
+  deploy:
+    name: Deploy accepted main revision
+    if: >-
+      github.ref == 'refs/heads/main'
+      && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -41,20 +41,32 @@ export function parseEnvironment(source) {
   return values;
 }
 
-function decodedJwtRole(key) {
-  if (!key.startsWith("eyJ")) return null;
+function decodeBase64UrlJson(value) {
   try {
-    const payload = key.split(".")[1];
-    if (!payload) return "invalid";
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const decoded = Buffer.from(normalized, "base64").toString("utf8");
-    return JSON.parse(decoded).role || "invalid";
+    if (!/^[A-Za-z0-9_-]+$/.test(value)) return null;
+    const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(Buffer.from(normalized, "base64").toString("utf8"));
   } catch {
-    return "invalid";
+    return null;
   }
 }
 
-export function validateBrowserConfiguration(values) {
+function isValidatedLegacyAnonKey(key, projectRef) {
+  const segments = key.split(".");
+  if (segments.length !== 3 || !/^[A-Za-z0-9_-]{16,}$/.test(segments[2])) return false;
+  const header = decodeBase64UrlJson(segments[0]);
+  const payload = decodeBase64UrlJson(segments[1]);
+  return header?.alg === "HS256"
+    && (header.typ === undefined || header.typ === "JWT")
+    && payload?.iss === "supabase"
+    && payload?.role === "anon"
+    && Number.isInteger(payload.iat)
+    && Number.isInteger(payload.exp)
+    && payload.exp > payload.iat
+    && (payload.ref === undefined || payload.ref === projectRef);
+}
+
+export function validateBrowserConfiguration(values, { production = false } = {}) {
   for (const name of REQUIRED_NAMES) {
     if (typeof values[name] !== "string" || values[name].trim() === "") {
       throw new Error(`Missing or blank required setting: ${name}.`);
@@ -93,11 +105,13 @@ export function validateBrowserConfiguration(values) {
   ) {
     throw new Error("SUPABASE_URL must be the matching remote HTTPS URL or exact M07B-3 loopback URL.");
   }
+  if (production && local) {
+    throw new Error("SUPABASE_URL cannot use loopback in production mode.");
+  }
 
   const publishableKey = values.SUPABASE_PUBLISHABLE_KEY.trim();
-  const jwtRole = decodedJwtRole(publishableKey);
   const modernPublishable = /^sb_publishable_[A-Za-z0-9_-]{16,}$/.test(publishableKey);
-  const legacyAnon = jwtRole === "anon";
+  const legacyAnon = isValidatedLegacyAnonKey(publishableKey, projectRef);
   if (
     /^sb_secret_/i.test(publishableKey)
     || /service[_-]?role/i.test(publishableKey)

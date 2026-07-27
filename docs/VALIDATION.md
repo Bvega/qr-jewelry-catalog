@@ -17,6 +17,14 @@ node scripts/validate-baseline.mjs
 
 The command checks JavaScript syntax, runs every `tests/baseline/*.test.mjs`, `tests/domain/*.test.mjs`, `tests/brand/*.test.mjs`, `tests/discovery/*.test.mjs`, `tests/detail/*.test.mjs`, `tests/permalinks/*.test.mjs`, `tests/content-intake/*.test.mjs`, and `tests/supabase-foundation/*.test.mjs` contract, runs the dependency-free Supabase static validator, validates current owner intake, prints known warnings separately, and returns exit code `0` only when every required contract passes. It remains runnable without Docker.
 
+For the complete M07B-4 Stage A deployment check, including every inherited suite, use:
+
+```bash
+npm run pages:check
+```
+
+That command uses fictional valid browser configuration, tests the deployment contracts, performs a clean deterministic build into `dist/pages/`, independently validates the final artifact, and never requires an owner credential or remote Supabase connection.
+
 ## Individual commands
 
 Use these commands when isolating a failure or completing a milestone review:
@@ -46,6 +54,14 @@ node --test tests/content-intake/*.test.mjs
 node scripts/validate-supabase-foundation.mjs
 node --test tests/supabase-foundation/*.test.mjs
 node scripts/validate-baseline.mjs
+npm run admin:validate
+npm run migration:validate
+npm run migration:test
+npm run pages:build
+npm run pages:validate
+npm run pages:test
+npm run pages:check
+npm run pages:serve
 npm run supabase:start
 npm run supabase:reset
 npm run supabase:test
@@ -56,7 +72,7 @@ git diff --cached --check
 git status --short
 ```
 
-The unchanged GitHub Actions workflow at `.github/workflows/baseline-validation.yml` runs the same primary validation command on pushes to `migration/**` and `feature/**` branches and on pull requests targeting `main`. The local M07A `content/**` branch must run the primary command before review; a later pull request to `main` is covered by the existing workflow.
+The historical workflow at `.github/workflows/baseline-validation.yml` still runs the primary baseline command on pushes to `migration/**` and `feature/**` branches and on pull requests targeting `main`. The M07B-4 workflow at `.github/workflows/deploy-pages.yml` validates pull requests without deployment, and builds and deploys only accepted `main` pushes or controlled `main` manual dispatches.
 
 The Supabase database integration suite remains separate because it requires the local container stack. `supabase:reset` rebuilds the local database from the one ordered migration and local seed, `supabase:test` runs pgTAP against real RLS roles and Storage metadata, and `supabase:lint` checks the resulting local schema.
 
@@ -194,7 +210,24 @@ The separate pgTAP suite verifies the actual local database structure and constr
 
 ### Repository workflow contract
 
-The suite reviews the workflow's required branch triggers, official Node setup action, Node version, primary command, lack of package-install steps, and lack of deployment behavior.
+The baseline suite continues to protect the historical validation-only workflow. The M07B-4 deployment tests separately verify exact-revision checkout, locked dependency installation, inherited validation, official accepted Pages action majors, least-privilege permissions, GitHub-variable-only browser configuration, strict `dist/pages` upload, successful-build dependency, `github-pages` environment URL, serialized deployment concurrency, and a deploy condition that excludes pull requests and non-`main` refs.
+
+### GitHub Pages artifact contracts
+
+`npm run pages:test` and `npm run pages:validate` verify:
+
+- the tracked, sorted 21-file production allowlist and clean deterministic rebuild;
+- byte-identical copies of all accepted public runtime files;
+- five public Finds, permanent IDs, numeric routes, registered slugs, QR behavior, and repository-subpath-relative navigation;
+- public absence of `BU-0006` through `BU-0009`;
+- fresh Manager JS/CSS bundles, production-only runtime configuration, remote-only CSP, and no signup or password-reset flow;
+- absence of activation, migration, intake, source, test, documentation, package, Git, environment, source-map, and symlink content;
+- rejection of blank, mismatched, loopback-production, secret, service-role, database, and access-token configuration;
+- acceptance of modern publishable and structurally validated legacy `anon` keys;
+- resolution of every deployed local HTML reference, with only the accepted external QR library and two intentional image-fallback references treated specially; and
+- a loopback-only preview rooted at `dist/pages/`.
+
+`npm run pages:build` intentionally requires the three production-style `SUPABASE_*` environment inputs. `npm run pages:check` supplies fictional inputs instead. Never pass real values on a command line or include them in logs.
 
 ## Warnings versus failures
 

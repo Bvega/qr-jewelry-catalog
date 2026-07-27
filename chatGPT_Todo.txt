@@ -1,5 +1,5 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Monday, July 27, 2026 at 1:27 p.m. ET
+Updated: Monday, July 27, 2026
 Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
@@ -17,7 +17,12 @@ CURRENT STATUS
 - The public catalog remains static and exposes only the five accepted Finds.
 - The next generated public ID must be BU-0010.
 - M07B-4 Deployment and Acceptance package is prepared and approved.
-- No M07B-4 implementation or remote deployment has occurred.
+- M07B-4 Stage A is implemented locally on
+  feature/m07b4-deployment-acceptance with a strict Pages artifact, deployment
+  workflow, fictional-config validation, preview server, acceptance runbook,
+  and rollback instructions.
+- No M07B-4 remote deployment, GitHub configuration, push, merge, tag, release,
+  remote authentication, database write, or Storage write has occurred.
 
 M07B PLAN
 - M07B-1 Supabase Foundation — COMPLETE
@@ -28,28 +33,22 @@ M07B PLAN
 - M07B-3 Controlled Catalog Data Migration — COMPLETE
 - M07B-3 Controlled Remote Import — COMPLETE AND ACCEPTED
 - M07B-4 Planning Package — COMPLETE
-- M07B-4 Stage A Implementation and Local Verification — NEXT
+- M07B-4 Stage A Implementation and Local Verification — COMPLETE LOCALLY;
+  AWAITING MASTER ACCEPTANCE
 - M07B-4 Stage B Controlled Deployment and Acceptance — BLOCKED UNTIL MASTER ACCEPTANCE
 
 TOP TASK
-Execute the complete M07B-4 Stage A implementation package in Codex as one
-complete pass whenever technically possible.
+Return the M07B-4 Stage A implementation report to MASTER and wait for explicit
+acceptance. Do not begin Stage B.
 
 NEXT ACTIONS
-1. Confirm main is synchronized and clean.
-2. Open the Codex project qr-jewelry-catalog.
-3. Confirm:
-   Local
-   main
-   GPT-5.6 Sol
-   Extra High
-4. Send exactly:
-   Read docs/MILESTONES/M07B4.md and execute the complete milestone exactly as
-   written. Use one-shot implementation whenever technically possible. Do not
-   perform remote deployment, configure GitHub variables, push, merge, tag, or
-   use real owner credentials. Return the required final report.
-5. Return the complete Codex report to MASTER.
-6. Do not deploy until MASTER accepts Stage A.
+1. Review the local implementation report and accepted implementation commit.
+2. Confirm the implementation branch is clean and all Stage A validation
+   passed.
+3. Return the report to MASTER.
+4. Wait for explicit MASTER acceptance.
+5. Only after acceptance, follow
+   docs/M07B4_DEPLOYMENT_ACCEPTANCE_RUNBOOK.md one step at a time.
 
 IMPORTANT
 - Codex creates feature/m07b4-deployment-acceptance.

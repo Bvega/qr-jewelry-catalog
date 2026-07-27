@@ -1,0 +1,108 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "output": ".nojekyll",
+      "mode": "generated-empty"
+    },
+    {
+      "output": "admin/assets/app.js",
+      "source": "admin-src/app.js",
+      "mode": "bundle-js"
+    },
+    {
+      "output": "admin/assets/styles.css",
+      "source": "admin-src/styles.css",
+      "mode": "bundle-css"
+    },
+    {
+      "output": "admin/index.html",
+      "source": "admin/index.html",
+      "mode": "production-admin-html"
+    },
+    {
+      "output": "admin/runtime-config.js",
+      "mode": "runtime-config"
+    },
+    {
+      "output": "app.js",
+      "source": "app.js",
+      "mode": "copy"
+    },
+    {
+      "output": "assets/brand/between-us-mark.svg",
+      "source": "assets/brand/between-us-mark.svg",
+      "mode": "copy"
+    },
+    {
+      "output": "assets/images/crystal-stud-earrings-01.jpeg",
+      "source": "assets/images/crystal-stud-earrings-01.jpeg",
+      "mode": "copy"
+    },
+    {
+      "output": "assets/images/gold-twisted-rope-bracelet-01.jpeg",
+      "source": "assets/images/gold-twisted-rope-bracelet-01.jpeg",
+      "mode": "copy"
+    },
+    {
+      "output": "assets/images/layered-gold-chain-necklace-01.jpeg",
+      "source": "assets/images/layered-gold-chain-necklace-01.jpeg",
+      "mode": "copy"
+    },
+    {
+      "output": "data/collections.js",
+      "source": "data/collections.js",
+      "mode": "copy"
+    },
+    {
+      "output": "data/discovery.js",
+      "source": "data/discovery.js",
+      "mode": "copy"
+    },
+    {
+      "output": "data/items.js",
+      "source": "data/items.js",
+      "mode": "copy"
+    },
+    {
+      "output": "data/media.js",
+      "source": "data/media.js",
+      "mode": "copy"
+    },
+    {
+      "output": "data/permalinks.js",
+      "source": "data/permalinks.js",
+      "mode": "copy"
+    },
+    {
+      "output": "data/reservation.js",
+      "source": "data/reservation.js",
+      "mode": "copy"
+    },
+    {
+      "output": "find.html",
+      "source": "find.html",
+      "mode": "copy"
+    },
+    {
+      "output": "index.html",
+      "source": "index.html",
+      "mode": "copy"
+    },
+    {
+      "output": "item.html",
+      "source": "item.html",
+      "mode": "copy"
+    },
+    {
+      "output": "item.js",
+      "source": "item.js",
+      "mode": "copy"
+    },
+    {
+      "output": "styles.css",
+      "source": "styles.css",
+      "mode": "copy"
+    }
+  ]
+}

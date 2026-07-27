@@ -34,26 +34,30 @@ M07A adds a private staging workspace under `content-intake/` for owner-supplied
 
 ## Supabase foundation
 
-M07B-1 adds a non-public Supabase database, authorization, Storage-policy, migration, and automated-test foundation for future catalog management. The current public catalog still uses the accepted static data. The Seller Catalog Manager is not available yet, and no existing or intake products have been migrated.
+M07B adds the remote Supabase database, authorization, Storage policies, controlled migration, and authenticated Seller Catalog Manager. The public catalog deliberately remains on the five accepted static repository records. The four imported Finds, `BU-0006` through `BU-0009`, remain remote, hidden, and unfeatured; M07B-4 does not publish them or add a public Supabase read path.
 
-The local database workflow requires Node.js, npm, and a running Docker-compatible container runtime. See `docs/SUPABASE_LOCAL_DEVELOPMENT.md`. No hosted project or browser configuration is part of M07B-1.
+The production Manager is a publicly reachable static route whose privacy and authorization come from Supabase Auth, the exact `owner`/`editor` role probe, RLS, and Storage policies. It connects to remote Supabase only after an authenticated sign-in. Its project URL, project reference, and publishable browser key are public browser configuration, not privileged secrets. A secret key, `service_role` key, database password, or access token must never be used. Temporary owner-activation and M07B-3 migration pages remain local maintenance history and are excluded from the Pages artifact.
+
+The local database workflow requires Node.js, npm, and a running Docker-compatible container runtime. See `docs/SUPABASE_LOCAL_DEVELOPMENT.md`.
 
 ## Local preview
 
-From the repository root:
+Build and validate the exact deployment artifact with fictional browser configuration, then serve only that artifact on loopback:
 
 ```bash
-python3 -m http.server 4175 --bind 127.0.0.1
+npm ci
+npm run pages:check
+npm run pages:serve
 ```
 
-Then open `http://127.0.0.1:4175/`.
+The server prints the exact public and Manager preview URLs and never serves repository internals. The fictional Manager configuration used by `pages:check` is for structural preview only and cannot authenticate to the real project.
 
 ## Validation
 
-The public catalog has no build step or runtime package dependency. Run the complete compatibility, domain, brand/public-shell, Collections/discovery, Find-detail, reservation, permalink, sharing, Copy Link, QR, content-intake, and static Supabase foundation suite without Docker with:
+Run the complete inherited and deployment validation without Docker with:
 
 ```bash
-node scripts/validate-baseline.mjs
+npm run pages:check
 ```
 
-Run `npm install` once to install the repository-local Supabase CLI before using the Docker-backed database commands. See `docs/VALIDATION.md` for individual commands and the contracts protected by the suite.
+The public source itself has no runtime package dependency; Node dependencies are used only to validate and assemble the allowlisted artifact and bundle the Manager. Run `npm install` once before Docker-backed database commands. See `docs/VALIDATION.md` for individual commands and protected contracts, and `docs/M07B4_DEPLOYMENT_ACCEPTANCE_RUNBOOK.md` for controlled Stage B deployment and rollback.
