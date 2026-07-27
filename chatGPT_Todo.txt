@@ -1,5 +1,5 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Wednesday, July 22, 2026 at 8:56 p.m. ET
+Updated: Monday, July 27, 2026 at 1:27 p.m. ET
 Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
@@ -7,23 +7,17 @@ CURRENT STATUS
 - M07B-1 Supabase Foundation is complete and accepted.
 - M07B-2 Seller Catalog Manager is complete and accepted.
 - M07B-2R1 Seller Invitation and Password Setup is complete and accepted.
-- M07B-3 Stage A is complete, accepted, merged, and pushed.
-- Accepted implementation commit on main:
-  26508f76ac24bd79838dde1a748f5ab935048abb
-- M07B-3 controlled remote import is complete and accepted.
-- Remote migrations are synchronized:
-  20260720120000
-  20260720130000
-  20260722120000
-- Four approved Finds were imported:
-  BU-0006 through BU-0009.
-- All four imported Finds are hidden and unfeatured.
-- Four primary photo rows and four original Storage objects were verified.
-- Seller Catalog Manager displays 4 of 4 imported Finds to the owner.
-- The public static catalog remains unchanged.
-- The next generated permanent ID must be BU-0010.
-- Browser-safe remote configuration remains local and ignored.
-- The owner signed out and the loopback server was stopped.
+- M07B-3 Controlled Catalog Data Migration is complete and accepted.
+- M07B-3 controlled remote import is complete, accepted, and pushed.
+- Current accepted main commit before M07B-4 planning:
+  00c5def9efa362cbc5a7da89f53d35bdbb24c76e
+- Remote migrations are synchronized through 20260722120000.
+- BU-0006 through BU-0009 exist remotely as hidden, unfeatured Finds.
+- Four primary-photo rows and four original Storage objects are verified.
+- The public catalog remains static and exposes only the five accepted Finds.
+- The next generated public ID must be BU-0010.
+- M07B-4 Deployment and Acceptance package is prepared and approved.
+- No M07B-4 implementation or remote deployment has occurred.
 
 M07B PLAN
 - M07B-1 Supabase Foundation — COMPLETE
@@ -33,23 +27,41 @@ M07B PLAN
 - Controlled remote owner activation smoke — COMPLETE
 - M07B-3 Controlled Catalog Data Migration — COMPLETE
 - M07B-3 Controlled Remote Import — COMPLETE AND ACCEPTED
-- M07B-4 Deployment and Acceptance — NEXT
+- M07B-4 Planning Package — COMPLETE
+- M07B-4 Stage A Implementation and Local Verification — NEXT
+- M07B-4 Stage B Controlled Deployment and Acceptance — BLOCKED UNTIL MASTER ACCEPTANCE
 
 TOP TASK
-Prepare the complete M07B-4 implementation package.
+Execute the complete M07B-4 Stage A implementation package in Codex as one
+complete pass whenever technically possible.
 
 NEXT ACTIONS
-1. Commit and push the M07B-3 remote acceptance record.
-2. Confirm main and origin/main are synchronized and clean.
-3. Do not modify or publish BU-0006 through BU-0009 before M07B-4 planning.
-4. MASTER must define the M07B-4 deployment and acceptance scope.
-5. Do not begin implementation until the M07B-4 package is approved.
+1. Confirm main is synchronized and clean.
+2. Open the Codex project qr-jewelry-catalog.
+3. Confirm:
+   Local
+   main
+   GPT-5.6 Sol
+   Extra High
+4. Send exactly:
+   Read docs/MILESTONES/M07B4.md and execute the complete milestone exactly as
+   written. Use one-shot implementation whenever technically possible. Do not
+   perform remote deployment, configure GitHub variables, push, merge, tag, or
+   use real owner credentials. Return the required final report.
+5. Return the complete Codex report to MASTER.
+6. Do not deploy until MASTER accepts Stage A.
 
 IMPORTANT
+- Codex creates feature/m07b4-deployment-acceptance.
 - Preserve BU-0001 through BU-0009.
-- The next generated public ID must be BU-0010.
-- Imported Finds remain hidden and unfeatured until explicitly approved.
-- Do not expose credentials, owner identifiers, tokens, or sessions.
-- Do not commit .env.local or admin/config.js.
-- Do not change the public catalog data source without an accepted milestone.
-- Do not begin M07B-4 implementation yet.
+- The next generated public ID must remain BU-0010.
+- BU-0006 through BU-0009 remain hidden and unfeatured.
+- The public catalog remains on static repository data.
+- Do not expose credentials, owner identifiers, tokens, sessions, or private
+  configuration.
+- Browser deployment may use only a publishable or validated legacy anon key.
+- Secret, service-role, database, and access-token values are forbidden.
+- Do not deploy activation or M07B-3 migration routes.
+- Do not commit .env.local, admin/config.js, or generated production config.
+- Do not change Supabase migrations, RLS, Storage policies, or remote data.
+- Do not begin Stage B before MASTER acceptance.
