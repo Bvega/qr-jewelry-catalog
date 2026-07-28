@@ -2,7 +2,7 @@
 
 ## Scope and architecture
 
-The private Seller Catalog Manager is a framework-free browser application at `/admin/`. `admin/index.html` is the semantic shell, `admin-src/` contains modular vanilla JavaScript and mobile-first CSS, and `scripts/build-admin.mjs` produces the committed browser assets with esbuild. The existing public catalog remains static and does not read from Supabase in M07B-2.
+The private Seller Catalog Manager is a framework-free browser application at `/admin/`. `admin/index.html` is the semantic shell, `admin-src/` contains modular vanilla JavaScript and mobile-first CSS, and `scripts/build-admin.mjs` produces the committed browser assets with esbuild. M08 adds controlled publication to the existing catalog editing workflow; public reads remain separate and are documented in `docs/CONTROLLED_DYNAMIC_PUBLISHING.md`.
 
 Browser configuration is deliberately separate from the bundle. `admin/config.js` is generated locally and ignored by Git, while the loopback server validates it and exposes only the browser-safe fields at `/admin/runtime-config.js` before `admin/assets/app.js`. Direct requests to `admin/config.js` are denied. The browser receives only the project URL, publishable key, and project reference.
 
@@ -18,9 +18,10 @@ An allowlisted owner or editor can:
 
 - load all Finds, including draft, hidden, and archived records;
 - filter by availability, publication, hidden, or archived state;
-- create a draft or explicitly publish a new Find;
+- create a hidden draft;
 - edit title, Collection, USD price, availability, description, condition, publication state, and primary image details;
-- hide a published Find;
+- review publication eligibility and exact blockers;
+- explicitly publish or unpublish one persisted Find after confirmation;
 - archive without deletion; and
 - restore an archived Find in a hidden state.
 
@@ -28,11 +29,21 @@ Collections are loaded from `public.collections` in `sort_order`. Finds use a de
 
 Archiving sets `archived_at` and `is_published = false`. Restoring clears `archived_at` and also sets `is_published = false`; publication always requires an explicit later action. The manager has no hard-delete action.
 
+## Controlled publication
+
+The existing state model remains authoritative: Published means `is_published = true` and `archived_at is null`; Hidden means `is_published = false` and `archived_at is null`; Archived means `archived_at` is set and is never publicly eligible.
+
+Publish is enabled only for a persisted, non-archived Find with a valid unique immutable public ID, title, established Collection, positive USD price, supported availability, nonempty description, valid optional slug, and valid primary-photo metadata when a photograph exists. A photograph is not required because the public experience has an accepted missing-image fallback. The UI lists blockers and disables Publish until they are resolved.
+
+Publish and Unpublish each require a Find-specific confirmation. They use the same submission guard as saving, so a delayed request cannot be duplicated. The update includes the previously loaded publication state and a non-archived predicate; a concurrent publication or archive-state change therefore returns a safe conflict instead of being overwritten. Success is shown only after both the mutation result and an exact fresh read confirm the requested state. Expired sessions, authorization failures, conflicts, request failures, and verification failures receive neutral retry or sign-in guidance.
+
+Unpublishing changes only `is_published`. It never deletes or archives the Find and never removes photograph metadata or Storage objects. Bulk publication is not available.
+
 ## Primary image workflow
 
 M07B-2 supports one primary JPEG, PNG, or WebP image up to 10 MiB. The browser validates MIME type and size, reads dimensions, shows a local `blob:` preview, and requires 1–500 characters of alternative text for an upload or replacement.
 
-Objects use `finds/{find-uuid}/{random-uuid}.{extension}` in the public `find-images` bucket. Public object URLs are derived directly from known metadata; the application never anonymously lists Storage.
+Objects use `finds/{find-uuid}/{random-uuid}.{extension}` in the private `find-images` bucket. The Manager downloads an authorized object through Storage RLS and creates a page-local `blob:` preview; it does not derive or persist a public object URL. The application never anonymously lists Storage.
 
 For a new image, the object is uploaded before its `find_photos` row is inserted. A metadata failure triggers best-effort removal of the new object and reports that the Find itself was already saved. For replacement, the new object is uploaded, the existing primary metadata row is updated, and only then is the old object removed. If the metadata update fails, the new object is removed and the previous valid image remains active. Cleanup failures are reported as recoverable partial failures.
 
@@ -46,13 +57,16 @@ The shell applies a strict Content Security Policy: scripts and styles are local
 
 Never place a database password, access token, owner identifier, secret key, or `service_role` key in browser configuration, source, tests, logs, or documentation. A publishable/legacy anon key is not authorization: private access depends on Auth, the self-only role probe, and RLS. `private.catalog_admins` is not exposed through the API.
 
+Anonymous public reads use explicit column grants and published-row RLS. Manager reads and writes still require an authenticated allowlisted role. The Manager never relies on hidden controls or client validation as authorization.
+
 ## Limitations
 
-- The public catalog does not read from Supabase yet.
-- The four accepted intake Finds are not migrated.
-- Cloudflare deployment is not part of this milestone.
+- M08 Stage A is pending MASTER review; it performs no remote publication or deployment.
+- `BU-0006` through `BU-0009` remain hidden and unpublished remotely.
 - Only one primary image is managed; additional galleries are deferred.
+- A primary image is optional for publication under the accepted fallback rule.
+- Related Find and Collection administration are not part of the Manager in M08.
 - Payments, shipping, messaging, analytics, multi-tenancy, destructive deletion, and public signup are out of scope.
-- Remote owner manual acceptance is deferred until MASTER approval.
+- Bulk publication and editable Featured, Latest, and Find of the Week controls are out of scope.
 
 See `docs/SELLER_MANAGER_LOCAL_SETUP.md` for local setup and troubleshooting.

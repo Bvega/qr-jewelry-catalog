@@ -36,6 +36,7 @@ const trackedPublicSources = Object.freeze([
   "data/discovery.js",
   "data/media.js",
   "data/permalinks.js",
+  "data/public-catalog.js",
   "data/reservation.js"
 ]);
 
@@ -91,6 +92,8 @@ test("local maintenance commands remain present, strict, and unchanged", () => {
   assert.equal(packageJson.scripts["pages:check"], "node scripts/check-pages.mjs");
   assert.equal(packageJson.scripts["pages:check:ci"], "node scripts/check-pages-ci.mjs");
   assert.equal(packageJson.scripts["pages:test"], "node --test tests/deployment/*.test.mjs");
+  assert.equal(packageJson.scripts["m08:check"], "node scripts/check-m08.mjs");
+  assert.equal(packageJson.scripts["m08:check:ci"], "node scripts/check-m08-ci.mjs");
 
   const baselineSource = readFileSync(resolve(root, "scripts/validate-baseline.mjs"), "utf8");
   assert.match(baselineSource, /buildRepositoryChecks\(\)/);
@@ -99,6 +102,19 @@ test("local maintenance commands remain present, strict, and unchanged", () => {
   const checkPagesSource = readFileSync(resolve(root, "scripts/check-pages.mjs"), "utf8");
   assert.match(checkPagesSource, /validate-catalog-migration\.mjs/);
   assert.match(checkPagesSource, /tests\/catalog-migration/);
+
+  const checkM08Source = readFileSync(resolve(root, "scripts/check-m08.mjs"), "utf8");
+  assert.match(checkM08Source, /"Local Supabase start",\s*\{ silent: true \}/);
+  for (const name of [
+    "DATABASE_URL",
+    "PGPASSWORD",
+    "SUPABASE_ACCESS_TOKEN",
+    "SUPABASE_DB_PASSWORD",
+    "SUPABASE_SECRET_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY"
+  ]) {
+    assert.ok(checkM08Source.includes(`"${name}"`), name);
+  }
 
   const checks = buildRepositoryChecks();
   const tagged = checks.filter((check) => check.requiresLocalMigrationSources);
@@ -201,7 +217,7 @@ test("tracked public catalog sources keep BU-0006 through BU-0009 absent", () =>
 
 test("Pages manifest keeps activation, migration, and intake content out of production", () => {
   const manifest = loadPagesManifest();
-  assert.equal(manifest.files.length, 21);
+  assert.equal(manifest.files.length, 23);
   const outputs = manifest.files.map((entry) => entry.output);
   for (const forbidden of [
     "admin/activate.html",

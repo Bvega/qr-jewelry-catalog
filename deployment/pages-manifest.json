@@ -75,6 +75,11 @@
       "mode": "copy"
     },
     {
+      "output": "data/public-catalog.js",
+      "source": "data/public-catalog.js",
+      "mode": "copy"
+    },
+    {
       "output": "data/reservation.js",
       "source": "data/reservation.js",
       "mode": "copy"
@@ -98,6 +103,10 @@
       "output": "item.js",
       "source": "item.js",
       "mode": "copy"
+    },
+    {
+      "output": "runtime-config.js",
+      "mode": "public-runtime-config"
     },
     {
       "output": "styles.css",

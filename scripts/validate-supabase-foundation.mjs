@@ -30,11 +30,6 @@ const requiredPaths = [
 ];
 
 const protectedPaths = [
-  "index.html",
-  "find.html",
-  "item.html",
-  "app.js",
-  "item.js",
   "styles.css",
   "data/items.js",
   "data/collections.js",
@@ -68,6 +63,7 @@ const migrationFiles = existsSync(migrationDirectory)
   ? readdirSync(migrationDirectory).filter((file) => file.endsWith(".sql")).sort()
   : [];
 const foundationMigrationFile = "20260720120000_m07b1_catalog_foundation.sql";
+const m08MigrationFile = "20260728120000_m08_controlled_dynamic_publishing.sql";
 requireCheck(
   migrationFiles.includes(foundationMigrationFile)
     && migrationFiles[0] === foundationMigrationFile,
@@ -76,6 +72,9 @@ requireCheck(
 
 const migration = migrationFiles.includes(foundationMigrationFile)
   ? read(`supabase/migrations/${foundationMigrationFile}`)
+  : "";
+const m08Migration = migrationFiles.includes(m08MigrationFile)
+  ? read(`supabase/migrations/${m08MigrationFile}`)
   : "";
 const config = existsSync(resolve(repositoryRoot, "supabase/config.toml"))
   ? read("supabase/config.toml")
@@ -125,6 +124,10 @@ requireCheck(/BU-'\s*\|\|\s*lpad/i.test(migration), "Public-ID generator must fo
 requireCheck(/create\s+trigger\s+finds_maintain_audit/i.test(migration), "Find audit trigger is required.");
 
 requireCheck(/\[storage\.buckets\.find-images\]/.test(config), "find-images must be configured locally.");
+requireCheck(
+  /\[storage\.buckets\.find-images\][\s\S]*?public\s*=\s*false/.test(config),
+  "find-images must be private so public retrieval follows Storage RLS."
+);
 requireCheck(/file_size_limit\s*=\s*"10MiB"/.test(config), "find-images must have a 10 MiB limit.");
 for (const mime of ["image/jpeg", "image/png", "image/webp"]) {
   requireCheck(config.includes(mime), `find-images must allow ${mime}.`);
@@ -137,6 +140,28 @@ for (const operation of ["list", "insert", "update", "delete"]) {
   );
 }
 requireCheck(/\^finds\//.test(migration), "Storage writes must enforce the Finds path convention.");
+requireCheck(
+  /revoke\s+select\s+on\s+public\.collections[\s\S]*from\s+anon,\s*authenticated/i.test(m08Migration),
+  "M08 must revoke broad catalog SELECT grants."
+);
+requireCheck(
+  /create\s+policy\s+find_images_public_read[\s\S]*for\s+select[\s\S]*to\s+anon[\s\S]*storage\.allow_any_operation\(array\[[\s\S]*object\.get_authenticated_info[\s\S]*object\.get_authenticated[\s\S]*finds\.is_published\s*=\s*true[\s\S]*finds\.archived_at\s+is\s+null/i.test(m08Migration),
+  "M08 private Storage reads must be anonymous, operation-restricted, and follow parent Find eligibility."
+);
+requireCheck(
+  !/create\s+policy\s+find_images_public_read[\s\S]*?to\s+anon,\s*authenticated/i.test(m08Migration)
+    && !/storage\.allow_any_operation\(array\[[\s\S]*?object\.list[\s\S]*?\]\)/i.test(m08Migration),
+  "M08 public Storage access must not extend to authenticated users or bucket listing."
+);
+requireCheck(
+  /add\s+constraint\s+find_photos_find_scoped_storage_path_check[\s\S]*find_id::text/i.test(m08Migration),
+  "M08 photo paths must remain scoped to their parent Find."
+);
+requireCheck(
+  /alter\s+policy\s+finds_public_read\s+on\s+public\.finds\s+to\s+anon/i.test(m08Migration)
+    && /create\s+policy\s+collections_admin_read[\s\S]*to\s+authenticated/i.test(m08Migration),
+  "M08 must separate anonymous public reads from authenticated admin reads."
+);
 
 requireCheck(
   !/insert\s+into\s+(?:auth\.users|private\.catalog_admins|public\.finds|public\.find_photos|public\.find_relations)/i.test(seed),
@@ -243,8 +268,8 @@ const protectedStatus = spawnSync("git", ["status", "--porcelain=v1", "--", ...p
 });
 requireCheck(protectedDiff.status === 0, "Unable to compare protected files with the accepted base.");
 requireCheck(protectedStatus.status === 0, "Unable to inspect protected working-tree files.");
-requireCheck(!protectedDiff.stdout.trim(), `Protected files changed: ${protectedDiff.stdout.trim()}`);
-requireCheck(!protectedStatus.stdout.trim(), `Protected working-tree changes detected: ${protectedStatus.stdout.trim()}`);
+requireCheck(!protectedDiff.stdout.trim(), `Protected static or intake files changed: ${protectedDiff.stdout.trim()}`);
+requireCheck(!protectedStatus.stdout.trim(), `Protected static or intake working-tree changes detected: ${protectedStatus.stdout.trim()}`);
 
 if (failures.length > 0) {
   console.error("Supabase foundation validation: FAIL");

@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   MAX_IMAGE_BYTES,
   normalizePrice,
+  publicationBlockers,
   validateFindInput,
   validatePhotoFile
 } from "../../admin-src/validation.js";
@@ -57,4 +58,60 @@ test("photo validation permits only JPEG, PNG, and WebP through 10 MiB", () => {
   assert.equal(validatePhotoFile({ type: "image/gif", size: 100 }).valid, false);
   assert.equal(validatePhotoFile({ type: "image/jpeg", size: MAX_IMAGE_BYTES + 1 }).valid, false);
   assert.equal(validatePhotoFile({ type: "image/jpeg", size: 0 }).valid, false);
+});
+
+const eligibleFind = Object.freeze({
+  id: "fictional-id",
+  public_id: "BU-9101",
+  slug: "fictional-publishable-find",
+  title: "Fictional Publishable Find",
+  collection_id: "jewelry",
+  price_amount: "25.00",
+  price_currency: "USD",
+  availability: "available",
+  description: "Fictional test-only description.",
+  archived_at: null,
+  primaryPhoto: null
+});
+
+test("publication eligibility follows the existing public contract and permits no-photo fallback", () => {
+  assert.deepEqual(publicationBlockers(eligibleFind, {
+    collectionIds: ["jewelry"],
+    allFinds: [eligibleFind]
+  }), []);
+  assert.deepEqual(publicationBlockers(null), ["Save this Find before publishing."]);
+});
+
+test("publication blockers explain malformed, duplicate, archived, and invalid-photo states", () => {
+  const blockers = publicationBlockers({
+    ...eligibleFind,
+    public_id: "invalid",
+    slug: "Invalid Slug",
+    title: "",
+    collection_id: "unknown",
+    price_amount: "0",
+    price_currency: "EUR",
+    availability: "inactive",
+    description: "",
+    archived_at: "2026-07-28T00:00:00Z",
+    primaryPhoto: {
+      storage_path: "private/path.jpg",
+      alt_text: "",
+      sequence: 0,
+      width: 0,
+      height: null
+    }
+  }, {
+    collectionIds: ["jewelry"],
+    allFinds: [
+      eligibleFind,
+      { ...eligibleFind, id: "other", public_id: "invalid" }
+    ]
+  });
+  for (const phrase of [
+    "public ID", "already assigned", "title", "Collection", "USD price",
+    "availability", "description", "slug", "archived", "photograph metadata"
+  ]) {
+    assert.ok(blockers.some((blocker) => blocker.includes(phrase)), phrase);
+  }
 });

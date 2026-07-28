@@ -25,6 +25,22 @@ npm run pages:check
 
 That command uses fictional valid browser configuration, tests the deployment contracts, performs a clean deterministic build into `dist/pages/`, independently validates the final artifact, and never requires an owner credential or remote Supabase connection.
 
+For the complete M08 Stage A check, including actual local database, RLS, and Storage policy verification, use:
+
+```bash
+npm run m08:check
+```
+
+This command requires Docker. It starts or reuses only the repository's local Supabase stack and exits nonzero if real local database verification is unavailable. It runs the inherited baseline, Seller Manager, controlled migration, M08 public adapter/UI, local reset, pgTAP, schema lint, Pages artifact, binary-safe security, and diff checks.
+
+For a tracked-only clean checkout without Docker or private inputs, use:
+
+```bash
+npm run m08:check:ci
+```
+
+That command runs the inherited clean Pages validation, M08 security scan, and diff check. It requires no `.env.local`, owner credential, ignored photo, intake source, local Supabase service, or remote access.
+
 ## Individual commands
 
 Use these commands when isolating a failure or completing a milestone review:
@@ -38,6 +54,7 @@ node --check data/discovery.js
 node --check data/media.js
 node --check data/reservation.js
 node --check data/permalinks.js
+node --check data/public-catalog.js
 node --check scripts/lib/content-intake.mjs
 node --check scripts/validate-content-intake.mjs
 node --check scripts/summarize-content-intake.mjs
@@ -62,6 +79,10 @@ npm run pages:validate
 npm run pages:test
 npm run pages:check
 npm run pages:serve
+npm run m08:check
+npm run m08:check:ci
+node --test tests/m08/*.test.mjs
+node scripts/security-scan-m08.mjs
 npm run supabase:start
 npm run supabase:reset
 npm run supabase:test
@@ -74,13 +95,13 @@ git status --short
 
 The historical workflow at `.github/workflows/baseline-validation.yml` still runs the primary baseline command on pushes to `migration/**` and `feature/**` branches and on pull requests targeting `main`. The M07B-4 workflow at `.github/workflows/deploy-pages.yml` validates pull requests without deployment, and builds and deploys only accepted `main` pushes or controlled `main` manual dispatches.
 
-The Supabase database integration suite remains separate because it requires the local container stack. `supabase:reset` rebuilds the local database from the one ordered migration and local seed, `supabase:test` runs pgTAP against real RLS roles and Storage metadata, and `supabase:lint` checks the resulting local schema.
+The Supabase database integration suite remains separate because it requires the local container stack. `supabase:reset` rebuilds the local database from the ordered migrations and local seed, `supabase:test` runs pgTAP against real RLS roles and Storage metadata, and `supabase:lint` checks the resulting local schema.
 
 ## What the validation checks
 
 ### JavaScript syntax
 
-Node parses `app.js`, `item.js`, `data/items.js`, `data/collections.js`, `data/discovery.js`, `data/media.js`, `data/reservation.js`, and `data/permalinks.js` without executing the browser application.
+Node parses `app.js`, `item.js`, `data/items.js`, `data/collections.js`, `data/discovery.js`, `data/media.js`, `data/reservation.js`, `data/permalinks.js`, and `data/public-catalog.js` without executing the browser application.
 
 ### Data contracts
 
@@ -208,6 +229,25 @@ The M07B-1 static and Node suite verifies the project structure, pinned reposito
 
 The separate pgTAP suite verifies the actual local database structure and constraints; anonymous draft/published/archive visibility; authenticated non-admin denial; allowlisted admin creation and updates; generated and explicit IDs; audit behavior; photo visibility; self-relation rejection; Storage denial/success; and rollback of all fictional fixtures.
 
+### M08 controlled dynamic-publishing contracts
+
+`tests/m08/public-catalog.test.mjs` and `tests/m08/public-ui.test.mjs` verify:
+
+- static-only installation and static fallback on missing configuration, timeout, network failure, or malformed responses;
+- static-first merge order, deterministic remote order, protected-ID precedence, and duplicate rejection;
+- hidden, unpublished, archived, incomplete, malformed, and unknown-Collection exclusion;
+- explicit approved Data API columns with no administrative or audit selection;
+- private Storage download through the publishable-key request and page-local blob URLs;
+- no localStorage, IndexedDB, or Service Worker persistence;
+- Explore, Collection activation and count, direct ID and slug detail routes, canonical URLs, sharing, Copy Link, reservation, QR, image/fallback, and eligible Related Finds; and
+- preservation of all five protected static Find contracts.
+
+The Seller Manager suite additionally verifies displayed publication blockers, confirmation cancellation, duplicate-submission protection, expected-state concurrency predicates, safe session and authorization failures, exact final-state refetch, and non-deleting Unpublish.
+
+`supabase/tests/database/06_m08_controlled_dynamic_publishing.test.sql` verifies the real local grant, RLS, and Storage boundary. It proves approved-column access, administrative-column denial, published/non-archived row visibility, hidden and archived denial, unauthorized publication denial, accepted admin writes, and eligible-object-only reads from the private bucket. Browser mocks cover failure presentation but do not replace this pgTAP suite.
+
+`scripts/security-scan-m08.mjs` scans changed tracked and untracked files, the final binary-safe diff, and the generated Pages artifact for credential-shaped values, privileged configuration, private identities, concrete private Storage paths, and accidental environment files.
+
 ### Repository workflow contract
 
 The baseline suite continues to protect the historical validation-only workflow. The M07B-4 deployment tests separately verify exact-revision checkout, locked dependency installation, inherited validation, official accepted Pages action majors, least-privilege permissions, GitHub-variable-only browser configuration, strict `dist/pages` upload, successful-build dependency, `github-pages` environment URL, serialized deployment concurrency, and a deploy condition that excludes pull requests and non-`main` refs.
@@ -216,14 +256,16 @@ The baseline suite continues to protect the historical validation-only workflow.
 
 `npm run pages:test` and `npm run pages:validate` verify:
 
-- the tracked, sorted 21-file production allowlist and clean deterministic rebuild;
+- the tracked, sorted 23-file production allowlist and clean deterministic rebuild;
 - byte-identical copies of all accepted public runtime files;
-- five public Finds, permanent IDs, numeric routes, registered slugs, QR behavior, and repository-subpath-relative navigation;
-- public absence of `BU-0006` through `BU-0009`;
+- five authoritative static Finds, permanent IDs, numeric routes, registered slugs, QR behavior, and repository-subpath-relative navigation;
+- absence of embedded remote `BU-0006` through `BU-0009` data;
+- inclusion of the public hybrid adapter and validated public runtime configuration;
 - fresh Manager JS/CSS bundles, production-only runtime configuration, remote-only CSP, and no signup or password-reset flow;
 - absence of activation, migration, intake, source, test, documentation, package, Git, environment, source-map, and symlink content;
 - rejection of blank, mismatched, loopback-production, secret, service-role, database, and access-token configuration;
 - acceptance of modern publishable and structurally validated legacy `anon` keys;
+- emission of only the URL and publishable key in public configuration;
 - resolution of every deployed local HTML reference, with only the accepted external QR library and two intentional image-fallback references treated specially; and
 - a loopback-only preview rooted at `dist/pages/`.
 

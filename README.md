@@ -13,10 +13,12 @@ The platform evolved from the QR Jewelry Catalog MVP. Its five original jewelry 
 - Responsive Find cards and detail pages
 - Permanent static-safe `find.html?id=BU-NNNN` detail links with exact registered-slug aliases
 - Normalized Find Details with permanent public IDs, Collection labels, currency-aware prices, and accessible photo galleries
+- Static-first hybrid catalog loading with RLS-protected eligible remote Finds and an automatic five-Find fallback
+- Authenticated, confirmed, and final-state-verified Manager publication and unpublication
 - Manual Reserve by Message for available Finds, using browser sharing with clipboard and selectable-text fallbacks
 - Canonical Share Find, Copy Link, reservation, and QR payloads with accessible manual and QR-failure recovery
 - Local Between Us SVG mark and system-font visual language
-- Five current Jewelry Finds in their original order
+- Five protected static Jewelry Finds in their original order, always available even when Supabase is not
 - Available, Reserved, and Sold states
 - Protected numeric `item.html?id=N` routes for every existing shared link and QR destination
 - Accessible missing-image and invalid-Find states
@@ -24,7 +26,7 @@ The platform evolved from the QR Jewelry Catalog MVP. Its five original jewelry 
 
 Reserve by Message does not complete or guarantee a reservation. The owner confirms availability manually; payment is cash, and local pickup details are arranged by message after confirmation. No direct recipient, customer data storage, public backend connection, or online payment is configured.
 
-Future collections are shown as **Coming Soon** without fake links or counts. Latest Finds is currently an editorial order rather than timestamp-derived chronology. Search, advanced filtering, clean-path routing, and broader inventory remain deferred to their approved milestones.
+Collections with eligible public Finds become active; empty Collections remain **Coming Soon** without fake links or counts. Latest Finds is currently an editorial order rather than timestamp-derived chronology. Search, advanced filtering, clean-path routing, and broader inventory remain deferred to their approved milestones.
 
 New public links use the immutable public ID, for example `find.html?id=BU-0001`. A registered slug such as `find.html?slug=gold-twisted-rope-bracelet` resolves as an alias, while its canonical metadata, sharing, reservation, and QR actions all use the public-ID URL. The query-based route works under GitHub Pages project subpaths without rewrite rules.
 
@@ -34,11 +36,13 @@ M07A adds a private staging workspace under `content-intake/` for owner-supplied
 
 ## Supabase foundation
 
-M07B adds the remote Supabase database, authorization, Storage policies, controlled migration, and authenticated Seller Catalog Manager. The public catalog deliberately remains on the five accepted static repository records. The four imported Finds, `BU-0006` through `BU-0009`, remain remote, hidden, and unfeatured; M07B-4 does not publish them or add a public Supabase read path.
+M07B adds the remote Supabase database, authorization, Storage policies, controlled migration, and authenticated Seller Catalog Manager. M08 Stage A adds a static-first public read path for published, non-archived Finds while preserving the five accepted repository records as authoritative. Explicit SQL column grants and RLS are the anonymous data boundary. `find-images` is private; eligible photographs are downloaded through Storage RLS and rendered with page-local blob URLs.
 
-The production Manager is a publicly reachable static route whose privacy and authorization come from Supabase Auth, the exact `owner`/`editor` role probe, RLS, and Storage policies. It connects to remote Supabase only after an authenticated sign-in. Its project URL, project reference, and publishable browser key are public browser configuration, not privileged secrets. A secret key, `service_role` key, database password, or access token must never be used. Temporary owner-activation and M07B-3 migration pages remain local maintenance history and are excluded from the Pages artifact.
+The production Manager is a publicly reachable static route whose privacy and authorization come from Supabase Auth, the exact `owner`/`editor` role probe, RLS, and Storage policies. It connects to remote Supabase only after an authenticated sign-in. Its project URL, project reference, and publishable browser key are public browser configuration, not privileged secrets. The public catalog configuration contains only the URL and publishable key. Privileged keys, database passwords, access tokens, owner identifiers, and sessions must never be exposed. Temporary owner-activation and M07B-3 migration pages remain local maintenance history and are excluded from the Pages artifact.
 
-The local database workflow requires Node.js, npm, and a running Docker-compatible container runtime. See `docs/SUPABASE_LOCAL_DEVELOPMENT.md`.
+M08 Stage A remains pending MASTER review and acceptance. It performs no deployment or remote migration/database/Storage write. The four imported Finds, `BU-0006` through `BU-0009`, remain hidden and unpublished remotely; the next generated public ID remains `BU-0010`. See `docs/CONTROLLED_DYNAMIC_PUBLISHING.md`.
+
+The complete local database workflow requires Node.js, npm, and a running Docker-compatible container runtime. See `docs/SUPABASE_LOCAL_DEVELOPMENT.md`.
 
 ## Local preview
 
@@ -54,10 +58,22 @@ The server prints the exact public and Manager preview URLs and never serves rep
 
 ## Validation
 
-Run the complete inherited and deployment validation without Docker with:
+Run the complete M08 validation, including actual local RLS and Storage tests, with:
+
+```bash
+npm run m08:check
+```
+
+For a Docker-free, tracked-only clean-checkout check:
+
+```bash
+npm run m08:check:ci
+```
+
+The inherited deployment-only validation remains:
 
 ```bash
 npm run pages:check
 ```
 
-The public source itself has no runtime package dependency; Node dependencies are used only to validate and assemble the allowlisted artifact and bundle the Manager. Run `npm install` once before Docker-backed database commands. See `docs/VALIDATION.md` for individual commands and protected contracts, and `docs/M07B4_DEPLOYMENT_ACCEPTANCE_RUNBOOK.md` for controlled Stage B deployment and rollback.
+The public source itself has no runtime package dependency; Node dependencies are used only to validate and assemble the allowlisted artifact and bundle the Manager. Run `npm install` once before Docker-backed database commands. See `docs/VALIDATION.md` for individual commands and protected contracts. M08 deployment remains prohibited until MASTER separately approves the Stage B canary in `docs/CONTROLLED_DYNAMIC_PUBLISHING.md`.

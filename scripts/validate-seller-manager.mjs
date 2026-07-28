@@ -67,8 +67,7 @@ const configTracked = spawnSync("git", ["ls-files", "--error-unmatch", "admin/co
 if (configTracked.status === 0) failures.push("admin/config.js must remain uncommitted.");
 
 const protectedPaths = [
-  "index.html", "find.html", "item.html", "app.js", "item.js", "styles.css",
-  "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
+  "styles.css", "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
   "data/reservation.js", "data/permalinks.js", "assets/images",
   "content-intake/finds.csv", "content-intake/photo-manifest.csv", "content-intake/photos",
   "tests/fixtures/legacy-items.snapshot.json"
@@ -81,8 +80,8 @@ const protectedStatus = spawnSync("git", ["status", "--porcelain=v1", "--", ...p
   cwd: repositoryRoot,
   encoding: "utf8"
 });
-if (protectedDiff.status !== 0 || protectedDiff.stdout.trim()) failures.push("Protected public catalog or intake files changed.");
-if (protectedStatus.status !== 0 || protectedStatus.stdout.trim()) failures.push("Protected public catalog or intake files have working-tree changes.");
+if (protectedDiff.status !== 0 || protectedDiff.stdout.trim()) failures.push("Protected static catalog, branding, or intake files changed.");
+if (protectedStatus.status !== 0 || protectedStatus.stdout.trim()) failures.push("Protected static catalog, branding, or intake files have working-tree changes.");
 
 const scanPaths = requiredPaths.filter((path) => existsSync(resolve(repositoryRoot, path)));
 const scanned = scanPaths.map((path) => readFileSync(resolve(repositoryRoot, path), "utf8")).join("\n");

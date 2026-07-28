@@ -23,9 +23,10 @@ test("shell provides all required catalog, editing, image, and lifecycle control
   for (const id of [
     "catalogList", "catalogFilter", "newFindButton", "findForm", "title", "collectionId",
     "priceAmount", "availability", "description", "condition", "primaryImage", "altText",
+    "publicationState", "publicationEligibility", "publicationBlockers", "publishFindButton",
     "hideFindButton", "archiveFindButton", "restoreFindButton", "cancelEditButton"
   ]) assert.match(html, new RegExp(`id="${id}"`), id);
-  for (const label of ["Save draft", "Save and publish", "New Find", "Hide", "Archive", "Restore", "Cancel edit"]) {
+  for (const label of ["Save Find", "Publish", "Unpublish", "New Find", "Archive", "Restore", "Cancel edit"]) {
     assert.ok(html.includes(label), label);
   }
   for (const filter of ["all", "available", "reserved", "sold", "published", "hidden", "archived"]) {
@@ -73,10 +74,9 @@ test("local server binds to loopback, maps /admin/, blocks secrets, and has no w
   server.close();
 });
 
-test("public runtime, accepted intake, and product images are unchanged", () => {
+test("protected static catalog, accepted intake, and product images are unchanged", () => {
   const protectedPaths = [
-    "index.html", "find.html", "item.html", "app.js", "item.js", "styles.css",
-    "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
+    "styles.css", "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
     "data/reservation.js", "data/permalinks.js", "assets/images",
     "content-intake/finds.csv", "content-intake/photo-manifest.csv", "content-intake/photos",
     "tests/fixtures/legacy-items.snapshot.json"

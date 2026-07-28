@@ -113,6 +113,8 @@ test("home loads item, Collection, and Discovery data before app.js", () => {
     "data/discovery.js",
     "data/media.js",
     "data/permalinks.js",
+    "runtime-config.js",
+    "data/public-catalog.js",
     "app.js"
   ]);
 });

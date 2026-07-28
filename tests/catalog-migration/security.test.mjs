@@ -204,12 +204,12 @@ test("migration sources and bundles contain no credentials, logging, identity, o
   }
 });
 
-test("ignored configuration remains untracked and public/protected runtime is unchanged", () => {
+test("ignored configuration remains untracked and protected static sources are unchanged", () => {
   assert.equal(spawnSync("git", ["check-ignore", "-q", "admin/config.js"], { cwd: root }).status, 0);
   assert.notEqual(spawnSync("git", ["ls-files", "--error-unmatch", "admin/config.js"], { cwd: root }).status, 0);
   const protectedPaths = [
-    "index.html", "find.html", "item.html", "app.js", "item.js", "styles.css",
-    "data/items.js", "data/discovery.js", "data/media.js", "data/reservation.js", "data/permalinks.js",
+    "styles.css", "data/items.js", "data/collections.js", "data/discovery.js",
+    "data/media.js", "data/reservation.js", "data/permalinks.js", "assets/images", "assets/brand",
     "content-intake/finds.csv", "content-intake/photo-manifest.csv", "content-intake/photos",
     "tests/fixtures/legacy-items.snapshot.json"
   ];

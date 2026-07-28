@@ -16,6 +16,7 @@ import { build } from "esbuild";
 import { repositoryRoot } from "./generate-admin-config.mjs";
 import {
   generatePagesRuntimeConfig,
+  pagesPublicRuntimeConfigPath,
   pagesRuntimeConfigPath
 } from "./generate-pages-runtime-config.mjs";
 
@@ -28,6 +29,7 @@ const ALLOWED_MODES = new Set([
   "copy",
   "generated-empty",
   "production-admin-html",
+  "public-runtime-config",
   "runtime-config"
 ]);
 
@@ -222,7 +224,12 @@ export async function buildPagesArtifact({ environment = process.env, silent = f
       if (outputPath !== pagesRuntimeConfigPath) {
         throw new Error("Runtime configuration output must be dist/pages/admin/runtime-config.js.");
       }
-      generatePagesRuntimeConfig({ environment });
+      generatePagesRuntimeConfig({ environment, target: "admin" });
+    } else if (entry.mode === "public-runtime-config") {
+      if (outputPath !== pagesPublicRuntimeConfigPath) {
+        throw new Error("Public runtime configuration output must be dist/pages/runtime-config.js.");
+      }
+      generatePagesRuntimeConfig({ environment, target: "public" });
     }
   }
 

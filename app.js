@@ -181,40 +181,47 @@ function renderWeeklyFind(container, find) {
     '</div>';
 }
 
-var finds = getNormalizedFinds();
-var collections = Array.isArray(window.BETWEEN_US_COLLECTIONS)
-  ? window.BETWEEN_US_COLLECTIONS
-  : [];
-var discovery = window.BETWEEN_US_DISCOVERY || null;
-var collectionGrid = document.getElementById("collectionGrid");
-var catalogGrid = document.getElementById("catalogGrid");
-var featuredGrid = document.getElementById("featuredGrid");
-var latestGrid = document.getElementById("latestGrid");
-var weeklyFeature = document.getElementById("weeklyFeature");
-var collectionFilters = document.getElementById("collectionFilters");
-var resultsSummary = document.getElementById("resultsSummary");
+function initializeCatalogPage(loadResult) {
+  var finds = getNormalizedFinds();
+  var collections = Array.isArray(window.BETWEEN_US_COLLECTIONS)
+    ? window.BETWEEN_US_COLLECTIONS
+    : [];
+  var discovery = window.BETWEEN_US_DISCOVERY || null;
+  var collectionGrid = document.getElementById("collectionGrid");
+  var catalogGrid = document.getElementById("catalogGrid");
+  var featuredGrid = document.getElementById("featuredGrid");
+  var latestGrid = document.getElementById("latestGrid");
+  var weeklyFeature = document.getElementById("weeklyFeature");
+  var collectionFilters = document.getElementById("collectionFilters");
+  var resultsSummary = document.getElementById("resultsSummary");
+  var availabilityStatus = document.getElementById("catalogAvailabilityStatus");
 
-renderCollections(collectionGrid, collections);
+  if (availabilityStatus) {
+    availabilityStatus.textContent = loadResult && loadResult.message ? loadResult.message : "";
+    availabilityStatus.hidden = !availabilityStatus.textContent;
+  }
 
-if (discovery) {
-  renderFindCards(featuredGrid, resolveFinds(discovery.featuredFindIds));
-  renderFindCards(latestGrid, resolveFinds(discovery.latestFindIds));
-  renderWeeklyFind(
-    weeklyFeature,
-    window.BETWEEN_US_DATA.findByPublicId(discovery.weeklyFindId)
-  );
-}
+  renderCollections(collectionGrid, collections);
 
-if (!catalogGrid) {
-  console.error("app.js: Could not find #catalogGrid on the page.");
-} else if (finds.length === 0) {
-  catalogGrid.innerHTML = '<p class="catalog-placeholder">No Finds found.</p>';
-} else {
-  var activeFilterId = null;
-  var filterButtons = [];
-  var activeCollections = collections.filter(function (collection) {
-    return collection.status === "active";
-  });
+  if (discovery) {
+    renderFindCards(featuredGrid, resolveFinds(discovery.featuredFindIds));
+    renderFindCards(latestGrid, resolveFinds(discovery.latestFindIds));
+    renderWeeklyFind(
+      weeklyFeature,
+      window.BETWEEN_US_DATA.findByPublicId(discovery.weeklyFindId)
+    );
+  }
+
+  if (!catalogGrid) {
+    return;
+  } else if (finds.length === 0) {
+    catalogGrid.innerHTML = '<p class="catalog-placeholder">No Finds found.</p>';
+  } else {
+    var activeFilterId = null;
+    var filterButtons = [];
+    var activeCollections = collections.filter(function (collection) {
+      return collection.status === "active";
+    });
 
   function collectionById(collectionId) {
     return activeCollections.find(function (collection) {
@@ -274,21 +281,32 @@ if (!catalogGrid) {
     });
   }
 
-  updateFilter(null);
-}
+    updateFilter(null);
+  }
 
-// Direct hash loads happen before the data-driven sections finish rendering.
-// Re-align the approved in-page target once the final layout is present.
-if (window.location && window.location.hash) {
-  var hashTarget = document.getElementById(window.location.hash.slice(1));
+  // Re-align a direct in-page target after each data-driven render.
+  if (window.location && window.location.hash) {
+    var hashTarget = document.getElementById(window.location.hash.slice(1));
 
-  if (hashTarget && typeof hashTarget.scrollIntoView === "function") {
-    if (typeof window.requestAnimationFrame === "function") {
-      window.requestAnimationFrame(function () {
+    if (hashTarget && typeof hashTarget.scrollIntoView === "function") {
+      if (typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(function () {
+          hashTarget.scrollIntoView({ block: "start", behavior: "instant" });
+        });
+      } else {
         hashTarget.scrollIntoView({ block: "start", behavior: "instant" });
-      });
-    } else {
-      hashTarget.scrollIntoView({ block: "start", behavior: "instant" });
+      }
     }
   }
+}
+
+// Render the protected static catalog immediately. A successful remote request
+// then replaces it with the static-first hybrid view.
+initializeCatalogPage({ message: "" });
+if (
+  window.BETWEEN_US_PUBLIC_CATALOG &&
+  window.BETWEEN_US_PUBLIC_CATALOG.ready &&
+  typeof window.BETWEEN_US_PUBLIC_CATALOG.ready.then === "function"
+) {
+  window.BETWEEN_US_PUBLIC_CATALOG.ready.then(initializeCatalogPage);
 }

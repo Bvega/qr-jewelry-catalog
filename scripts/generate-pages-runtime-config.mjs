@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import {
   repositoryRoot,
   serializeBrowserConfiguration,
+  serializePublicBrowserConfiguration,
   validateBrowserConfiguration
 } from "./generate-admin-config.mjs";
 
@@ -13,26 +14,41 @@ export const pagesRuntimeConfigPath = resolve(
   repositoryRoot,
   "dist/pages/admin/runtime-config.js"
 );
+export const pagesPublicRuntimeConfigPath = resolve(
+  repositoryRoot,
+  "dist/pages/runtime-config.js"
+);
 
-export function generatePagesRuntimeConfig({ environment = process.env } = {}) {
+export function generatePagesRuntimeConfig({
+  environment = process.env,
+  target = "admin"
+} = {}) {
   const configuration = validateBrowserConfiguration(environment, { production: true });
+  if (target !== "admin" && target !== "public") {
+    throw new Error("Pages runtime configuration target is invalid.");
+  }
+  const outputPath = target === "admin"
+    ? pagesRuntimeConfigPath
+    : pagesPublicRuntimeConfigPath;
   const directories = [
     resolve(repositoryRoot, "dist"),
-    resolve(repositoryRoot, "dist/pages"),
-    resolve(repositoryRoot, "dist/pages/admin")
+    resolve(repositoryRoot, "dist/pages")
   ];
+  if (target === "admin") directories.push(resolve(repositoryRoot, "dist/pages/admin"));
   for (const path of directories) {
     if (existsSync(path) && lstatSync(path).isSymbolicLink()) {
       throw new Error("Pages runtime configuration path cannot contain a symlink.");
     }
   }
-  mkdirSync(dirname(pagesRuntimeConfigPath), { recursive: true });
-  if (existsSync(pagesRuntimeConfigPath) && lstatSync(pagesRuntimeConfigPath).isSymbolicLink()) {
+  mkdirSync(dirname(outputPath), { recursive: true });
+  if (existsSync(outputPath) && lstatSync(outputPath).isSymbolicLink()) {
     throw new Error("Pages runtime configuration path cannot contain a symlink.");
   }
   writeFileSync(
-    pagesRuntimeConfigPath,
-    serializeBrowserConfiguration(configuration),
+    outputPath,
+    target === "admin"
+      ? serializeBrowserConfiguration(configuration)
+      : serializePublicBrowserConfiguration(configuration),
     { encoding: "utf8", mode: 0o644 }
   );
   return configuration;
@@ -40,7 +56,7 @@ export function generatePagesRuntimeConfig({ environment = process.env } = {}) {
 
 async function main() {
   try {
-    generatePagesRuntimeConfig();
+    generatePagesRuntimeConfig({ target: process.argv.includes("--public") ? "public" : "admin" });
     console.log("Pages browser configuration generated.");
   } catch (error) {
     console.error(`Pages browser configuration failed: ${error.message}`);

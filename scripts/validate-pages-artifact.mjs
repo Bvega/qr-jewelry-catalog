@@ -14,6 +14,7 @@ import {
 } from "./build-pages-artifact.mjs";
 import {
   serializeBrowserConfiguration,
+  serializePublicBrowserConfiguration,
   validateBrowserConfiguration
 } from "./generate-admin-config.mjs";
 
@@ -57,11 +58,13 @@ const PUBLIC_OUTPUTS = new Set([
   "data/items.js",
   "data/media.js",
   "data/permalinks.js",
+  "data/public-catalog.js",
   "data/reservation.js",
   "find.html",
   "index.html",
   "item.html",
   "item.js",
+  "runtime-config.js",
   "styles.css"
 ]);
 
@@ -122,24 +125,33 @@ function validateCssReferences(file, source, inventory) {
   }
 }
 
-function parseRuntimeConfiguration(source) {
-  const match = source.match(
-    /^window\.BETWEEN_US_ADMIN_CONFIG = Object\.freeze\((\{[\s\S]*\})\);\n$/
-  );
+function parseRuntimeConfiguration(source, { publicRuntime = false } = {}) {
+  const globalName = publicRuntime
+    ? "BETWEEN_US_PUBLIC_CONFIG"
+    : "BETWEEN_US_ADMIN_CONFIG";
+  const match = source.match(new RegExp(
+    `^window\\.${globalName} = Object\\.freeze\\((\\{[\\s\\S]*\\})\\);\\n$`
+  ));
   if (!match) throw new Error("Production runtime configuration serialization is invalid.");
   const parsed = JSON.parse(match[1]);
-  if (
-    JSON.stringify(Object.keys(parsed).sort())
-    !== JSON.stringify(["projectRef", "publishableKey", "url"])
-  ) {
+  const expectedKeys = publicRuntime
+    ? ["publishableKey", "url"]
+    : ["projectRef", "publishableKey", "url"];
+  if (JSON.stringify(Object.keys(parsed).sort()) !== JSON.stringify(expectedKeys)) {
     throw new Error("Production runtime configuration contains an unexpected field.");
   }
+  const projectRef = publicRuntime
+    ? new URL(parsed.url).hostname.replace(/\.supabase\.co$/, "")
+    : parsed.projectRef;
   const configuration = validateBrowserConfiguration({
     SUPABASE_URL: parsed.url,
     SUPABASE_PUBLISHABLE_KEY: parsed.publishableKey,
-    SUPABASE_PROJECT_REF: parsed.projectRef
+    SUPABASE_PROJECT_REF: projectRef
   }, { production: true });
-  if (serializeBrowserConfiguration(configuration) !== source) {
+  const canonical = publicRuntime
+    ? serializePublicBrowserConfiguration(configuration)
+    : serializeBrowserConfiguration(configuration);
+  if (canonical !== source) {
     throw new Error("Production runtime configuration is not canonically serialized.");
   }
   return configuration;
@@ -213,7 +225,9 @@ export function validatePagesArtifact() {
     const extension = extname(path).toLowerCase();
     if (![".css", ".html", ".js", ".json", ".svg", ""].includes(extension)) continue;
     const source = readFileSync(resolve(pagesArtifactRoot, path), "utf8");
-    scanTextFile(path, source, { runtimeConfiguration: path === "admin/runtime-config.js" });
+    scanTextFile(path, source, {
+      runtimeConfiguration: path === "admin/runtime-config.js" || path === "runtime-config.js"
+    });
     if (path.endsWith(".html")) validateHtmlReferences(path, source, inventory);
     if (path.endsWith(".css")) validateCssReferences(path, source, inventory);
   }
@@ -223,6 +237,16 @@ export function validatePagesArtifact() {
   );
   if (!runtimeConfiguration.url.startsWith("https://")) {
     throw new Error("Production Manager configuration must use HTTPS.");
+  }
+  const publicRuntimeConfiguration = parseRuntimeConfiguration(
+    readFileSync(resolve(pagesArtifactRoot, "runtime-config.js"), "utf8"),
+    { publicRuntime: true }
+  );
+  if (
+    publicRuntimeConfiguration.url !== runtimeConfiguration.url ||
+    publicRuntimeConfiguration.publishableKey !== runtimeConfiguration.publishableKey
+  ) {
+    throw new Error("Public and Manager browser configurations must target the same project.");
   }
 
   const adminHtml = readFileSync(resolve(pagesArtifactRoot, "admin/index.html"), "utf8");
@@ -242,6 +266,15 @@ export function validatePagesArtifact() {
     || /127\.0\.0\.1|localhost|unsafe-inline|unsafe-eval/i.test(adminHtml)
   ) {
     throw new Error("Production Manager CSP is not restricted to required Supabase targets.");
+  }
+
+  for (const page of ["index.html", "find.html", "item.html"]) {
+    const html = readFileSync(resolve(pagesArtifactRoot, page), "utf8");
+    const configIndex = html.indexOf('src="runtime-config.js"');
+    const adapterIndex = html.indexOf('src="data/public-catalog.js"');
+    if (configIndex < 0 || adapterIndex <= configIndex) {
+      throw new Error(`${page} must load public configuration before the hybrid adapter.`);
+    }
   }
 
   const publicText = [...PUBLIC_OUTPUTS]

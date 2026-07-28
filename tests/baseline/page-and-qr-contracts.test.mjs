@@ -33,6 +33,8 @@ test("catalog page loads the shared stylesheet, data, and renderer in order", ()
     "data/discovery.js",
     "data/media.js",
     "data/permalinks.js",
+    "runtime-config.js",
+    "data/public-catalog.js",
     "app.js"
   ]);
 });
@@ -45,6 +47,8 @@ test("detail page loads data, approved QR library, and renderer in order", () =>
     "data/media.js",
     "data/reservation.js",
     "data/permalinks.js",
+    "runtime-config.js",
+    "data/public-catalog.js",
     APPROVED_QR_LIBRARY,
     "item.js"
   ]);

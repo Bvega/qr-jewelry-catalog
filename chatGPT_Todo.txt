@@ -1,5 +1,5 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Monday, July 27, 2026
+Updated: Tuesday, July 28, 2026
 Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
@@ -11,6 +11,10 @@ CURRENT STATUS
 - M07B-3 controlled remote import is complete, accepted, and pushed.
 - M07B-4 Stage A implementation is complete and accepted.
 - M07B-4 Stage B controlled deployment is complete and accepted.
+- M08 Controlled Dynamic Publishing Stage A is implemented locally on its
+  feature branch and remains pending MASTER review and acceptance.
+- No M08 push, merge, deployment, GitHub configuration, remote migration,
+  remote database write, or remote Storage write has been performed.
 - Deployed revision on GitHub Pages:
   484eebfd9756841db45df4485437805bb03a3bdc
 - Production URL:
@@ -19,7 +23,8 @@ CURRENT STATUS
 - BU-0006 through BU-0009 remain hidden and unpublished.
 - Seller Manager production authentication and sign-out were verified.
 - Remote migrations are synchronized through 20260722120000.
-- The public catalog remains static and exposes only the five accepted Finds.
+- Accepted production remains on the M07B-4 static catalog and exposes only
+  the five accepted Finds.
 - The next generated public ID must be BU-0010.
 - M07B-4 is fully complete:
   docs/REPORTS/M07B4_DEPLOYMENT_ACCEPTANCE.md
@@ -38,26 +43,43 @@ M07B PLAN
 - M07B-4 Stage A Implementation and Local Verification — COMPLETE AND ACCEPTED
 - M07B-4 Stage B Controlled Deployment and Acceptance — COMPLETE AND ACCEPTED
 
+M08 PLAN
+- Controlled Dynamic Publishing Stage A local implementation — IMPLEMENTED,
+  PENDING MASTER REVIEW AND ACCEPTANCE
+- Controlled Stage B migration, deployment, and one-Find canary — NOT
+  AUTHORIZED
+
 TOP TASK
-M07B-4 is fully complete. The next milestone remains pending MASTER planning.
-Do not begin new milestone work until MASTER provides the next approved
-package.
+Review and validate the local M08 Stage A implementation. Do not mark M08
+complete or accepted, and do not begin Stage B without explicit MASTER
+approval.
 
 NEXT ACTIONS
-1. Wait for MASTER to plan and approve the next milestone package.
-2. Do not invent a milestone number or scope in the meantime.
-3. Track the Node.js action deprecation warnings as deferred maintenance for
+1. Run and preserve the required local and clean-checkout M08 validation
+   evidence.
+2. Submit the single local implementation commit and external review bundle
+   to MASTER.
+3. Wait for MASTER review and acceptance.
+4. Do not migrate, push, deploy, configure GitHub, authenticate a real owner,
+   or publish any remote Find during Stage A.
+5. Track the Node.js action deprecation warnings as deferred maintenance for
    a future MASTER-approved maintenance task.
 
 IMPORTANT
 - Preserve BU-0001 through BU-0009.
 - The next generated public ID must remain BU-0010.
-- BU-0006 through BU-0009 remain hidden and unfeatured.
-- The public catalog remains on static repository data.
+- BU-0006 through BU-0009 remain hidden, unpublished, and unfeatured
+  remotely.
+- BU-0001 through BU-0005 remain authoritative static records and must stay
+  available when Supabase fails.
+- M08 Stage B must not begin without separate MASTER approval.
 - Do not expose credentials, owner identifiers, tokens, sessions, or private
   configuration.
 - Browser deployment may use only a publishable or validated legacy anon key.
 - Secret, service-role, database, and access-token values are forbidden.
 - Do not deploy activation or M07B-3 migration routes.
 - Do not commit .env.local, admin/config.js, or generated production config.
-- Do not change Supabase migrations, RLS, Storage policies, or remote data.
+- Do not apply the M08 migration or any RLS/Storage change remotely during
+  Stage A.
+- Do not publish, unpublish, or otherwise change remote catalog data during
+  Stage A.

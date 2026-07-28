@@ -23,7 +23,8 @@ export const repositoryTestDirectories = Object.freeze([
   "tests/content-intake",
   "tests/supabase-foundation",
   "tests/seller-manager",
-  "tests/catalog-migration"
+  "tests/catalog-migration",
+  "tests/m08"
 ]);
 
 export function findTestFiles(relativeDirectory) {
@@ -70,6 +71,8 @@ export function buildRepositoryChecks() {
       "data/media.js",
       "data/reservation.js",
       "data/permalinks.js",
+      "data/public-catalog.js",
+      "runtime-config.js",
       "scripts/lib/content-intake.mjs",
       "scripts/validate-content-intake.mjs",
       "scripts/summarize-content-intake.mjs",
@@ -90,6 +93,12 @@ export function buildRepositoryChecks() {
       "scripts/prepare-catalog-migration.mjs",
       "scripts/validate-catalog-migration.mjs",
       "scripts/generate-admin-config.mjs",
+      "scripts/generate-pages-runtime-config.mjs",
+      "scripts/build-pages-artifact.mjs",
+      "scripts/validate-pages-artifact.mjs",
+      "scripts/check-m08.mjs",
+      "scripts/check-m08-ci.mjs",
+      "scripts/security-scan-m08.mjs",
       "scripts/serve-static.mjs",
       "scripts/validate-seller-manager.mjs"
     ].map(syntaxCheck),
@@ -105,6 +114,7 @@ export function buildRepositoryChecks() {
     scriptCheck("Supabase foundation static validation", "scripts/validate-supabase-foundation.mjs"),
     testSuiteCheck("Supabase foundation tests", "tests/supabase-foundation"),
     testSuiteCheck("Seller Catalog Manager tests", "tests/seller-manager"),
+    testSuiteCheck("M08 controlled dynamic publishing tests", "tests/m08"),
     {
       ...scriptCheck(LOCAL_MIGRATION_CHECK_LABELS[0], "scripts/validate-catalog-migration.mjs"),
       requiresLocalMigrationSources: true

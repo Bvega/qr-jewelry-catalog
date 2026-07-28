@@ -150,10 +150,18 @@
                 </div>
               </fieldset>
 
+              <section class="publication-panel" aria-labelledby="publicationTitle">
+                <p class="eyebrow">Public catalog</p>
+                <h3 id="publicationTitle">Publication</h3>
+                <p id="publicationState" role="status" aria-live="polite"></p>
+                <p id="publicationEligibility"></p>
+                <ul id="publicationBlockers"></ul>
+              </section>
+
               <div class="form-actions">
-                <button class="button button-secondary" type="submit" name="saveAction" value="draft">Save draft</button>
-                <button class="button button-primary" type="submit" name="saveAction" value="publish">Save and publish</button>
-                <button id="hideFindButton" class="button" type="button" hidden>Hide</button>
+                <button class="button button-secondary" type="submit" name="saveAction" value="save">Save Find</button>
+                <button id="publishFindButton" class="button button-primary" type="button" hidden>Publish</button>
+                <button id="hideFindButton" class="button" type="button" hidden>Unpublish</button>
                 <button id="archiveFindButton" class="button button-danger" type="button" hidden>Archive</button>
                 <button id="restoreFindButton" class="button" type="button" hidden>Restore</button>
               </div>

@@ -1,6 +1,10 @@
 export const AVAILABILITY_VALUES = Object.freeze(["available", "reserved", "sold"]);
 export const IMAGE_MIME_TYPES = Object.freeze(["image/jpeg", "image/png", "image/webp"]);
 export const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const PUBLIC_ID_PATTERN = /^BU-[0-9]{4,}$/;
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const STORAGE_PATH_PATTERN =
+  /^finds\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/[^/]+$/i;
 
 function trimmed(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -81,6 +85,64 @@ export function validatePhotoFile(file) {
     return { valid: false, error: "Choose an image no larger than 10 MiB." };
   }
   return { valid: true, error: null };
+}
+
+export function publicationBlockers(find, {
+  collectionIds = [],
+  allFinds = []
+} = {}) {
+  const blockers = [];
+  const knownCollections = new Set(collectionIds);
+
+  if (!find || typeof find !== "object") return ["Save this Find before publishing."];
+  if (!PUBLIC_ID_PATTERN.test(find.public_id || "")) {
+    blockers.push("A valid immutable public ID is required.");
+  }
+  if (allFinds.some((candidate) => (
+    candidate.id !== find.id && candidate.public_id === find.public_id
+  ))) {
+    blockers.push("The public ID is already assigned to another Find.");
+  }
+  if (!trimmed(find.title) || trimmed(find.title).length > 200) {
+    blockers.push("A title is required.");
+  }
+  if (!knownCollections.has(find.collection_id)) {
+    blockers.push("Choose an established Collection.");
+  }
+  const price = Number(find.price_amount);
+  if (!Number.isFinite(price) || price <= 0 || find.price_currency !== "USD") {
+    blockers.push("A positive USD price is required.");
+  }
+  if (!AVAILABILITY_VALUES.includes(find.availability)) {
+    blockers.push("Choose a valid availability state.");
+  }
+  if (!trimmed(find.description) || trimmed(find.description).length > 5000) {
+    blockers.push("A description is required.");
+  }
+  if (find.slug !== null && find.slug !== undefined && find.slug !== "") {
+    const slug = trimmed(find.slug);
+    if (slug.length > 160 || !SLUG_PATTERN.test(slug)) {
+      blockers.push("The optional slug is invalid.");
+    }
+  }
+  if (find.archived_at) blockers.push("Restore this archived Find before publishing.");
+
+  if (find.primaryPhoto) {
+    const photo = find.primaryPhoto;
+    if (
+      !STORAGE_PATH_PATTERN.test(photo.storage_path || "") ||
+      !trimmed(photo.alt_text) ||
+      trimmed(photo.alt_text).length > 500 ||
+      !Number.isInteger(photo.sequence) ||
+      photo.sequence < 1 ||
+      (photo.width !== null && (!Number.isInteger(photo.width) || photo.width < 1)) ||
+      (photo.height !== null && (!Number.isInteger(photo.height) || photo.height < 1))
+    ) {
+      blockers.push("The primary photograph metadata is invalid.");
+    }
+  }
+
+  return blockers;
 }
 
 export function readImageDimensions(file, dependencies = {}) {

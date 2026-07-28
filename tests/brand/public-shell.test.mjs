@@ -66,6 +66,8 @@ test("detail page shares the brand shell and preserves required script order", (
     "data/media.js",
     "data/reservation.js",
     "data/permalinks.js",
+    "runtime-config.js",
+    "data/public-catalog.js",
     APPROVED_QR_LIBRARY,
     "item.js"
   ]);

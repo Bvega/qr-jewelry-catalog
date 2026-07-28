@@ -11,8 +11,12 @@ const migrations = readdirSync(resolve(repositoryRoot, "supabase/migrations"))
   .filter((file) => file.endsWith(".sql"))
   .sort();
 const foundationMigration = "20260720120000_m07b1_catalog_foundation.sql";
+const m08MigrationFile = "20260728120000_m08_controlled_dynamic_publishing.sql";
 const migration = migrations.includes(foundationMigration)
   ? read(`supabase/migrations/${foundationMigration}`)
+  : "";
+const m08Migration = migrations.includes(m08MigrationFile)
+  ? read(`supabase/migrations/${m08MigrationFile}`)
   : "";
 const config = read("supabase/config.toml");
 const seed = read("supabase/seed.sql");
@@ -49,7 +53,8 @@ test("the ordered M07B-1 foundation remains the schema source of truth beneath l
   assert.deepEqual(migrations, [
     "20260720120000_m07b1_catalog_foundation.sql",
     "20260720130000_m07b2_catalog_admin_role_probe.sql",
-    "20260722120000_m07b3_public_id_reservations.sql"
+    "20260722120000_m07b3_public_id_reservations.sql",
+    "20260728120000_m08_controlled_dynamic_publishing.sql"
   ]);
   assert.match(migration, /create schema if not exists private/i);
   assert.doesNotMatch(config, /schemas\s*=\s*\[[^\]]*"private"/);
@@ -109,19 +114,35 @@ test("administration requires explicit allowlisting rather than login or metadat
 });
 
 test("Storage bucket and object policies enforce the approved contract", () => {
-  assert.match(config, /\[storage\.buckets\.find-images\][\s\S]*public = true[\s\S]*file_size_limit = "10MiB"/);
+  assert.match(config, /\[storage\.buckets\.find-images\][\s\S]*public = false[\s\S]*file_size_limit = "10MiB"/);
   for (const mime of ["image/jpeg", "image/png", "image/webp"]) assert.ok(config.includes(mime));
   assert.match(migration, /insert into storage\.buckets/i);
   for (const operation of ["list", "insert", "update", "delete"]) {
     assert.match(migration, new RegExp(`create policy find_images_admin_${operation}`, "i"));
   }
+  assert.match(m08Migration, /update storage\.buckets[\s\S]*set public = false/i);
+  assert.match(
+    m08Migration,
+    /create policy find_images_public_read[\s\S]*for select[\s\S]*to anon[\s\S]*storage\.allow_any_operation\(array\[[\s\S]*object\.get_authenticated_info[\s\S]*object\.get_authenticated[\s\S]*finds\.is_published = true[\s\S]*finds\.archived_at is null/i
+  );
+  assert.doesNotMatch(
+    m08Migration,
+    /create policy find_images_public_read[\s\S]*?to anon,\s*authenticated/i
+  );
+  assert.doesNotMatch(
+    m08Migration,
+    /storage\.allow_any_operation\(array\[[\s\S]*?object\.list[\s\S]*?\]\)/i
+  );
+  assert.match(m08Migration, /add constraint find_photos_find_scoped_storage_path_check[\s\S]*find_id::text/i);
+  assert.match(m08Migration, /alter policy finds_public_read on public\.finds to anon/i);
+  assert.match(m08Migration, /create policy collections_admin_read[\s\S]*to authenticated/i);
   assert.match(migration, /\^finds\//);
   assert.doesNotMatch(config, /image\/heic/i);
 });
 
 test("foundation sources contain no committed credential values or owner data", () => {
   const source = [
-    read(".env.example"), config, seed, migration,
+    read(".env.example"), config, seed, migration, m08Migration,
     read("docs/SUPABASE_CONFIGURATION.md"),
     read("docs/SUPABASE_REMOTE_SETUP.md")
   ].join("\n");
@@ -168,10 +189,9 @@ test("documentation covers architecture, local workflow, configuration, and defe
   }
 });
 
-test("protected live catalog and accepted intake files remain unchanged", () => {
+test("protected static catalog, branding, workflow, and intake files remain unchanged", () => {
   const protectedPaths = [
-    "index.html", "find.html", "item.html", "app.js", "item.js", "styles.css",
-    "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
+    "styles.css", "data/items.js", "data/collections.js", "data/discovery.js", "data/media.js",
     "data/reservation.js", "data/permalinks.js", "assets/images", "assets/brand",
     "content-intake/finds.csv", "content-intake/photo-manifest.csv", "content-intake/photos",
     "tests/fixtures/legacy-items.snapshot.json",

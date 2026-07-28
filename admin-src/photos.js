@@ -41,10 +41,6 @@ async function cleanupNewObject(storage, storagePath) {
   }
 }
 
-function publicUrl(storage, storagePath) {
-  return storage.getPublicUrl(storagePath).data.publicUrl;
-}
-
 export async function uploadPrimaryImage({
   client,
   findId,
@@ -107,7 +103,7 @@ export async function uploadPrimaryImage({
     }
     return {
       photo: update.data,
-      publicUrl: publicUrl(storage, storagePath),
+      publicUrl: null,
       warning: oldCleanupFailed
         ? "The replacement is active, but the previous Storage object could not be removed."
         : null
@@ -137,14 +133,20 @@ export async function uploadPrimaryImage({
 
   return {
     photo: insert.data,
-    publicUrl: publicUrl(storage, storagePath),
+    publicUrl: null,
     warning: null
   };
 }
 
-export function getPrimaryImageUrl(client, photo) {
+export async function getPrimaryImageUrl(
+  client,
+  photo,
+  createObjectURL = globalThis.URL?.createObjectURL?.bind(globalThis.URL)
+) {
   if (!photo?.storage_path) return null;
-  return client.storage.from(IMAGE_BUCKET).getPublicUrl(photo.storage_path).data.publicUrl;
+  const result = await client.storage.from(IMAGE_BUCKET).download(photo.storage_path);
+  if (result.error || !result.data || typeof createObjectURL !== "function") return null;
+  return createObjectURL(result.data);
 }
 
 export async function updatePrimaryAltText(client, photoId, altText) {

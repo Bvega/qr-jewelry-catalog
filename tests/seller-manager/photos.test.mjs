@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   PhotoWorkflowError,
   createStoragePath,
+  getPrimaryImageUrl,
   uploadPrimaryImage
 } from "../../admin-src/photos.js";
 
@@ -21,7 +22,7 @@ function createPhotoClient({ updateError = null, insertError = null, oldCleanupE
       calls.removes.push(paths);
       return { error: paths[0].includes("old") ? oldCleanupError : null };
     },
-    getPublicUrl: (path) => ({ data: { publicUrl: `https://images.example.test/${path}` } })
+    download: async (path) => ({ data: { fictionalBlobFor: path }, error: null })
   };
   function terminal(data, error) {
     return {
@@ -119,4 +120,20 @@ test("old-object cleanup failure is reported after a valid replacement", async (
     randomUUID: () => newObjectId
   });
   assert.match(result.warning, /replacement is active/i);
+});
+
+test("private Find images are downloaded through Storage RLS into a page-local URL", async () => {
+  const { client } = createPhotoClient();
+  const path = `finds/${findId}/private.jpg`;
+  const calls = [];
+  const url = await getPrimaryImageUrl(
+    client,
+    { storage_path: path },
+    (blob) => {
+      calls.push(blob);
+      return "blob:fictional-manager-photo";
+    }
+  );
+  assert.equal(url, "blob:fictional-manager-photo");
+  assert.deepEqual(calls, [{ fictionalBlobFor: path }]);
 });

@@ -98,6 +98,8 @@ test("permanent page exists with the approved shell, canonical element, and scri
     "data/media.js",
     "data/reservation.js",
     "data/permalinks.js",
+    "runtime-config.js",
+    "data/public-catalog.js",
     APPROVED_QR_LIBRARY,
     "item.js"
   ]);

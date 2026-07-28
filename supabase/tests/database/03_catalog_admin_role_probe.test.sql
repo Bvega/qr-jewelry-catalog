@@ -349,8 +349,8 @@ select is(
     where schemaname = 'public'
       and tablename in ('collections', 'finds', 'find_photos', 'find_relations')
   ),
-  19::bigint,
-  'the role probe does not weaken catalog RLS policies'
+  20::bigint,
+  'the role probe remains compatible with the complete M08 catalog RLS policy set'
 );
 
 select * from finish();

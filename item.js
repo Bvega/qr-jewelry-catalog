@@ -45,6 +45,19 @@ function orderedUsablePhotos(find) {
   return ordered;
 }
 
+function altTextForPhoto(find, photo) {
+  var index = Array.isArray(find.photos) ? find.photos.indexOf(photo) : -1;
+  if (
+    index >= 0 &&
+    Array.isArray(find.photoAltTexts) &&
+    typeof find.photoAltTexts[index] === "string" &&
+    find.photoAltTexts[index].trim().length > 0
+  ) {
+    return find.photoAltTexts[index];
+  }
+  return find.altText;
+}
+
 function collectionLabel(collectionId) {
   var collections = Array.isArray(window.BETWEEN_US_COLLECTIONS)
     ? window.BETWEEN_US_COLLECTIONS
@@ -102,7 +115,7 @@ function galleryHTML(find, photos) {
   return '<div class="detail-gallery" aria-label="Photos for ' + escapeHTML(find.title) + '">' +
     '<div class="gallery-primary">' +
       '<img class="detail-image" id="galleryMainImage" src="' + escapeHTML(photos[0]) +
-        '" alt="' + escapeHTML(find.altText) + '" />' +
+        '" alt="' + escapeHTML(altTextForPhoto(find, photos[0])) + '" />' +
       fallbackPhotoHTML("", true) +
     '</div>' +
     thumbnailHTML +
@@ -281,7 +294,7 @@ function wireGallery(find, photos, detail) {
 
   function selectPhoto(index) {
     mainImage.src = photos[index];
-    mainImage.alt = find.altText;
+    mainImage.alt = altTextForPhoto(find, photos[index]);
     mainImage.hidden = false;
     if (fallback) fallback.hidden = true;
 
@@ -641,11 +654,16 @@ function updateCanonicalMetadata(canonicalURL) {
   }
 }
 
-var detail = document.getElementById("itemDetail");
+function renderFindDetail(loadResult) {
+  var detail = document.getElementById("itemDetail");
+  var availabilityStatus = document.getElementById("catalogAvailabilityStatus");
+  if (availabilityStatus) {
+    availabilityStatus.textContent = loadResult && loadResult.message ? loadResult.message : "";
+    availabilityStatus.hidden = !availabilityStatus.textContent;
+  }
 
-if (!detail) {
-  console.error("item.js: Could not find #itemDetail on the page.");
-} else {
+  if (!detail) return;
+
   var permalinks = window.BETWEEN_US_PERMALINKS;
   var find = null;
   var canonicalURL = null;
@@ -705,4 +723,20 @@ if (!detail) {
     wireGeneralSharing(find, canonicalURL);
     wireQRCode(find, canonicalURL);
   }
+}
+
+var initialPermalinks = window.BETWEEN_US_PERMALINKS;
+var initialFind = initialPermalinks && typeof initialPermalinks.findByRoute === "function"
+  ? initialPermalinks.findByRoute(window.location)
+  : null;
+var publicCatalogReady = window.BETWEEN_US_PUBLIC_CATALOG &&
+  window.BETWEEN_US_PUBLIC_CATALOG.ready;
+
+// Static routes render without waiting for the network. Remote routes resolve
+// independently after the bounded public-catalog request.
+if (initialFind || !publicCatalogReady || typeof publicCatalogReady.then !== "function") {
+  renderFindDetail({ message: "" });
+}
+if (publicCatalogReady && typeof publicCatalogReady.then === "function") {
+  publicCatalogReady.then(renderFindDetail);
 }

@@ -20,6 +20,8 @@
     "pages:check": "node scripts/check-pages.mjs",
     "pages:check:ci": "node scripts/check-pages-ci.mjs",
     "pages:serve": "node scripts/serve-pages-artifact.mjs",
+    "m08:check": "node scripts/check-m08.mjs",
+    "m08:check:ci": "node scripts/check-m08-ci.mjs",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:reset": "supabase db reset",

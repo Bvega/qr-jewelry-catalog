@@ -135,6 +135,17 @@ export function serializeBrowserConfiguration(configuration) {
   return `window.BETWEEN_US_ADMIN_CONFIG = Object.freeze(${json});\n`;
 }
 
+export function serializePublicBrowserConfiguration(configuration) {
+  const json = JSON.stringify({
+    url: configuration.url,
+    publishableKey: configuration.publishableKey
+  }, null, 2)
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029")
+    .replace(/</g, "\\u003c");
+  return `window.BETWEEN_US_PUBLIC_CONFIG = Object.freeze(${json});\n`;
+}
+
 export function generateAdminConfig({
   environmentPath = resolve(repositoryRoot, ".env.local"),
   outputPath = resolve(repositoryRoot, "admin/config.js")

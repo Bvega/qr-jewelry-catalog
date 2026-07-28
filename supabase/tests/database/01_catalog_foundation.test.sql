@@ -205,8 +205,8 @@ select is(
     where schemaname = 'public'
       and tablename in ('collections', 'finds', 'find_photos', 'find_relations')
   ),
-  19::bigint,
-  'catalog tables expose the complete public/admin policy set'
+  20::bigint,
+  'catalog tables expose the complete public/admin policy set including M08 Collection reads'
 );
 
 select is(
@@ -566,8 +566,8 @@ reset role;
 
 select is(
   (select public from storage.buckets where id = 'find-images'),
-  true,
-  'find-images is a public-retrieval bucket'
+  false,
+  'find-images is private so retrieval follows Storage RLS'
 );
 
 select is(

@@ -20,10 +20,12 @@ import {
 } from "../../scripts/build-pages-artifact.mjs";
 import {
   serializeBrowserConfiguration,
+  serializePublicBrowserConfiguration,
   validateBrowserConfiguration
 } from "../../scripts/generate-admin-config.mjs";
 import {
   generatePagesRuntimeConfig,
+  pagesPublicRuntimeConfigPath,
   pagesRuntimeConfigPath
 } from "../../scripts/generate-pages-runtime-config.mjs";
 import {
@@ -67,6 +69,7 @@ const publicCopyPaths = Object.freeze([
   "data/items.js",
   "data/media.js",
   "data/permalinks.js",
+  "data/public-catalog.js",
   "data/reservation.js",
   "find.html",
   "index.html",
@@ -125,7 +128,7 @@ await buildPagesArtifact({ environment, silent: true });
 test("manifest is a deterministic, sorted, strict runtime allowlist", () => {
   const manifest = loadPagesManifest();
   assert.equal(manifest.version, 1);
-  assert.equal(manifest.files.length, 21);
+  assert.equal(manifest.files.length, 23);
   const outputs = manifest.files.map((entry) => entry.output);
   assert.deepEqual(outputs, [...outputs].sort((left, right) => left.localeCompare(right)));
   assert.equal(new Set(outputs).size, outputs.length);
@@ -229,16 +232,25 @@ test("production configuration accepts only validated browser-safe values", () =
 });
 
 test("deployment generator writes only the exact production runtime config without logging values", () => {
-  generatePagesRuntimeConfig({ environment });
+  generatePagesRuntimeConfig({ environment, target: "admin" });
+  generatePagesRuntimeConfig({ environment, target: "public" });
   const output = readFileSync(pagesRuntimeConfigPath, "utf8");
   assert.equal(output, serializeBrowserConfiguration({
     url: `https://${projectRef}.supabase.co/`,
     publishableKey,
     projectRef
   }));
+  assert.equal(
+    readFileSync(pagesPublicRuntimeConfigPath, "utf8"),
+    serializePublicBrowserConfiguration({
+      url: `https://${projectRef}.supabase.co/`,
+      publishableKey,
+      projectRef
+    })
+  );
   assert.deepEqual(
     listFiles().filter((path) => path.endsWith("runtime-config.js")),
-    ["admin/runtime-config.js"]
+    ["admin/runtime-config.js", "runtime-config.js"]
   );
   assert.equal(lstatSync(resolve(root, "admin")).isDirectory(), true);
 
@@ -250,7 +262,7 @@ test("deployment generator writes only the exact production runtime config witho
   assert.equal(result.status, 0, result.stderr);
   const logs = `${result.stdout}\n${result.stderr}`;
   for (const value of Object.values(environment)) assert.ok(!logs.includes(value));
-  assert.match(logs, /Pages artifact built \(21 files\)/);
+  assert.match(logs, /Pages artifact built \(23 files\)/);
 });
 
 test("artifact starts clean, rejects unexpected entries and symlinks, and rebuilds byte-identically", async () => {

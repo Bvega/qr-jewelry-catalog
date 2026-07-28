@@ -61,6 +61,10 @@ export function createUI(documentRoot = document) {
     altText: byId("altText"),
     imagePreview: byId("imagePreview"),
     imagePlaceholder: byId("imagePlaceholder"),
+    publicationState: byId("publicationState"),
+    publicationEligibility: byId("publicationEligibility"),
+    publicationBlockers: byId("publicationBlockers"),
+    publishFindButton: byId("publishFindButton"),
     hideFindButton: byId("hideFindButton"),
     archiveFindButton: byId("archiveFindButton"),
     restoreFindButton: byId("restoreFindButton")
@@ -207,7 +211,29 @@ export function createUI(documentRoot = document) {
     first?.focus();
   }
 
-  function openEditor(find = null) {
+  function setPublicationState(find, blockers = []) {
+    const persisted = Boolean(find?.id);
+    const archived = Boolean(find?.archived_at);
+    const published = Boolean(find?.is_published && !archived);
+    refs.publicationState.textContent = published
+      ? "Published — this Find is visible in the public catalog."
+      : archived
+        ? "Archived — this Find is not publicly visible."
+        : "Hidden — this Find is not publicly visible.";
+    refs.publicationEligibility.textContent = blockers.length === 0 && persisted
+      ? "Ready to publish."
+      : "Publication is blocked until the following is resolved:";
+    refs.publicationBlockers.replaceChildren();
+    for (const blocker of blockers) {
+      refs.publicationBlockers.append(element("li", "", blocker));
+    }
+    refs.publicationBlockers.hidden = blockers.length === 0;
+    refs.publishFindButton.hidden = !persisted || published || archived;
+    refs.publishFindButton.disabled = blockers.length > 0;
+    refs.hideFindButton.hidden = !published;
+  }
+
+  function openEditor(find = null, publicationBlockers = []) {
     clearErrors();
     refs.findForm.reset();
     refs.findForm.dataset.findId = find?.id || "";
@@ -220,9 +246,9 @@ export function createUI(documentRoot = document) {
     refs.description.value = find?.description || "";
     refs.condition.value = find?.condition || "";
     refs.altText.value = find?.primaryPhoto?.alt_text || "";
-    refs.hideFindButton.hidden = !find || !find.is_published || Boolean(find.archived_at);
     refs.archiveFindButton.hidden = !find || Boolean(find.archived_at);
     refs.restoreFindButton.hidden = !find?.archived_at;
+    setPublicationState(find, publicationBlockers);
     setPreview(find?.primaryPhoto?.publicUrl || null, find?.primaryPhoto?.alt_text || "Primary image");
     refs.editorSection.hidden = false;
     refs.editorTitle.focus();
@@ -273,7 +299,8 @@ export function createUI(documentRoot = document) {
     showErrors,
     clearErrors,
     setPreview,
-    setSaving
+    setSaving,
+    setPublicationState
   };
 }
 
