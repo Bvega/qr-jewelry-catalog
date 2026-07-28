@@ -9,20 +9,22 @@ CURRENT STATUS
 - M07B-2R1 Seller Invitation and Password Setup is complete and accepted.
 - M07B-3 Controlled Catalog Data Migration is complete and accepted.
 - M07B-3 controlled remote import is complete, accepted, and pushed.
-- Current accepted main commit before M07B-4 planning:
-  00c5def9efa362cbc5a7da89f53d35bdbb24c76e
+- M07B-4 Stage A implementation is complete and accepted.
+- M07B-4 Stage B controlled deployment is complete and accepted.
+- Deployed revision on GitHub Pages:
+  484eebfd9756841db45df4485437805bb03a3bdc
+- Production URL:
+  https://bvega.github.io/qr-jewelry-catalog/
+- Exactly five static public Finds are visible in the accepted order.
+- BU-0006 through BU-0009 remain hidden and unpublished.
+- Seller Manager production authentication and sign-out were verified.
 - Remote migrations are synchronized through 20260722120000.
-- BU-0006 through BU-0009 exist remotely as hidden, unfeatured Finds.
-- Four primary-photo rows and four original Storage objects are verified.
 - The public catalog remains static and exposes only the five accepted Finds.
 - The next generated public ID must be BU-0010.
-- M07B-4 Deployment and Acceptance package is prepared and approved.
-- M07B-4 Stage A is implemented locally on
-  feature/m07b4-deployment-acceptance with a strict Pages artifact, deployment
-  workflow, fictional-config validation, preview server, acceptance runbook,
-  and rollback instructions.
-- No M07B-4 remote deployment, GitHub configuration, push, merge, tag, release,
-  remote authentication, database write, or Storage write has occurred.
+- M07B-4 is fully complete:
+  docs/REPORTS/M07B4_DEPLOYMENT_ACCEPTANCE.md
+- GitHub Actions Node.js 20 deprecation warnings for upstream actions are
+  recorded as deferred maintenance, not a blocker.
 
 M07B PLAN
 - M07B-1 Supabase Foundation — COMPLETE
@@ -33,25 +35,21 @@ M07B PLAN
 - M07B-3 Controlled Catalog Data Migration — COMPLETE
 - M07B-3 Controlled Remote Import — COMPLETE AND ACCEPTED
 - M07B-4 Planning Package — COMPLETE
-- M07B-4 Stage A Implementation and Local Verification — COMPLETE LOCALLY;
-  AWAITING MASTER ACCEPTANCE
-- M07B-4 Stage B Controlled Deployment and Acceptance — BLOCKED UNTIL MASTER ACCEPTANCE
+- M07B-4 Stage A Implementation and Local Verification — COMPLETE AND ACCEPTED
+- M07B-4 Stage B Controlled Deployment and Acceptance — COMPLETE AND ACCEPTED
 
 TOP TASK
-Return the M07B-4 Stage A implementation report to MASTER and wait for explicit
-acceptance. Do not begin Stage B.
+M07B-4 is fully complete. The next milestone remains pending MASTER planning.
+Do not begin new milestone work until MASTER provides the next approved
+package.
 
 NEXT ACTIONS
-1. Review the local implementation report and accepted implementation commit.
-2. Confirm the implementation branch is clean and all Stage A validation
-   passed.
-3. Return the report to MASTER.
-4. Wait for explicit MASTER acceptance.
-5. Only after acceptance, follow
-   docs/M07B4_DEPLOYMENT_ACCEPTANCE_RUNBOOK.md one step at a time.
+1. Wait for MASTER to plan and approve the next milestone package.
+2. Do not invent a milestone number or scope in the meantime.
+3. Track the Node.js action deprecation warnings as deferred maintenance for
+   a future MASTER-approved maintenance task.
 
 IMPORTANT
-- Codex creates feature/m07b4-deployment-acceptance.
 - Preserve BU-0001 through BU-0009.
 - The next generated public ID must remain BU-0010.
 - BU-0006 through BU-0009 remain hidden and unfeatured.
@@ -63,4 +61,3 @@ IMPORTANT
 - Do not deploy activation or M07B-3 migration routes.
 - Do not commit .env.local, admin/config.js, or generated production config.
 - Do not change Supabase migrations, RLS, Storage policies, or remote data.
-- Do not begin Stage B before MASTER acceptance.
