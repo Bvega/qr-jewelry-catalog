@@ -18,12 +18,17 @@ const migrationTests = readdirSync(resolve(repositoryRoot, "tests/catalog-migrat
   .sort()
   .map((path) => resolve(repositoryRoot, "tests/catalog-migration", path));
 
+const deploymentTests = readdirSync(resolve(repositoryRoot, "tests/deployment"))
+  .filter((path) => path.endsWith(".test.mjs"))
+  .sort()
+  .map((path) => resolve(repositoryRoot, "tests/deployment", path));
+
 const commands = [
   ["scripts/validate-baseline.mjs"],
   ["scripts/validate-seller-manager.mjs"],
   ["scripts/validate-catalog-migration.mjs"],
   ["--test", ...migrationTests],
-  ["--test", "tests/deployment/pages-artifact.test.mjs"]
+  ["--test", ...deploymentTests]
 ];
 
 for (const args of commands) {

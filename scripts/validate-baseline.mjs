@@ -1,190 +1,23 @@
 #!/usr/bin/env node
 
-import { readdirSync } from "node:fs";
-import { relative, resolve } from "node:path";
+import { relative } from "node:path";
 import { spawnSync } from "node:child_process";
 import {
   APPROVED_QR_LIBRARY,
   getImageAssetState,
   repositoryRoot
 } from "./lib/baseline-contracts.mjs";
+import {
+  buildRepositoryChecks,
+  findTestFiles,
+  repositoryTestDirectories
+} from "./lib/repository-checks.mjs";
 
-function findTestFiles(relativeDirectory) {
-  const testDirectory = resolve(repositoryRoot, relativeDirectory);
-
-  return readdirSync(testDirectory)
-    .filter((file) => file.endsWith(".test.mjs"))
-    .sort()
-    .map((file) => resolve(testDirectory, file));
-}
-
-const baselineTestFiles = findTestFiles("tests/baseline");
-const domainTestFiles = findTestFiles("tests/domain");
-const brandTestFiles = findTestFiles("tests/brand");
-const discoveryTestFiles = findTestFiles("tests/discovery");
-const detailTestFiles = findTestFiles("tests/detail");
-const permalinkTestFiles = findTestFiles("tests/permalinks");
-const contentIntakeTestFiles = findTestFiles("tests/content-intake");
-const supabaseFoundationTestFiles = findTestFiles("tests/supabase-foundation");
-const sellerManagerTestFiles = findTestFiles("tests/seller-manager");
-const catalogMigrationTestFiles = findTestFiles("tests/catalog-migration");
-
-const checks = [
-  {
-    label: "JavaScript syntax: app.js",
-    displayCommand: "node --check app.js",
-    arguments: ["--check", "app.js"]
-  },
-  {
-    label: "JavaScript syntax: item.js",
-    displayCommand: "node --check item.js",
-    arguments: ["--check", "item.js"]
-  },
-  {
-    label: "JavaScript syntax: data/items.js",
-    displayCommand: "node --check data/items.js",
-    arguments: ["--check", "data/items.js"]
-  },
-  {
-    label: "JavaScript syntax: data/collections.js",
-    displayCommand: "node --check data/collections.js",
-    arguments: ["--check", "data/collections.js"]
-  },
-  {
-    label: "JavaScript syntax: data/discovery.js",
-    displayCommand: "node --check data/discovery.js",
-    arguments: ["--check", "data/discovery.js"]
-  },
-  {
-    label: "JavaScript syntax: data/media.js",
-    displayCommand: "node --check data/media.js",
-    arguments: ["--check", "data/media.js"]
-  },
-  {
-    label: "JavaScript syntax: data/reservation.js",
-    displayCommand: "node --check data/reservation.js",
-    arguments: ["--check", "data/reservation.js"]
-  },
-  {
-    label: "JavaScript syntax: data/permalinks.js",
-    displayCommand: "node --check data/permalinks.js",
-    arguments: ["--check", "data/permalinks.js"]
-  },
-  {
-    label: "JavaScript syntax: scripts/lib/content-intake.mjs",
-    displayCommand: "node --check scripts/lib/content-intake.mjs",
-    arguments: ["--check", "scripts/lib/content-intake.mjs"]
-  },
-  {
-    label: "JavaScript syntax: scripts/validate-content-intake.mjs",
-    displayCommand: "node --check scripts/validate-content-intake.mjs",
-    arguments: ["--check", "scripts/validate-content-intake.mjs"]
-  },
-  {
-    label: "JavaScript syntax: scripts/summarize-content-intake.mjs",
-    displayCommand: "node --check scripts/summarize-content-intake.mjs",
-    arguments: ["--check", "scripts/summarize-content-intake.mjs"]
-  },
-  {
-    label: "JavaScript syntax: scripts/validate-supabase-foundation.mjs",
-    displayCommand: "node --check scripts/validate-supabase-foundation.mjs",
-    arguments: ["--check", "scripts/validate-supabase-foundation.mjs"]
-  },
-  ...[
-    "admin-src/app.js",
-    "admin-src/auth.js",
-    "admin-src/catalog.js",
-    "admin-src/migration.js",
-    "admin-src/migration-auth.js",
-    "admin-src/migration-executor.js",
-    "admin-src/migration-plan.js",
-    "admin-src/migration-ui.js",
-    "admin-src/photos.js",
-    "admin-src/validation.js",
-    "admin-src/ui.js",
-    "scripts/build-admin.mjs",
-    "scripts/lib/m07b3-plan.mjs",
-    "scripts/prepare-catalog-migration.mjs",
-    "scripts/validate-catalog-migration.mjs",
-    "scripts/generate-admin-config.mjs",
-    "scripts/serve-static.mjs",
-    "scripts/validate-seller-manager.mjs"
-  ].map((file) => ({
-    label: `JavaScript syntax: ${file}`,
-    displayCommand: `node --check ${file}`,
-    arguments: ["--check", file]
-  })),
-  {
-    label: "Baseline contract tests",
-    displayCommand: "node --test tests/baseline/*.test.mjs",
-    arguments: ["--test", ...baselineTestFiles]
-  },
-  {
-    label: "Find domain and compatibility adapter tests",
-    displayCommand: "node --test tests/domain/*.test.mjs",
-    arguments: ["--test", ...domainTestFiles]
-  },
-  {
-    label: "Between Us brand and public shell tests",
-    displayCommand: "node --test tests/brand/*.test.mjs",
-    arguments: ["--test", ...brandTestFiles]
-  },
-  {
-    label: "Collections and discovery tests",
-    displayCommand: "node --test tests/discovery/*.test.mjs",
-    arguments: ["--test", ...discoveryTestFiles]
-  },
-  {
-    label: "Find Details, gallery, media, and reservation tests",
-    displayCommand: "node --test tests/detail/*.test.mjs",
-    arguments: ["--test", ...detailTestFiles]
-  },
-  {
-    label: "Permalink, sharing, Copy Link, and QR tests",
-    displayCommand: "node --test tests/permalinks/*.test.mjs",
-    arguments: ["--test", ...permalinkTestFiles]
-  },
-  {
-    label: "Content intake tests",
-    displayCommand: "node --test tests/content-intake/*.test.mjs",
-    arguments: ["--test", ...contentIntakeTestFiles]
-  },
-  {
-    label: "Content intake default validation",
-    displayCommand: "node scripts/validate-content-intake.mjs",
-    arguments: ["scripts/validate-content-intake.mjs"]
-  },
-  {
-    label: "Content intake default summary",
-    displayCommand: "node scripts/summarize-content-intake.mjs",
-    arguments: ["scripts/summarize-content-intake.mjs"]
-  },
-  {
-    label: "Supabase foundation static validation",
-    displayCommand: "node scripts/validate-supabase-foundation.mjs",
-    arguments: ["scripts/validate-supabase-foundation.mjs"]
-  },
-  {
-    label: "Supabase foundation tests",
-    displayCommand: "node --test tests/supabase-foundation/*.test.mjs",
-    arguments: ["--test", ...supabaseFoundationTestFiles]
-  },
-  {
-    label: "Seller Catalog Manager tests",
-    displayCommand: "node --test tests/seller-manager/*.test.mjs",
-    arguments: ["--test", ...sellerManagerTestFiles]
-  },
-  {
-    label: "Controlled catalog migration validation",
-    displayCommand: "node scripts/validate-catalog-migration.mjs",
-    arguments: ["scripts/validate-catalog-migration.mjs"]
-  },
-  {
-    label: "Controlled catalog migration tests",
-    displayCommand: "node --test tests/catalog-migration/*.test.mjs",
-    arguments: ["--test", ...catalogMigrationTestFiles]
-  }
-];
+// The complete local maintenance validation: every repository check runs here,
+// including the controlled catalog migration checks that need the local-only
+// M07B-3 source photos. The clean-checkout deployment subset lives in
+// scripts/check-pages-ci.mjs.
+const checks = buildRepositoryChecks();
 
 const failures = [];
 
@@ -240,18 +73,8 @@ if (failures.length > 0) {
   console.error(`\nM07B-3 repository validation: FAIL (${failures.length} required check(s) failed)`);
   process.exitCode = 1;
 } else {
-  const relativeTests = [
-    ...baselineTestFiles,
-    ...domainTestFiles,
-    ...brandTestFiles,
-    ...discoveryTestFiles,
-    ...detailTestFiles,
-    ...permalinkTestFiles,
-    ...contentIntakeTestFiles,
-    ...supabaseFoundationTestFiles,
-    ...sellerManagerTestFiles,
-    ...catalogMigrationTestFiles
-  ]
+  const relativeTests = repositoryTestDirectories
+    .flatMap((directory) => findTestFiles(directory))
     .map((file) => relative(repositoryRoot, file));
   console.log(`\nValidated ${relativeTests.length} baseline, domain, brand, discovery, detail, permalink, content-intake, Supabase foundation, Seller Manager, and catalog migration test files.`);
   console.log("M07B-3 repository validation: PASS");

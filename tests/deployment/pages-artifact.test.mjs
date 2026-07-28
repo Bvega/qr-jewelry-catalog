@@ -409,7 +409,10 @@ test("workflow validates every event but deploys only accepted main revisions wi
   );
   assert.equal(workflow.split("actions/configure-pages@v5").length - 1, 1);
   assert.equal(workflow.split("actions/deploy-pages@v4").length - 1, 1);
-  assert.match(workflow, /uses: actions\/checkout@v6[\s\S]*?ref: \$\{\{ github\.sha \}\}/);
+  assert.match(
+    workflow,
+    /uses: actions\/checkout@v6\n\s+with:\n\s+ref: \$\{\{ github\.sha \}\}\n\s+fetch-depth: 0/
+  );
   assert.match(workflow, /uses: actions\/setup-node@v6/);
   assert.match(workflow, /uses: actions\/upload-pages-artifact@v4[\s\S]*?path: dist\/pages/);
   assert.doesNotMatch(workflow, /path:\s*[.'"]+\s*$/m);
@@ -428,6 +431,8 @@ test("workflow validates every event but deploys only accepted main revisions wi
   }
   assert.doesNotMatch(workflow, /secrets\./);
   assert.match(workflow, /run: npm ci/);
+  assert.match(buildJob, /run: npm run pages:check:ci$/m);
+  assert.equal(workflow.split("npm run ").length - 1, 1);
   for (const command of [
     "validate:baseline",
     "admin:validate",
@@ -436,7 +441,8 @@ test("workflow validates every event but deploys only accepted main revisions wi
     "pages:test",
     "pages:build",
     "pages:validate"
-  ]) assert.match(workflow, new RegExp(`npm run ${command.replace(":", "\\:")}`));
+  ]) assert.doesNotMatch(workflow, new RegExp(`npm run ${command.replace(":", "\\:")}`));
+  assert.doesNotMatch(workflow, /npm run pages:check(?!:ci)/);
 });
 
 function lstatOrNull(path) {

@@ -17,10 +17,11 @@ jobs:
     name: Validate and build Pages artifact
     runs-on: ubuntu-latest
     steps:
-      - name: Check out triggering revision
+      - name: Check out triggering revision with full history
         uses: actions/checkout@v6
         with:
           ref: ${{ github.sha }}
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -31,30 +32,12 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
 
-      - name: Validate inherited public catalog
-        run: npm run validate:baseline
-
-      - name: Validate Seller Catalog Manager
-        run: npm run admin:validate
-
-      - name: Validate catalog migration package
-        run: npm run migration:validate
-
-      - name: Test catalog migration package
-        run: npm run migration:test
-
-      - name: Test Pages deployment contracts
-        run: npm run pages:test
-
-      - name: Build strict Pages artifact
-        run: npm run pages:build
+      - name: Run clean-checkout deployment validation and build strict Pages artifact
+        run: npm run pages:check:ci
         env:
           SUPABASE_URL: ${{ vars.BETWEEN_US_SUPABASE_URL }}
           SUPABASE_PUBLISHABLE_KEY: ${{ vars.BETWEEN_US_SUPABASE_PUBLISHABLE_KEY }}
           SUPABASE_PROJECT_REF: ${{ vars.BETWEEN_US_SUPABASE_PROJECT_REF }}
-
-      - name: Validate final Pages artifact
-        run: npm run pages:validate
 
       - name: Upload strict Pages artifact
         uses: actions/upload-pages-artifact@v4
