@@ -17,6 +17,7 @@ export const LOCAL_NAVIGATION_ORIGINS = Object.freeze([
   "http://127.0.0.1:3000",
   "http://127.0.0.1:4175"
 ]);
+export const LOCAL_SUPABASE_ORIGIN = "http://127.0.0.1:54321";
 
 const productionBase = new URL(PRODUCTION_CATALOG_BASE);
 const publicPaths = new Set([
@@ -216,6 +217,59 @@ export function assertAnonymousRequest(
     return Object.freeze({ service: "supabase", method: normalizedMethod });
   }
   reject("Anonymous request origin is not allowlisted.");
+}
+
+export function assertLocalRequest(
+  { url: value, method = "GET" },
+  { phase = "anonymous" } = {}
+) {
+  if (phase !== "anonymous" && phase !== "manager") {
+    reject("Local request phase must be anonymous or manager.");
+  }
+  const url = parseURL(value, "Local request");
+  const normalizedMethod = String(method).toUpperCase();
+  if (
+    url.origin !== LOCAL_SUPABASE_ORIGIN ||
+    url.username ||
+    url.password ||
+    url.hash
+  ) {
+    reject("Local rehearsal requests require the exact loopback Supabase origin.");
+  }
+
+  if (phase === "anonymous") {
+    if (!["GET", "HEAD", "OPTIONS"].includes(normalizedMethod)) {
+      reject("Anonymous local rehearsal requests must be read-only.");
+    }
+    if (
+      !url.pathname.startsWith("/rest/v1/") &&
+      !url.pathname.startsWith("/storage/v1/object/authenticated/find-images/")
+    ) {
+      reject("Anonymous local request path is outside catalog reads.");
+    }
+    return Object.freeze({
+      service: "local-supabase",
+      method: normalizedMethod,
+      writeCapable: false
+    });
+  }
+
+  const readOnly = ["GET", "HEAD", "OPTIONS"].includes(normalizedMethod);
+  const humanAuthentication =
+    normalizedMethod === "POST" &&
+    (url.pathname === "/auth/v1/token" || url.pathname === "/auth/v1/logout");
+  const humanPublication =
+    normalizedMethod === "PATCH" &&
+    url.pathname === "/rest/v1/finds";
+  if (!readOnly && !humanAuthentication && !humanPublication) {
+    reject("Manager request is outside the local human-checkpoint boundary.");
+  }
+  return Object.freeze({
+    service: "local-supabase",
+    method: normalizedMethod,
+    writeCapable: !readOnly,
+    humanOnly: !readOnly
+  });
 }
 
 export function classifyAction(action) {

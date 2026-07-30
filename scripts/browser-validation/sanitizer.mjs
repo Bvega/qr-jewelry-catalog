@@ -32,6 +32,8 @@ const patterns = Object.freeze({
   storagePath:
     /\bfinds\/[0-9a-f-]{32,}\/[^\s"'?#]+/gi,
   supabaseOrigin: /https:\/\/[a-z0-9-]+\.supabase\.co/gi,
+  temporaryPath:
+    /\/(?:(?:private\/)?var\/folders|private\/tmp)\/[^:\r\n"'<> ]+/g,
   unixPersonalPath: /\/(?:Users|home)\/[^/\s"'<>]+(?:\/[^:\r\n"'<>]*)?/g,
   uuid: /\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/gi,
   windowsPersonalPath: /\b[A-Z]:\\Users\\[^\\\s"'<>]+(?:\\[^:\r\n"'<>]*)?/gi
@@ -73,6 +75,7 @@ export function sanitizeText(value, { supabaseOrigin } = {}) {
   text = text.replace(patterns.email, REDACTIONS.email);
   text = text.replace(patterns.uuid, REDACTIONS.identifier);
   text = text.replace(patterns.windowsPersonalPath, REDACTIONS.path);
+  text = text.replace(patterns.temporaryPath, REDACTIONS.path);
   text = text.replace(patterns.unixPersonalPath, REDACTIONS.path);
   return text;
 }
@@ -110,6 +113,7 @@ export function findSensitiveShapes(value) {
     ["private Storage path", patterns.storagePath],
     ["concrete Supabase origin", patterns.supabaseOrigin],
     ["UUID-shaped value", patterns.uuid],
+    ["temporary filesystem path", patterns.temporaryPath],
     ["personal Unix path", patterns.unixPersonalPath],
     ["personal Windows path", patterns.windowsPersonalPath]
   ];

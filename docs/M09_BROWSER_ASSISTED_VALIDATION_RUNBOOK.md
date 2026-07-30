@@ -195,3 +195,51 @@ The sanitized text-only evidence is
 `evidence/M09_STAGE_A_EVIDENCE.zip`, with its adjacent SHA-256 record. This
 disposition closes Stage A only; it does not mark M09 complete or authorize a
 local or production write canary.
+
+## Stage B Disposable Local Write Canary
+
+Stage B is a localhost-only rehearsal that uses a disposable Supabase stack and
+one synthetic Find, `BU-9000`. It is not a production canary and must not use
+production credentials, production URLs, production Storage, GitHub Pages,
+GitHub writes, repository secrets, workflows, Pages configuration, or the
+production public-ID sequence.
+
+The local setup may run `supabase start` and, with explicit MASTER approval,
+allow the local Supabase CLI to pull only the official Docker images required
+for the existing local stack. That exception is local runtime acquisition only.
+It is not npm dependency installation and it must not alter tracked project
+configuration.
+
+Before any publish instruction, the harness must prove:
+
+- exact loopback origins only;
+- `BU-9000` is Active, Hidden, and unpublished;
+- the public adapter still returns the five protected static Finds;
+- the repaired fixture photograph is a valid, visible `32x32` PNG;
+- the local Storage object downloads and byte-matches the fixture; and
+- the next generated production public ID remains `BU-0010`.
+
+The only write checkpoints are human actions in the localhost Manager:
+
+1. publish only `BU-9000`, then reply only `LOCAL PUBLISHED`;
+2. unpublish only `BU-9000`, then reply only `LOCAL UNPUBLISHED`.
+
+After publication, the localhost public adapter must show exactly six visible
+Finds and validate the `BU-9000` card, detail, visible photo, canonical URL,
+Share Find, QR destination, Reserve by Message, Related Finds, Manager
+Published-equivalent state, and no unrelated record change.
+
+After rollback, the localhost public adapter must return to exactly five
+protected static Finds. `BU-9000` must be no longer publicly visible or
+route-resolvable, while its row, photo metadata, Storage object, and relation
+remain preserved before reset.
+
+Final cleanup must reset and stop the disposable local Supabase stack, remove
+the local account, sessions, test Find, photo row, Storage object, temporary
+credential sheet, temporary site, and server state, and confirm no local
+Supabase containers remain running unless explicitly required by the standard
+local workflow.
+
+The sanitized Stage B text-only evidence is
+`evidence/M09_STAGE_B_EVIDENCE.zip`, with its adjacent SHA-256 record. Stage B
+does not mark M09 complete and does not authorize any production write.

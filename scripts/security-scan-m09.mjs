@@ -16,13 +16,14 @@ const findings = [];
 const allowedPaths = Object.freeze([
   /^package\.json$/,
   /^docs\/M09_BROWSER_ASSISTED_VALIDATION_(?:PLAN|RUNBOOK)\.md$/,
-  /^docs\/REPORTS\/M09_(?:PLANNING_REPORT|STAGE_A_EXECUTION)\.md$/,
+  /^docs\/REPORTS\/M09_(?:PLANNING_REPORT|STAGE_A_EXECUTION|STAGE_B_EXECUTION)\.md$/,
   /^scripts\/browser-validation\/[a-z0-9-]+\.mjs$/,
   /^scripts\/check-m09\.mjs$/,
   /^scripts\/security-scan-m09\.mjs$/,
   /^tests\/browser-validation\/[a-z0-9-]+\.test\.mjs$/,
   /^evidence\/m09-stage-a\/(?:[a-z0-9._-]+\/)*[a-z0-9._-]+$/,
-  /^evidence\/M09_STAGE_A_EVIDENCE\.zip(?:\.sha256)?$/
+  /^evidence\/M09_STAGE_A_EVIDENCE\.zip(?:\.sha256)?$/,
+  /^evidence\/M09_STAGE_B_EVIDENCE\.zip(?:\.sha256)?$/
 ]);
 
 const credentialPatterns = Object.freeze([
@@ -129,7 +130,10 @@ for (const path of paths) {
   const absolute = resolve(repositoryRoot, path);
   if (!existsSync(absolute) || !lstatSync(absolute).isFile()) continue;
   const buffer = readFileSync(absolute);
-  if (path === "evidence/M09_STAGE_A_EVIDENCE.zip") {
+    if (
+      path === "evidence/M09_STAGE_A_EVIDENCE.zip" ||
+      path === "evidence/M09_STAGE_B_EVIDENCE.zip"
+    ) {
     inspectEvidenceArchive(path, absolute);
   } else if (!buffer.includes(0)) {
     inspectText(path, buffer.toString("utf8"));

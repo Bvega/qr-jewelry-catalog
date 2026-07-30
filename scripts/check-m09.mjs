@@ -23,6 +23,12 @@ const commands = Object.freeze([
   ]],
   ["node", ["scripts/browser-validation/validate-stage-a.mjs"]],
   ["node", ["scripts/browser-validation/validate-evidence.mjs"]],
+  ["node", ["scripts/browser-validation/validate-stage-b-evidence.mjs"]],
+  ["node", [
+    "--test",
+    "tests/browser-validation/stage-b.test.mjs",
+    "tests/browser-validation/local-canary-photo.test.mjs"
+  ]],
   ["node", ["scripts/security-scan-m09.mjs"]],
   ["git", ["diff", "--check", acceptedBase, "HEAD", "--"]],
   ["git", ["diff", "--check"]]
