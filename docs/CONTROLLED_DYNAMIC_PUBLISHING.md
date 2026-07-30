@@ -2,9 +2,9 @@
 
 ## Goal and review state
 
-M08 Stage A adds a controlled public Supabase read path while preserving the five accepted static Finds and every existing permanent-link, sharing, reservation, QR, and image-fallback contract. The implementation is a local review candidate. It is not complete or accepted until MASTER reviews it, and Stage B must not begin without separate MASTER approval.
+M08 adds a controlled public Supabase read path while preserving the five accepted static Finds and every existing permanent-link, sharing, reservation, QR, and image-fallback contract. Stage A implementation and Stage B deployment, canary, rollback, and evidence are complete and accepted.
 
-No push, deployment, GitHub configuration, remote migration, remote database write, or remote Storage write is part of Stage A. `BU-0006` through `BU-0009` remain hidden and unpublished in the remote project. The next generated public ID remains `BU-0010`.
+The accepted implementation commit is deployed and only the reviewed M08 migration was applied. The `BU-0006` canary was published and then unpublished after successful anonymous verification. `BU-0006` through `BU-0009` are active, hidden, and unpublished; the public catalog has returned to the five protected static Finds. No new Find was created, so the next generated public ID remains `BU-0010`.
 
 ## Publication state and minimal migration
 
@@ -102,7 +102,7 @@ It requires no ignored configuration, owner credential, private photograph, inta
 
 ## Rollback
 
-Before Stage B, rollback is entirely local: discard or revert the single M08 implementation commit and reset the local Supabase database from the accepted migrations. No production state exists to unwind.
+Before Stage B, the rollback boundary was entirely local: discard or revert the single M08 implementation commit and reset the local Supabase database from the accepted migrations. That pre-deployment boundary is retained here as historical review context.
 
 If a later approved Stage B canary fails:
 
@@ -113,9 +113,10 @@ If a later approved Stage B canary fails:
 
 Do not repair production through ad hoc dashboard edits. Record the failing revision, public ID, checks, and verified final visibility without recording credentials, sessions, owner identifiers, or private object paths.
 
-## Stage B canary procedure
+## Accepted Stage B canary procedure
 
-Stage B requires explicit MASTER approval and a separately authorized operator.
+Stage B was executed under explicit MASTER approval with a separately
+authorized operator. The accepted procedure was:
 
 1. Confirm the accepted M08 commit and all local and clean-checkout validation evidence.
 2. Confirm `BU-0006` through `BU-0009` are still unpublished and unfeatured before applying anything.
@@ -128,6 +129,10 @@ Stage B requires explicit MASTER approval and a separately authorized operator.
 9. Confirm every other hidden or archived Find remains absent.
 10. Confirm Unpublish removes the canary from lists, direct routes, relationships, and Storage access without deleting data.
 11. Record the outcome for MASTER before any further publication.
+
+All eleven controls completed successfully. No further publication was
+authorized. The final acceptance is recorded in
+`docs/REPORTS/M08_CONTROLLED_DYNAMIC_PUBLISHING_ACCEPTANCE.md`.
 
 ## Known limitations and exclusions
 

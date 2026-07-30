@@ -61,8 +61,9 @@ Anonymous public reads use explicit column grants and published-row RLS. Manager
 
 ## Limitations
 
-- M08 Stage A is pending MASTER review; it performs no remote publication or deployment.
-- `BU-0006` through `BU-0009` remain hidden and unpublished remotely.
+- M08 publication and Unpublish behavior is complete and accepted.
+- `BU-0006` through `BU-0009` are active, hidden, and unpublished remotely
+  after the accepted `BU-0006` canary and rollback.
 - Only one primary image is managed; additional galleries are deferred.
 - A primary image is optional for publication under the accepted fallback rule.
 - Related Find and Collection administration are not part of the Manager in M08.

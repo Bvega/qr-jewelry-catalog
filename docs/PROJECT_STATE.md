@@ -1,58 +1,52 @@
-# Project State — QR Jewelry Catalog
+# Project State — Between Us Platform
 
-## Current Phase
+## Current milestone
 
-PHASE 1D — Partial Real Photos Stable
+`M08 — Controlled Dynamic Publishing` is complete and accepted.
 
-## Current Status
+The accepted implementation is deployed to GitHub Pages, and migration
+`20260728120000_m08_controlled_dynamic_publishing.sql` is applied remotely.
+The public experience uses the five protected static Finds as its authoritative
+base and can append only remote Finds that pass the accepted publication,
+RLS, grant, normalization, and image-delivery contracts.
 
-Static MVP is complete and published on GitHub Pages.
+## Accepted production state
 
-3 products show real jewelry photos.
+- The public catalog contains exactly five protected static Finds.
+- `BU-0006` is active, hidden, unpublished, and preserved after its accepted
+  publication and rollback canary.
+- `BU-0007` through `BU-0009` are unchanged, active, hidden, and unpublished.
+- The Seller Catalog Manager inventory remains available to an authenticated,
+  allowlisted owner or editor.
+- The `find-images` bucket remains private, with public object access limited
+  to photographs linked to eligible published Finds.
+- No additional migration, publication, Auth change, role change, policy
+  change, grant change, Storage change, or GitHub configuration change is part
+  of the M08 closeout.
 
-2 products intentionally show "No photo yet" until real photos are available.
+## Protected contracts
 
-QR code generator, share link, and copy button all remain working.
+- `BU-0001` through `BU-0005` remain authoritative and available when the
+  remote public path fails.
+- Permanent public-ID and registered-slug routes, sharing, Copy Link, Reserve
+  by Message, QR destinations, galleries, Related Finds, and image fallbacks
+  remain intact.
+- Publishing and Unpublishing require authenticated role authorization,
+  explicit confirmation, expected-state writes, and exact final-state
+  verification.
+- Unpublish preserves the Find row, photograph metadata, and Storage objects.
+- The next generated public ID remains `BU-0010`.
 
-## Files in Place
+## Acceptance evidence
 
-- index.html — catalog homepage, renders product cards
-- item.html — product detail page, loads qrcodejs CDN
-- styles.css — mobile-first styles, two-column detail layout on desktop
-- app.js — renders product grid from window.JEWELRY_ITEMS
-- item.js — renders detail, related items, share link, QR code
-- data/items.js — 5 jewelry items, 3 with real photos
+- `docs/REPORTS/M08_CONTROLLED_DYNAMIC_PUBLISHING_ACCEPTANCE.md`
+- `docs/REPORTS/M08_STAGE_B_EXECUTION.md`
+- `evidence/M08_STAGE_B_CLOSEOUT_EVIDENCE.zip`
+- `evidence/M08_STAGE_B_CLOSEOUT_EVIDENCE.zip.sha256`
 
-## Real Photos Live
+## Next planning milestone
 
-- Gold Twisted Rope Bracelet — gold-twisted-rope-bracelet-01.jpeg
-- Layered Gold Chain Necklace — layered-gold-chain-necklace-01.jpeg
-- Crystal Stud Earrings — crystal-stud-earrings-01.jpeg
+`M09 — Browser-Assisted Validation`
 
-## Still on Placeholder
-
-- Silver Stackable Ring Set — no real photo yet
-- Pearl Drop Earrings — no real photo yet
-
-## What Works
-
-- Homepage renders all 5 product cards.
-- Detail pages render at item.html?id=ITEM_ID.
-- Related items appear on detail pages.
-- Share link box shows the current item URL.
-- Copy item link button works.
-- QR code generates from the live GitHub Pages URL.
-- Download QR code button saves a PNG file.
-- Phone camera scan of QR code opens the correct item page.
-- GitHub Pages version confirmed working after cache refresh.
-- Mobile and desktop layouts both work.
-
-## Next Planned Work
-
-PHASE 1E — Seller Workflow Polish.
-
-1. Review full catalog experience as a seller would see it.
-2. Identify any layout or copy improvements.
-3. Add remaining real photos when available.
-4. Polish detail page and card presentation.
-5. Commit and push updates.
+M09 remains planning-only. No M09 architecture, migration, feature, browser
+module, or implementation has begun.

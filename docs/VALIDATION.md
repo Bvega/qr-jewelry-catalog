@@ -25,7 +25,7 @@ npm run pages:check
 
 That command uses fictional valid browser configuration, tests the deployment contracts, performs a clean deterministic build into `dist/pages/`, independently validates the final artifact, and never requires an owner credential or remote Supabase connection.
 
-For the complete M08 Stage A check, including actual local database, RLS, and Storage policy verification, use:
+For the complete accepted M08 check, including actual local database, RLS, and Storage policy verification, use:
 
 ```bash
 npm run m08:check

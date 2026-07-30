@@ -1,9 +1,9 @@
-# M08 Controlled Dynamic Publishing — Stage A report
+# M08 Controlled Dynamic Publishing — Stage A Implementation Report
 
 **Date:** Tuesday, July 28, 2026
-**Status:** Implementation candidate — pending MASTER review and acceptance
+**Status:** Stage A accepted; superseded by final M08 acceptance
 **Accepted base:** `775ac4a3bac0fd096dd8db47f90712fee033a1f9`
-**Remote actions:** None
+**Remote actions during Stage A:** None
 
 ## Result
 
@@ -59,11 +59,18 @@ Before Stage B, the single local implementation commit can be reverted with no r
 
 Stage B requires separate MASTER approval. It must start with all four imported Finds still hidden, apply only the reviewed migration, deploy only the accepted artifact, publish at most one reviewed canary, verify its anonymous public and private-image behavior, prove all other hidden Finds remain absent, and prove Unpublish removes the canary without deleting data before any broader publication.
 
-## Open status
+## Stage A handoff status
 
 - `BU-0006` through `BU-0009` remain hidden and unpublished remotely.
 - The next generated public ID remains `BU-0010`.
 - No push, merge, deployment, GitHub configuration, authentication, remote database write, remote Storage write, or other remote write was performed for Stage A.
-- M08 remains pending MASTER review and acceptance.
+- At the Stage A handoff, M08 remained pending MASTER review and acceptance.
 
 See `docs/CONTROLLED_DYNAMIC_PUBLISHING.md` for the complete state, access, failure, validation, rollback, canary, limitation, and exclusion contract.
+
+## Final acceptance
+
+Stage A was accepted, its reviewed migration and implementation were deployed
+during the separately authorized Stage B, and the `BU-0006` publication and
+rollback canary passed. M08 is complete and accepted. See
+`docs/REPORTS/M08_CONTROLLED_DYNAMIC_PUBLISHING_ACCEPTANCE.md`.

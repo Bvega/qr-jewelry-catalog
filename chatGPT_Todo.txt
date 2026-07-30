@@ -1,85 +1,52 @@
 chatGPT_Todo.txt — REPLACE THE EXISTING FILE
-Updated: Tuesday, July 28, 2026
+Updated: Thursday, July 30, 2026
 Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
 - M00 through M07A are complete.
-- M07B-1 Supabase Foundation is complete and accepted.
-- M07B-2 Seller Catalog Manager is complete and accepted.
-- M07B-2R1 Seller Invitation and Password Setup is complete and accepted.
-- M07B-3 Controlled Catalog Data Migration is complete and accepted.
-- M07B-3 controlled remote import is complete, accepted, and pushed.
-- M07B-4 Stage A implementation is complete and accepted.
-- M07B-4 Stage B controlled deployment is complete and accepted.
-- M08 Controlled Dynamic Publishing Stage A is implemented locally on its
-  feature branch and remains pending MASTER review and acceptance.
-- No M08 push, merge, deployment, GitHub configuration, remote migration,
-  remote database write, or remote Storage write has been performed.
-- Deployed revision on GitHub Pages:
-  484eebfd9756841db45df4485437805bb03a3bdc
-- Production URL:
-  https://bvega.github.io/qr-jewelry-catalog/
-- Exactly five static public Finds are visible in the accepted order.
-- BU-0006 through BU-0009 remain hidden and unpublished.
-- Seller Manager production authentication and sign-out were verified.
-- Remote migrations are synchronized through 20260722120000.
-- Accepted production remains on the M07B-4 static catalog and exposes only
-  the five accepted Finds.
-- The next generated public ID must be BU-0010.
-- M07B-4 is fully complete:
-  docs/REPORTS/M07B4_DEPLOYMENT_ACCEPTANCE.md
-- GitHub Actions Node.js 20 deprecation warnings for upstream actions are
-  recorded as deferred maintenance, not a blocker.
-
-M07B PLAN
-- M07B-1 Supabase Foundation — COMPLETE
-- Remote Supabase bootstrap — COMPLETE
-- M07B-2 Seller Catalog Manager — COMPLETE
-- M07B-2R1 Seller Invitation and Password Setup — COMPLETE
-- Controlled remote owner activation smoke — COMPLETE
-- M07B-3 Controlled Catalog Data Migration — COMPLETE
-- M07B-3 Controlled Remote Import — COMPLETE AND ACCEPTED
-- M07B-4 Planning Package — COMPLETE
-- M07B-4 Stage A Implementation and Local Verification — COMPLETE AND ACCEPTED
-- M07B-4 Stage B Controlled Deployment and Acceptance — COMPLETE AND ACCEPTED
+- M07B-1 through M07B-4 are complete and accepted.
+- M08 Controlled Dynamic Publishing Stage A is complete and accepted.
+- M08 Stage B migration, deployment, canary, rollback, and final verification
+  are complete and accepted.
+- Accepted implementation and deployed revision:
+  bc7a060338998c27537d74f9e5b37b1732d96aeb
+- Applied migration:
+  20260728120000_m08_controlled_dynamic_publishing.sql
+- The public catalog contains exactly five protected static Finds.
+- BU-0006 is active, hidden, unpublished, and preserved after the accepted
+  canary and rollback.
+- BU-0007 through BU-0009 are unchanged, active, hidden, and unpublished.
+- The Seller Catalog Manager inventory remains available to the authenticated
+  allowlisted operator.
+- The next generated public ID remains BU-0010.
+- M08 acceptance:
+  docs/REPORTS/M08_CONTROLLED_DYNAMIC_PUBLISHING_ACCEPTANCE.md
 
 M08 PLAN
-- Controlled Dynamic Publishing Stage A local implementation — IMPLEMENTED,
-  PENDING MASTER REVIEW AND ACCEPTANCE
-- Controlled Stage B migration, deployment, and one-Find canary — NOT
-  AUTHORIZED
+- Controlled Dynamic Publishing Stage A — COMPLETE AND ACCEPTED
+- Controlled Stage B migration and deployment — COMPLETE AND ACCEPTED
+- BU-0006 publication and rollback canary — COMPLETE AND ACCEPTED
+- Final closeout evidence and MASTER acceptance — COMPLETE AND ACCEPTED
+
+NEXT PLANNING MILESTONE
+M09 — Browser-Assisted Validation
 
 TOP TASK
-Review and validate the local M08 Stage A implementation. Do not mark M08
-complete or accepted, and do not begin Stage B without explicit MASTER
-approval.
+Plan M09 only. Do not implement M09 without separate MASTER authorization.
 
 NEXT ACTIONS
-1. Run and preserve the required local and clean-checkout M08 validation
-   evidence.
-2. Submit the single local implementation commit and external review bundle
-   to MASTER.
-3. Wait for MASTER review and acceptance.
-4. Do not migrate, push, deploy, configure GitHub, authenticate a real owner,
-   or publish any remote Find during Stage A.
-5. Track the Node.js action deprecation warnings as deferred maintenance for
-   a future MASTER-approved maintenance task.
+1. Preserve the accepted M08 production and evidence state.
+2. Prepare a planning-only M09 scope for MASTER review when requested.
+3. Do not create M09 architecture, migrations, features, or browser modules
+   during M08 closeout.
 
 IMPORTANT
 - Preserve BU-0001 through BU-0009.
-- The next generated public ID must remain BU-0010.
-- BU-0006 through BU-0009 remain hidden, unpublished, and unfeatured
-  remotely.
-- BU-0001 through BU-0005 remain authoritative static records and must stay
-  available when Supabase fails.
-- M08 Stage B must not begin without separate MASTER approval.
-- Do not expose credentials, owner identifiers, tokens, sessions, or private
+- Preserve the five protected static public Finds.
+- Keep BU-0006 through BU-0009 hidden and unpublished unless a later,
+  separately authorized workflow says otherwise.
+- Keep the next generated public ID at BU-0010.
+- Do not expose credentials, private identifiers, tokens, sessions, or private
   configuration.
-- Browser deployment may use only a publishable or validated legacy anon key.
-- Secret, service-role, database, and access-token values are forbidden.
-- Do not deploy activation or M07B-3 migration routes.
-- Do not commit .env.local, admin/config.js, or generated production config.
-- Do not apply the M08 migration or any RLS/Storage change remotely during
-  Stage A.
-- Do not publish, unpublish, or otherwise change remote catalog data during
-  Stage A.
+- Do not commit ignored runtime configuration or private migration inputs.
+- M09 remains planning-only.

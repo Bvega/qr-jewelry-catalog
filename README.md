@@ -36,11 +36,11 @@ M07A adds a private staging workspace under `content-intake/` for owner-supplied
 
 ## Supabase foundation
 
-M07B adds the remote Supabase database, authorization, Storage policies, controlled migration, and authenticated Seller Catalog Manager. M08 Stage A adds a static-first public read path for published, non-archived Finds while preserving the five accepted repository records as authoritative. Explicit SQL column grants and RLS are the anonymous data boundary. `find-images` is private; eligible photographs are downloaded through Storage RLS and rendered with page-local blob URLs.
+M07B adds the remote Supabase database, authorization, Storage policies, controlled migration, and authenticated Seller Catalog Manager. M08 adds the accepted static-first public read path for published, non-archived Finds while preserving the five accepted repository records as authoritative. Explicit SQL column grants and RLS are the anonymous data boundary. `find-images` is private; eligible photographs are downloaded through Storage RLS and rendered with page-local blob URLs.
 
 The production Manager is a publicly reachable static route whose privacy and authorization come from Supabase Auth, the exact `owner`/`editor` role probe, RLS, and Storage policies. It connects to remote Supabase only after an authenticated sign-in. Its project URL, project reference, and publishable browser key are public browser configuration, not privileged secrets. The public catalog configuration contains only the URL and publishable key. Privileged keys, database passwords, access tokens, owner identifiers, and sessions must never be exposed. Temporary owner-activation and M07B-3 migration pages remain local maintenance history and are excluded from the Pages artifact.
 
-M08 Stage A remains pending MASTER review and acceptance. It performs no deployment or remote migration/database/Storage write. The four imported Finds, `BU-0006` through `BU-0009`, remain hidden and unpublished remotely; the next generated public ID remains `BU-0010`. See `docs/CONTROLLED_DYNAMIC_PUBLISHING.md`.
+M08 Controlled Dynamic Publishing is complete and accepted. The reviewed migration and implementation are deployed. The approved `BU-0006` canary was published, anonymously verified, and unpublished without deleting its record, photographs, or private Storage objects. `BU-0006` through `BU-0009` are active, hidden, and unpublished; the public catalog contains exactly the five protected static Finds. See `docs/CONTROLLED_DYNAMIC_PUBLISHING.md` and `docs/REPORTS/M08_CONTROLLED_DYNAMIC_PUBLISHING_ACCEPTANCE.md`.
 
 The complete local database workflow requires Node.js, npm, and a running Docker-compatible container runtime. See `docs/SUPABASE_LOCAL_DEVELOPMENT.md`.
 
@@ -76,4 +76,4 @@ The inherited deployment-only validation remains:
 npm run pages:check
 ```
 
-The public source itself has no runtime package dependency; Node dependencies are used only to validate and assemble the allowlisted artifact and bundle the Manager. Run `npm install` once before Docker-backed database commands. See `docs/VALIDATION.md` for individual commands and protected contracts. M08 deployment remains prohibited until MASTER separately approves the Stage B canary in `docs/CONTROLLED_DYNAMIC_PUBLISHING.md`.
+The public source itself has no runtime package dependency; Node dependencies are used only to validate and assemble the allowlisted artifact and bundle the Manager. Run `npm install` once before Docker-backed database commands. See `docs/VALIDATION.md` for individual commands and protected contracts. The next milestone is `M09 — Browser-Assisted Validation`, which remains planning-only.

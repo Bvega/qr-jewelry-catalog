@@ -46,11 +46,18 @@ The seed creates only the approved six Collection records. It creates no users, 
 
 Local Supabase and the ignored `admin/config.js` remain development and controlled-maintenance inputs. `npm run pages:check` uses fictional browser configuration and writes only the ignored `dist/pages/` artifact. It does not connect to local or remote Supabase, authenticate an owner, or perform a database or Storage write.
 
-The M08 source adds a hybrid public client, but Stage A does not deploy it or alter the accepted production site. Until a separately approved Stage B, production continues to expose only the five accepted static Finds. Remote `BU-0006` through `BU-0009` remain hidden and unpublished, and the next generated public ID remains `BU-0010`.
+The accepted M08 hybrid public client is deployed. After the successful
+`BU-0006` canary and rollback, production exposes only the five protected
+static Finds. Remote `BU-0006` through `BU-0009` are active, hidden, and
+unpublished, and the next generated public ID remains `BU-0010`.
 
 The Manager configuration contains only the matching HTTPS project URL, project reference, and browser-safe publishable key (or a structurally validated legacy `anon` key). Public runtime configuration contains only the matching URL and browser-safe key. Those values are visible to every browser and are not privileged secrets. Secret or privileged keys, database passwords, access tokens, refresh tokens, owner identifiers, and authenticated sessions are forbidden. The deployment artifact excludes `admin/activate.html`, `admin/migrate-intake.html`, their bundles, all migration inputs, and every repository-internal path.
 
-The local M08 migration changes only local grants and the local `find-images` bucket during reset. It does not contact the remote project. Stop the local stack with `npm run supabase:stop` after review if it was not already needed for other work.
+Local reset applies the M08 migration only to the local grants and local
+`find-images` bucket; local commands do not contact the remote project. The
+same reviewed migration was separately applied to production during accepted
+Stage B. Stop the local stack with `npm run supabase:stop` after review if it
+was not already needed for other work.
 
 ## Local RLS and Storage verification
 
