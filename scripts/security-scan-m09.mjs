@@ -15,8 +15,10 @@ const findings = [];
 
 const allowedPaths = Object.freeze([
   /^package\.json$/,
+  /^chatGPT_Todo\.txt$/,
+  /^docs\/PROJECT_STATE\.md$/,
   /^docs\/M09_BROWSER_ASSISTED_VALIDATION_(?:PLAN|RUNBOOK)\.md$/,
-  /^docs\/REPORTS\/M09_(?:PLANNING_REPORT|STAGE_A_EXECUTION|STAGE_B_EXECUTION)\.md$/,
+  /^docs\/REPORTS\/M09_(?:PLANNING_REPORT|STAGE_A_EXECUTION|STAGE_B_EXECUTION|BROWSER_ASSISTED_VALIDATION_ACCEPTANCE)\.md$/,
   /^scripts\/browser-validation\/[a-z0-9-]+\.mjs$/,
   /^scripts\/check-m09\.mjs$/,
   /^scripts\/security-scan-m09\.mjs$/,
@@ -141,7 +143,6 @@ for (const path of paths) {
 }
 
 for (const protectedPath of [
-  "chatGPT_Todo.txt",
   "deployment/pages-manifest.json",
   "package-lock.json"
 ]) {

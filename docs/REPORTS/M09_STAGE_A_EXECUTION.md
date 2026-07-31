@@ -118,3 +118,9 @@ No dependency installation was performed.
 M09 is not complete. Stage A establishes and rehearses the read-only validation
 foundation only. A local write-canary stage requires separate MASTER
 authorization and has not begun.
+
+## Final acceptance note
+
+Stage A was accepted by MASTER. Stage B was later accepted, and M09 is complete
+and accepted. See
+`docs/REPORTS/M09_BROWSER_ASSISTED_VALIDATION_ACCEPTANCE.md`.

@@ -2,13 +2,13 @@
 
 ## Current milestone
 
-`M08 — Controlled Dynamic Publishing` is complete and accepted.
+`M09 — Browser-Assisted Validation` is complete and accepted.
 
-The accepted implementation is deployed to GitHub Pages, and migration
-`20260728120000_m08_controlled_dynamic_publishing.sql` is applied remotely.
-The public experience uses the five protected static Finds as its authoritative
-base and can append only remote Finds that pass the accepted publication,
-RLS, grant, normalization, and image-delivery contracts.
+The accepted M08 implementation remains deployed to GitHub Pages, and migration
+`20260728120000_m08_controlled_dynamic_publishing.sql` remains applied
+remotely. M09 adds development-only browser-assisted validation controls and a
+disposable localhost write canary. It does not add a production feature,
+database migration, production workflow, or production write path.
 
 ## Accepted production state
 
@@ -36,6 +36,9 @@ RLS, grant, normalization, and image-delivery contracts.
   verification.
 - Unpublish preserves the Find row, photograph metadata, and Storage objects.
 - The next generated public ID remains `BU-0010`.
+- Production writes remain human-exclusive.
+- Localhost write canaries are disposable only.
+- Browser-assisted validation remains a development and validation tool only.
 
 ## Acceptance evidence
 
@@ -43,10 +46,17 @@ RLS, grant, normalization, and image-delivery contracts.
 - `docs/REPORTS/M08_STAGE_B_EXECUTION.md`
 - `evidence/M08_STAGE_B_CLOSEOUT_EVIDENCE.zip`
 - `evidence/M08_STAGE_B_CLOSEOUT_EVIDENCE.zip.sha256`
+- `docs/REPORTS/M09_BROWSER_ASSISTED_VALIDATION_ACCEPTANCE.md`
+- `docs/REPORTS/M09_STAGE_A_EXECUTION.md`
+- `docs/REPORTS/M09_STAGE_B_EXECUTION.md`
+- `evidence/M09_STAGE_A_EVIDENCE.zip`
+- `evidence/M09_STAGE_A_EVIDENCE.zip.sha256`
+- `evidence/M09_STAGE_B_EVIDENCE.zip`
+- `evidence/M09_STAGE_B_EVIDENCE.zip.sha256`
 
 ## Next planning milestone
 
-`M09 — Browser-Assisted Validation`
+`M10 — Production Inventory Expansion Planning`
 
-M09 remains planning-only. No M09 architecture, migration, feature, browser
-module, or implementation has begun.
+M10 remains planning-only. No M10 architecture, migration, feature, production
+workflow, browser module, or implementation has begun.

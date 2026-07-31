@@ -1,44 +1,47 @@
-chatGPT_Todo.txt — REPLACE THE EXISTING FILE
+chatGPT_Todo.txt - REPLACE THE EXISTING FILE
 Updated: Thursday, July 30, 2026
 Project: Between Us Platform / QR Jewelry Catalog
 
 CURRENT STATUS
 - M00 through M07A are complete.
 - M07B-1 through M07B-4 are complete and accepted.
-- M08 Controlled Dynamic Publishing Stage A is complete and accepted.
-- M08 Stage B migration, deployment, canary, rollback, and final verification
-  are complete and accepted.
-- Accepted implementation and deployed revision:
-  bc7a060338998c27537d74f9e5b37b1732d96aeb
-- Applied migration:
-  20260728120000_m08_controlled_dynamic_publishing.sql
+- M08 Controlled Dynamic Publishing is complete and accepted.
+- M09 Browser-Assisted Validation is complete and accepted.
+- M09 accepted Stage A commit:
+  58c60c2c9ff40c0a904373b83f235758bb6041bb
+- M09 accepted Stage B commit:
+  b50bcd112ccc1baad7ede4d279fcb54015120b23
 - The public catalog contains exactly five protected static Finds.
+- BU-0001 through BU-0005 remain the protected public Finds.
 - BU-0006 is active, hidden, unpublished, and preserved after the accepted
-  canary and rollback.
+  M08 production canary and rollback.
 - BU-0007 through BU-0009 are unchanged, active, hidden, and unpublished.
 - The Seller Catalog Manager inventory remains available to the authenticated
   allowlisted operator.
 - The next generated public ID remains BU-0010.
-- M08 acceptance:
-  docs/REPORTS/M08_CONTROLLED_DYNAMIC_PUBLISHING_ACCEPTANCE.md
+- Production writes remain human-exclusive.
+- Localhost write canaries remain disposable and local-only.
+- Browser-assisted validation remains a development and validation tool only.
+- M09 acceptance:
+  docs/REPORTS/M09_BROWSER_ASSISTED_VALIDATION_ACCEPTANCE.md
 
-M08 PLAN
-- Controlled Dynamic Publishing Stage A — COMPLETE AND ACCEPTED
-- Controlled Stage B migration and deployment — COMPLETE AND ACCEPTED
-- BU-0006 publication and rollback canary — COMPLETE AND ACCEPTED
-- Final closeout evidence and MASTER acceptance — COMPLETE AND ACCEPTED
+M09 PLAN
+- Planning and runbook foundation - COMPLETE AND ACCEPTED
+- Stage A browser-assisted read-only rehearsal - COMPLETE AND ACCEPTED
+- Stage B disposable localhost write canary - COMPLETE AND ACCEPTED
+- Final closeout evidence and MASTER acceptance - COMPLETE AND ACCEPTED
 
 NEXT PLANNING MILESTONE
-M09 — Browser-Assisted Validation
+M10 - Production Inventory Expansion Planning
 
 TOP TASK
-Plan M09 only. Do not implement M09 without separate MASTER authorization.
+Plan M10 only. Do not implement M10 without separate MASTER authorization.
 
 NEXT ACTIONS
-1. Preserve the accepted M08 production and evidence state.
-2. Prepare a planning-only M09 scope for MASTER review when requested.
-3. Do not create M09 architecture, migrations, features, or browser modules
-   during M08 closeout.
+1. Preserve the accepted M09 production and evidence state.
+2. Prepare a planning-only M10 scope for MASTER review when requested.
+3. Do not create M10 architecture, migrations, production workflows, inventory
+   changes, or browser modules during M09 closeout.
 
 IMPORTANT
 - Preserve BU-0001 through BU-0009.
@@ -46,7 +49,9 @@ IMPORTANT
 - Keep BU-0006 through BU-0009 hidden and unpublished unless a later,
   separately authorized workflow says otherwise.
 - Keep the next generated public ID at BU-0010.
-- Do not expose credentials, private identifiers, tokens, sessions, or private
-  configuration.
+- Keep production writes human-exclusive.
+- Keep localhost write canaries disposable and local-only.
+- Do not expose credentials, private identifiers, tokens, sessions, cookies,
+  authorization headers, browser profile data, or private configuration.
 - Do not commit ignored runtime configuration or private migration inputs.
-- M09 remains planning-only.
+- M10 remains planning-only.

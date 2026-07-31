@@ -243,3 +243,17 @@ local workflow.
 The sanitized Stage B text-only evidence is
 `evidence/M09_STAGE_B_EVIDENCE.zip`, with its adjacent SHA-256 record. Stage B
 does not mark M09 complete and does not authorize any production write.
+
+## Final M09 Acceptance Disposition
+
+M09 is complete and accepted. The accepted capability remains limited to
+development and validation work. It does not add browser automation code to the
+production artifact, does not authorize unattended production writes, and does
+not create a production canary target.
+
+Production writes remain human-exclusive. Localhost write canaries remain
+disposable, local-only, and excluded from production data and the production
+public-ID sequence.
+
+The final acceptance record is
+`docs/REPORTS/M09_BROWSER_ASSISTED_VALIDATION_ACCEPTANCE.md`.

@@ -105,3 +105,8 @@ The final validation gate includes:
 
 No npm package, Playwright, MCP, browser extension, or new tool installation was
 performed. Nothing was pushed, merged, deployed, or modified remotely.
+
+## Final acceptance note
+
+Stage B was accepted by MASTER. M09 is complete and accepted. See
+`docs/REPORTS/M09_BROWSER_ASSISTED_VALIDATION_ACCEPTANCE.md`.
